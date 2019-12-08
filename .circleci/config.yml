@@ -1,0 +1,35 @@
+version: 2.1
+jobs:
+  build:
+    docker: 
+      - image: circleci/node:10.16.3 
+      - image: circleci/mysql:8.0.4
+        environment:
+          MYSQL_USER: travis
+    steps:
+      - checkout 
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+      - run: npm install
+      - save_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+          paths:
+            - ./node_modules
+      - run: sudo apt install -y mysql-client
+      - run:
+      # Our primary container isn't MYSQL so run a sleep command until it's ready.
+          name: Waiting for MySQL to be ready
+          command: |
+            for i in `seq 1 10`;
+            do
+              nc -z 127.0.0.1 3306 && echo Success && exit 0
+              echo -n .
+              sleep 1
+            done
+            echo Failed waiting for MySQL && exit 1
+      - run: mysql -e 'CREATE DATABASE IF NOT EXISTS ac_twitter_workspace_test default character set utf8mb4 collate utf8mb4_unicode_ci;'
+      - run: npm install sequelize-cli -g
+      - run: sequelize db:migrate
+      - run:
+          name: test
+          command: npm test
