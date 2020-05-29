@@ -8,16 +8,36 @@
             <h3>{{dataValues.name}}</h3>
           </li>
           <li>{{dataValues.description}}</li>
-          <li>Tweet<span class="badge badge-primary badge-pill">{{dataValues.Tweet.length}}</span>
+          <li>
+            <a href="/users/{{dataValues.id}}/tweets">
+              Tweet &nbsp
+              <span class="badge badge-primary badge-pill">{{dataValues.Tweets.length}}</span>
+            </a>
           </li>
-          <li>Followings<span class="badge badge-primary badge-pill">{{dataValues.Followings.length}}</span>
+          <li>
+            <a href="/users/{{dataValues.id}}/followings">
+              Followings &nbsp
+              <span class="badge badge-primary badge-pill">{{dataValues.Followings.length}}</span>
+            </a>
           </li>
-          <li>Followers<span class="badge badge-primary badge-pill">{{dataValues.Followers.length}}</span>
+          <li>
+            <a href="/users/{{dataValues.id}}/followers">
+              Followers &nbsp
+              <span class="badge badge-primary badge-pill">{{dataValues.Followers.length}}</span>
+            </a>
           </li>
-          <li>Like<span class="badge badge-primary badge-pill">{{dataValues.Like.length}}</span>
+          <li>
+            <a href="/users/{{dataValues.id}}/likes">
+              Like &nbsp
+              <span class="badge badge-primary badge-pill">{{dataValues.Likes.length}}</span>
+            </a>
           </li>
         </ul>
-        <button class="btn btn-primary"> Follow</button>
+        {{#if isOwn}}
+        <button class="btn btn-primary mt-5"> Edit</button>
+        {{else}}
+        <button class="btn btn-primary mt-5"> Follow</button>
+        {{/if}}
       </div>
 
     </div>
@@ -34,6 +54,11 @@
                 @{{../dataValues.name}} <small class="text-muted">{{this.updatedAt}}</small>
               </h5>
               <p class="card-text">{{this.description}}</p>
+              <a href="/users/{{../dataValues.id}}/replies" class="btn btn-primary mt-5">
+                Reply({{../dataValues.Replies.length}})</a>
+              <a href="/users/{{../dataValues.id}}/likes" class="btn btn-danger mt-5">
+                Like({{../dataValues.Likes.length}})</a>
+
             </div>
           </div>
         </div>
