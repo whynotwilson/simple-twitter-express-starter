@@ -6,40 +6,49 @@ const moment = require('moment')
 
 const userController = {
 
-  getTweets: (req, res) => {
+  getTweets: async (req, res) => {
 
-    // async writing
-    // try {
-    //   const userId = req.params.id
-    //   // const { user } = await User.findByPk(userId) 
-    //   // if (!user) {
-    //   //   throw new Error("user is not found")
-    //   // }
-    //   const { tweets } = await Tweet.findAll({ raw: true, next: true, where: { UserId: userId } })
+    try {
+      const userId = req.params.id
+      const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId) : null
 
-    //   let isOwn = userId === req.user.id ? true : false
-    //   return render('getTweets', { user: user, tweets: tweets, isOwn: isOwn })
-    // } catch (error) {
-    //   console.log('error', error)
-    // }
-    const userId = req.params.id
+      if (!dataValues) {
+        throw new Error("user is not found")
+      }
 
-    User.findByPk(userId).then((user) => {
-      if (!user) throw new Error("user not found")
+      const tweets = await Tweet.findAll({ raw: true, next: true, where: { UserId: userId } }).map(tweet => ({
+        ...tweet,
+        description: tweet.description ? tweet.description.substring(0, 50) : null,
+        updatedAt: tweet.updatedAt ? moment(tweet.updatedAt).format(`YYYY-MM-DD, hh:mm`) : '-'
+      }))
 
-      return Tweet.findAll({ raw: true, next: true, where: { UserId: userId } }).then((tweets) => {
 
-        console.log(user)
-        tweets = tweets.map(tweet => ({
-          ...tweet,
-          description: tweet.description ? tweet.description.substring(0, 50) : null,
-          updatedAt: tweet.updatedAt ? moment(tweet.updatedAt).format(`YYYY-MM-DD, hh:mm`) : '-'
-        }))
-        // let isOwn = userId === req.user.id ? true : false
+      // let isOwn = userId === req.user.id ? true : false
 
-        return res.render('getTweets', { user: user, tweets: tweets })
-      })
-    })
+      return res.render('getTweets', { dataValues, tweets })
+    } catch (error) {
+      console.log('error', error)
+    }
+
+    // then writing
+    // const userId = req.params.id
+
+    // User.findByPk(userId).then((user) => {
+    //   if (!user) throw new Error("user not found")
+
+    //   return Tweet.findAll({ raw: true, next: true, where: { UserId: userId } }).then((tweets) => {
+
+    //     console.log(user)
+    //     tweets = tweets.map(tweet => ({
+    //       ...tweet,
+    //       description: tweet.description ? tweet.description.substring(0, 50) : null,
+    //       updatedAt: tweet.updatedAt ? moment(tweet.updatedAt).format(`YYYY-MM-DD, hh:mm`) : '-'
+    //     }))
+    //     // let isOwn = userId === req.user.id ? true : false
+
+    //     return res.render('getTweets', { user: user, tweets: tweets })
+    //   })
+    // })
   },
   getFollowings: (req, res) => {
 

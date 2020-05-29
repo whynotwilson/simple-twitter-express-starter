@@ -1,20 +1,20 @@
 <div class="container py-5">
   <div class="row" style="justify-content: space-evenly">
     <div col="col-md-4">
-      <img src="{{user.avatar}}" alt="avatar" style="width: 250px;margin-bottom: 25px;" />
-      <div class="userProfile">
+      <img src="{{dataValues.avatar}}" alt="avatar" style="width: 250px;margin-bottom: 25px;" />
+      <div class="dataValuesProfile">
         <ul class="list-group" style="list-style-type:none">
           <li>
-            <h3>{{user.name}}</h3>
+            <h3>{{dataValues.name}}</h3>
           </li>
-          <li>{{user.description}}</li>
-          <li>Tweet<span class="badge badge-primary badge-pill">{{user.Tweet.length}}</span>
+          <li>{{dataValues.description}}</li>
+          <li>Tweet<span class="badge badge-primary badge-pill">{{dataValues.Tweet.length}}</span>
           </li>
-          <li>Followings<span class="badge badge-primary badge-pill">{{user.Followings.length}}</span>
+          <li>Followings<span class="badge badge-primary badge-pill">{{dataValues.Followings.length}}</span>
           </li>
-          <li>Followers<span class="badge badge-primary badge-pill">{{user.Followers.length}}</span>
+          <li>Followers<span class="badge badge-primary badge-pill">{{dataValues.Followers.length}}</span>
           </li>
-          <li>Like<span class="badge badge-primary badge-pill">{{user.Like.length}}</span>
+          <li>Like<span class="badge badge-primary badge-pill">{{dataValues.Like.length}}</span>
           </li>
         </ul>
         <button class="btn btn-primary"> Follow</button>
@@ -26,12 +26,12 @@
       <div class="card mb-3" style="max-width: 540px;">
         <div class="row no-gutters">
           <div class="col-md-4">
-            <img src="{{../user.avatar}}" class="card-img" alt="avatar">
+            <img src="{{../dataValues.avatar}}" class="card-img" alt="avatar">
           </div>
           <div class="col-md-8">
             <div class="card-body">
               <h5 class="card-title">
-                @{{../user.name}} <small class="text-muted">{{this.updatedAt}}</small>
+                @{{../dataValues.name}} <small class="text-muted">{{this.updatedAt}}</small>
               </h5>
               <p class="card-text">{{this.description}}</p>
             </div>
