@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const userController = require('../controller/userController')
 
-router.get('/', (req, res) => {
-  res.render('getTweets')
-})
+
+router.get('/:id/tweets', userController.getTweets)
 
 module.exports = router
