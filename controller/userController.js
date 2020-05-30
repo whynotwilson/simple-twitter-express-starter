@@ -96,8 +96,51 @@ const userController = {
       console.log('error', error)
     }
   },
-  getFollowers: (req, res) => {
+  getFollowers: async (req, res) => {
+    try {
+      // let isOwn = userId === req.user.id ? true : false
+      //判斷不是owner 要退出
 
+      const userId = req.params.id
+      const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId, {
+        include: [
+          { model: User, as: 'Followers' },
+          { model: User, as: 'Followings' },
+          Like,
+          Tweet,
+          Reply
+        ]
+      }) : null
+
+      if (!dataValues) {
+        throw new Error("user is not found")
+      }
+      let user = {}
+      user = { ...dataValues, introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null }
+
+
+      const followers = dataValues.Followers.map(follower => ({
+        ...follower.dataValues,
+        introduction: follower.introduction ? follower.introduction.substring(0, 20) : null,
+      }))
+
+      const followings = dataValues.Followings.map(following => ({
+        ...following.dataValues,
+      }))
+
+
+      // 確認是否追蹤
+      const isFollowing = followings.every((following) => {
+        followers.every((follower) => {
+          following.id === follower.id
+        })
+      })
+
+
+      return res.render('getFollowers', { user: user, followers: followers, isFollowing: isFollowing })
+    } catch (error) {
+      console.log('error', error)
+    }
   },
   getLikes: (req, res) => {
 

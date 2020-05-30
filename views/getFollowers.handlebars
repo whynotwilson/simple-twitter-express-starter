@@ -1,0 +1,78 @@
+<div class="container py-5">
+  <div class="row" style="justify-content: space-evenly">
+    <div col="col-md-4">
+      <img src="{{user.avatar}}" alt="avatar" style="width: 250px;margin-bottom: 25px;" />
+      <div class="userProfile">
+        <ul class="list-group" style="list-style-type:none">
+          <li>
+            <h3>{{user.name}}</h3>
+          </li>
+          <li>{{user.introduction}}</li>
+          <li>
+            <a href="/users/{{user.id}}/tweets">
+              Tweet &nbsp
+              <span class="badge badge-primary badge-pill">{{user.Tweets.length}}</span>
+            </a>
+          </li>
+          <li>
+            <a href="/users/{{user.id}}/followings">
+              Followings &nbsp
+              <span class="badge badge-primary badge-pill">{{user.Followings.length}}</span>
+            </a>
+          </li>
+          <li>
+            <a href="/users/{{user.id}}/followers">
+              Followers &nbsp
+              <span class="badge badge-primary badge-pill">{{user.Followers.length}}</span>
+            </a>
+          </li>
+          <li>
+            <a href="/users/{{user.id}}/likes">
+              Like &nbsp
+              <span class="badge badge-primary badge-pill">{{user.Likes.length}}</span>
+            </a>
+          </li>
+        </ul>
+        {{#if isOwn}}
+        <button class="btn btn-primary mt-5"> Edit</button>
+        {{else}}
+        <button class="btn btn-primary mt-5"> Follow</button>
+        {{/if}}
+      </div>
+    </div>
+
+
+    <div col="col-md-8">
+      <h1>Follower</h1>
+      {{#each followers}}
+      <div class="row">
+        <div class="card mb-3" style="max-width: 540px;">
+          <div class="row no-gutters">
+            <div class="col-md-4">
+              <img src="{{this.avatar}}" class="card-img" alt="avatar">
+            </div>
+            <div class="col-md-8">
+              <div class="card-body">
+                <h5 class="card-title">
+                  @{{this.name}}
+                </h5>
+                <p class="card-text">{{this.introduction}}</p>
+
+                {{#if isFollowing}}
+                <form action="/followships/{{this.id}}?_method=DELETE" method="POST">
+                  <button type="submit" class="btn btn-danger">Unfollow</button>
+                </form>
+                {{else}}
+                <form action="/followships/{{this.id}}" method="POST">
+                  <button type="submit" class="btn btn-primary">Follow</button>
+                </form>
+                {{/if}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+</div>
