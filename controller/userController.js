@@ -232,7 +232,7 @@ const userController = {
       console.log('error', error)
     }
   },
-  putEdit: async (req, res) => {
+  postEdit: async (req, res) => {
     try {
       // if (!req.body.name) {
       //   req.flash('error_messages', "請至少輸入姓名")
@@ -268,7 +268,7 @@ const userController = {
           })
         })
 
-        return res.redirect(`/users/${userId}/edit`)
+        return res.redirect(`/users/${userId}/tweets`)
 
       }
     } catch (error) {

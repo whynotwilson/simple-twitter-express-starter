@@ -34,9 +34,18 @@
           </li>
         </ul>
         {{#if isOwn}}
-        <button class="btn btn-primary mt-5"> Edit</button>
+        <a href="/users/{{user.id}}/edit" class="btn btn-primary mt-5"> Edit Profile</a>
         {{else}}
-        <button class="btn btn-primary mt-5"> Follow</button>
+        {{#if isFollowing}}
+        <form action="/followships/{{user.id}}?_method=DELETE" method="POST">
+          <button type="submit" class="btn btn-danger">Unfollow</button>
+        </form>
+        {{else}}
+        <form action="/followships/{{user.id}}" method="POST">
+          <button type="submit" class="btn btn-primary">Follow </button>
+        </form>
+        {{/if}}
+        </form>
         {{/if}}
       </div>
     </div>

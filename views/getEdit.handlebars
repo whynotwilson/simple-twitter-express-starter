@@ -15,7 +15,7 @@
 
 
 <div class="container py-5">
-  <form action="/users/{{user.id}}/edit?_method=PUT" method="POST" enctype="multipart/form-data">
+  <form action="/users/{{user.id}}/edit" method="POST" enctype="multipart/form-data">
     <div class="row" style="justify-content: space-evenly">
       <div class="col-md-4">
         <div class="form-group">
@@ -34,12 +34,11 @@
         </div>
         <div class="form-group">
           <label for="introduction">介紹</label>
-          <textarea class="form-control" id="introduction" name="introduction" rows="15">{{user.introduction}}
-        </textarea>
+          <textarea class="form-control" id="introduction" name="introduction"
+            rows="15">{{user.introduction}}</textarea>
         </div>
         <button class="btn btn-primary mt-5" type="submit">儲存</button>
         <a href="/users/{{user.id}}/edit" class="btn btn-primary mt-5">取消</a>
-
       </div>
     </div>
   </form>
