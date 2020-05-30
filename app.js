@@ -19,7 +19,7 @@ app.use('/upload', express.static(__dirname + '/upload'))
 // app.use(flash())
 
 // app.use((req, res, next) => {
-//   res.locals.success_msg = req.flash('sucess_msg')
+//   res.locals.success_msg = req.flash('success_msg')
 //   res.locals.warning_msg = req.flash('warning_msg')
 //   next()
 // })
