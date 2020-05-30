@@ -2,12 +2,11 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController')
 
-//上傳圖片
+// 上傳圖片
 const multer = require('multer')
 const upload = multer({
   dest: 'temp/'
 })
-
 
 router.get('/:id/tweets', userController.getTweets)
 router.get('/:id/followings', userController.getFollowings)
