@@ -1,7 +1,7 @@
 const db = require("../models");
 const Tweet = db.Tweet;
 const User = db.User;
-const helpers = require('../_helpers')
+const helpers = require("../_helpers");
 
 const tweetController = {
   getTweets: (req, res) => {
@@ -31,12 +31,12 @@ const tweetController = {
     });
   },
   postTweets: (req, res) => {
-    const tweetsDesc = req.body.tweets.trim()
+    const tweetsDesc = req.body.tweets.trim();
 
     if (tweetsDesc !== "" && tweetsDesc.length <= 140) {
       Tweet.create({
         description: tweetsDesc,
-        UserId: helpers.getUser(req).id
+        UserId: helpers.getUser(req).id,
       }).then((tweet) => {
         return res.redirect('/tweets')
       });
@@ -44,7 +44,7 @@ const tweetController = {
       req.flash("error_msg", "輸入不可為空白！");
       return res.redirect("/tweets");
     }
-  }
+  },
 };
 
 module.exports = tweetController;
