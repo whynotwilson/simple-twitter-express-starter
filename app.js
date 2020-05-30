@@ -9,8 +9,8 @@ const port = 3000
 // use helpers.ensureAuthenticated(req) to replace req.isAuthenticated()
 
 app.engine('handlebars', handlebars({
-  defaultLayout: 'main'
-  // helpers: require('./config/handlebars-helpers')
+  defaultLayout: 'main',
+  helpers: require('./config/handlebars-helpers')
 }))
 
 app.set('view engine', 'handlebars')
