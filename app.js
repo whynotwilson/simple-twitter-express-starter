@@ -1,8 +1,6 @@
 const express = require('express')
 const helpers = require('./_helpers')
 const handlebars = require('express-handlebars')
-const app = express()
-const port = 3000
 
 const exphbs = require('express-handlebars')
 const bodyParser = require('body-parser')
@@ -29,9 +27,6 @@ app.use('/upload', express.static(__dirname + '/upload'))
 //   res.locals.warning_msg = req.flash('warning_msg')
 //   next()
 // })
-
-app.use('/users', require('./routes/user'))
-app.use('/', require('./routes/home'))
 
 app.engine('handlebars', handlebars({
   defaultLayout: 'main',

@@ -8,11 +8,18 @@ const upload = multer({
   dest: 'temp/'
 })
 
-router.get('/:id/tweets', userController.getTweets)
-router.get('/:id/followings', userController.getFollowings)
-router.get('/:id/followers', userController.getFollowers)
-router.get('/:id/likes', userController.getLikes)
-router.get('/:id/edit', userController.getEdit)
-router.post('/:id/edit', upload.single('avatar'), userController.postEdit)
+const authenticated = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    return next()
+  }
+  res.redirect('/signin')
+}
+
+router.get('/:id/tweets', authenticated, userController.getTweets)
+router.get('/:id/followings', authenticated, userController.getFollowings)
+router.get('/:id/followers', authenticated, userController.getFollowers)
+router.get('/:id/likes', authenticated, userController.getLikes)
+router.get('/:id/edit', authenticated, userController.getEdit)
+router.post('/:id/edit', authenticated, upload.single('avatar'), userController.postEdit)
 
 module.exports = router

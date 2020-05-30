@@ -6,6 +6,7 @@ const Like = db.Like
 const Reply = db.Reply
 const moment = require('moment')
 const Followship = db.Followship
+const bcrypt = require('bcryptjs')
 
 const fs = require('fs')
 
