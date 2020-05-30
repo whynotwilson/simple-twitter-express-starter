@@ -20,10 +20,6 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
 app.use('/upload', express.static(__dirname + '/upload'))
 
-
-app.use('/users', require('./routes/user'))
-app.use('/', require('./routes/home'))
-
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
