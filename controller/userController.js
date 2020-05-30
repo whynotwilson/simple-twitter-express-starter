@@ -5,6 +5,8 @@ const Tweet = db.Tweet
 const Like = db.Like
 const Reply = db.Reply
 const moment = require('moment')
+const Followship = db.Followship
+
 
 const userController = {
 
@@ -63,6 +65,9 @@ const userController = {
   },
   getFollowings: async (req, res) => {
     try {
+      // let isOwn = userId === req.user.id ? true : false
+      //判斷不是owner 要退出
+
       const userId = req.params.id
       const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId, {
         include: [
@@ -80,33 +85,13 @@ const userController = {
       let user = {}
       user = { ...dataValues, introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null }
 
-      const dummyFollowing = {
-        name: 'test',
-        introduction: 'helloweorijeoiwrjkdksmkdmfkdsmfkdsfmkd'
-      }
-      // const followings = dataValues.Followings.map(following => ({
-      //   // ...following,
-      //   // introduction: following.introduction ? following.introduction.substring(0, 20) : null,
-      //   name: dummyFollowing.name,
-      //   introduction: dummyFollowing.introduction.substring(0, 20)
-      // }))
-      const followings = [{
-        name: dummyFollowing.name,
-        introduction: dummyFollowing.introduction.substring(0, 20)
-      },
-      {
-        name: dummyFollowing.name,
-        introduction: dummyFollowing.introduction.substring(0, 20)
-      },
-      {
-        name: dummyFollowing.name,
-        introduction: dummyFollowing.introduction.substring(0, 20)
-      }]
-      console.log(followings)
 
-      // let isOwn = userId === req.user.id ? true : false
+      const followings = dataValues.Followings.map(following => ({
+        ...following.dataValues,
+        introduction: following.introduction ? following.introduction.substring(0, 20) : null,
+      }))
 
-      return res.render('getFollowings', { user, followings })
+      return res.render('getFollowings', { user: user, followings: followings })
     } catch (error) {
       console.log('error', error)
     }
@@ -117,11 +102,33 @@ const userController = {
   getLikes: (req, res) => {
 
   },
-  postFollow: (req, res) => {
+  addFollowing: async (req, res) => {
+    try {
+      const newFollow = await Followship.create({
+        followerId: req.user.id,
+        followingId: req.params.userId
+      })
 
+      return res.redirect('back')
+    } catch (error) {
+      console.log('error', error)
+    }
   },
-  deleteFollow: (req, res) => {
+  deleteFollowing: async (req, res) => {
+    try {
+      const destroyFollow = await Followship.findOne({
+        where: {
+          followerId: req.user.id,
+          followingId: req.params.userId
+        }
+      }).then((followship) => {
+        followship.destroy()
+      })
 
+      return res.redirect('back')
+    } catch (error) {
+      console.log('error', error)
+    }
   },
   getEdit: (req, res) => {
 
