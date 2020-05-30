@@ -59,7 +59,10 @@ const userController = {
   getTweets: async (req, res) => {
 
     try {
+
       const userId = req.params.id
+      let isOwner = (Number(userId) === req.user.id) ? true : false;
+
       const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId, {
         include: [
           { model: User, as: 'Followers' },
@@ -73,8 +76,11 @@ const userController = {
       if (!dataValues) {
         throw new Error("user is not found")
       }
-      let user = {}
-      user = { ...dataValues, introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null }
+      let userData = {}
+      userData = {
+        ...dataValues, introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null,
+        isFollowing: req.user.Followings.map(d => d.id).includes(userId)
+      }
 
       const tweets = dataValues.Tweets.map(tweet => ({
         ...tweet,
@@ -82,19 +88,17 @@ const userController = {
         updatedAt: tweet.updatedAt ? moment(tweet.updatedAt).format(`YYYY-MM-DD, hh:mm`) : '-'
       }))
 
-      // let isOwn = userId === req.user.id ? true : false
-
-      return res.render('getTweets', { user, tweets })
+      return res.render('getTweets', { userData, tweets, isOwner })
     } catch (error) {
       console.log('error', error)
     }
   },
   getFollowings: async (req, res) => {
     try {
-      // let isOwn = userId === req.user.id ? true : false
-      //判斷不是owner 要退出
 
       const userId = req.params.id
+      let isOwner = (Number(userId) === req.user.id) ? true : false;
+
       const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId, {
         include: [
           { model: User, as: 'Followers' },
@@ -108,8 +112,11 @@ const userController = {
       if (!dataValues) {
         throw new Error("user is not found")
       }
-      let user = {}
-      user = { ...dataValues, introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null }
+      let userData = {}
+      userData = {
+        ...dataValues, introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null,
+        isFollowing: req.user.Followings.map(d => d.id).includes(userId)
+      }
 
 
       const followings = dataValues.Followings.map(following => ({
@@ -117,17 +124,16 @@ const userController = {
         introduction: following.introduction ? following.introduction.substring(0, 20) : null,
       }))
 
-      return res.render('getFollowings', { user: user, followings: followings })
+      return res.render('getFollowings', { userData, followings: followings, isOwner })
     } catch (error) {
       console.log('error', error)
     }
   },
   getFollowers: async (req, res) => {
     try {
-      // let isOwn = userId === req.user.id ? true : false
-      //判斷不是owner 要退出
 
       const userId = req.params.id
+      let isOwner = (Number(userId) === req.user.id) ? true : false;
       const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId, {
         include: [
           { model: User, as: 'Followers' },
@@ -141,38 +147,27 @@ const userController = {
       if (!dataValues) {
         throw new Error("user is not found")
       }
-      let user = {}
-      user = { ...dataValues, introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null }
-
+      let userData = {}
+      userData = {
+        ...dataValues, introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null,
+        isFollowing: req.user.Followings.map(d => d.id).includes(userId)
+      }
 
       const followers = dataValues.Followers.map(follower => ({
         ...follower.dataValues,
         introduction: follower.introduction ? follower.introduction.substring(0, 20) : null,
       }))
 
-      const followings = dataValues.Followings.map(following => ({
-        ...following.dataValues,
-      }))
-
-
-      // 確認是否追蹤
-      const isFollowing = followings.every((following) => {
-        followers.every((follower) => {
-          following.id === follower.id
-        })
-      })
-
-
-      return res.render('getFollowers', { user: user, followers: followers, isFollowing: isFollowing })
+      return res.render('getFollowers', { userData, followers: followers, isOwner })
     } catch (error) {
       console.log('error', error)
     }
   },
   getLikes: async (req, res) => {
     try {
-      //判斷是否為isOwn
 
       const userId = req.params.id
+      let isOwner = (Number(userId) === req.user.id) ? true : false;
       const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId, {
         include: [
           { model: User, as: 'Followers' },
@@ -186,15 +181,20 @@ const userController = {
       if (!dataValues) {
         throw new Error("user is not found")
       }
-      let Tweets = {}
-      Tweets = await Tweet.findAll({ raw: true, nest: true },
-        { include: User })
+      let tweetsData = {}
+      tweetsData = await Tweet.findAll({
+        include: [
+          User,
+          Like,
+          Reply
+        ]
+      })
 
-      let user = {}
-      user = { ...dataValues, introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null }
+      let userData = {}
+      userData = { ...dataValues, introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null, isFollowing: req.user.Followings.map(d => d.id).includes(userId) }
 
-      const likedTweets = Tweets.filter(tweet =>
-        user.Likes.map(like => like.dataValues.TweetId).includes(tweet.id)
+      const likedTweets = tweetsData.filter(tweet =>
+        userData.Likes.map(like => like.dataValues.TweetId).includes(tweet.dataValues.id)
       )
 
       const tweets = likedTweets.map(tweet => ({
@@ -203,9 +203,8 @@ const userController = {
         updatedAt: tweet.updatedAt ? moment(tweet.updatedAt).format(`YYYY-MM-DD, hh:mm`) : '-'
       }))
 
-      // let isOwn = userId === req.user.id ? true : false
-
-      return res.render('getLikes', { user, tweets })
+      console.log(tweets[0].dataValues.Likes)
+      return res.render('getLikes', { userData, tweets, isOwner })
     } catch (error) {
       console.log('error', error)
     }
@@ -240,7 +239,6 @@ const userController = {
   },
   getEdit: async (req, res) => {
     try {
-      //驗證isOwn
       // let isOwn = userId === req.user.id ? true : false
 
       const userId = req.params.id
