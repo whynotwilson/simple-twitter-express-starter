@@ -1,6 +1,7 @@
 const express = require('express')
-const helpers = require('./_helpers');
-
+const helpers = require('./_helpers')
+const handlebars = require('express-handlebars')
+const userController = require('./controllers/userController')
 const app = express()
 const port = 3000
 
@@ -9,8 +10,7 @@ const bodyParser = require('body-parser')
 const methodOverride = require('method-override')
 // const flash = require('connect-flash')
 
-app.engine('handlebars', exphbs({ defaultLayout: 'main' }))
-app.set('view engine', 'handlebars')
+
 // use helpers.getUser(req) to replace req.user
 // use helpers.ensureAuthenticated(req) to replace req.isAuthenticated()
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -26,6 +26,15 @@ app.use('/upload', express.static(__dirname + '/upload'))
 
 app.use('/users', require('./routes/user'))
 app.use('/', require('./routes/home'))
+
+app.engine('handlebars', handlebars({
+  defaultLayout: 'main',
+  helpers: require('./config/handlebars-helpers')
+}))
+
+app.set('view engine', 'handlebars')
+
+require('./routes')(app)
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
 
