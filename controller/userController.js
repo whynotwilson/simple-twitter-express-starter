@@ -7,6 +7,7 @@ const Reply = db.Reply
 const moment = require('moment')
 const Followship = db.Followship
 
+const fs = require('fs')
 
 const userController = {
 
@@ -212,10 +213,67 @@ const userController = {
       console.log('error', error)
     }
   },
-  getEdit: (req, res) => {
+  getEdit: async (req, res) => {
+    try {
+      //驗證isOwn
+      // let isOwn = userId === req.user.id ? true : false
 
+      const userId = req.params.id
+      const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId) : null
+
+      if (!dataValues) {
+        throw new Error("user is not found")
+      }
+      let user = {}
+      user = { ...dataValues }
+
+      return res.render('getEdit', { user })
+    } catch (error) {
+      console.log('error', error)
+    }
   },
-  putEdit: (req, res) => {
+  putEdit: async (req, res) => {
+    try {
+      // if (!req.body.name) {
+      //   req.flash('error_messages', "請至少輸入姓名")
+      //   return res.redirect('back')
+      // }
+      const userId = req.params.id
+
+      const { file } = req
+      if (file) {
+
+        const data = fs.readFileSync(file.path)
+        const writeFile = fs.writeFileSync(`upload/${file.originalname}`, data)
+
+        const updateUser = await User.findByPk(userId).then((user) => {
+          user.update({
+            name: req.body.name,
+            introduction: req.body.introduction,
+            avatar: file ? `/upload/${file.originalname}` : null
+          })
+        })
+
+        // 可以加flash - 更新成功
+
+        return res.redirect(`/users/${userId}/edit`)
+
+      } else {
+
+        const updateUser = await User.findByPk(userId).then((user) => {
+          user.update({
+            name: req.body.name,
+            introduction: req.body.introduction,
+            avatar: this.avatar
+          })
+        })
+
+        return res.redirect(`/users/${userId}/edit`)
+
+      }
+    } catch (error) {
+      console.log('error', error)
+    }
 
   }
 }

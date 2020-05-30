@@ -14,6 +14,8 @@ app.set('view engine', 'handlebars')
 // use helpers.ensureAuthenticated(req) to replace req.isAuthenticated()
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
+app.use('/upload', express.static(__dirname + '/upload'))
+
 
 app.use('/users', require('./routes/user'))
 app.use('/', require('./routes/home'))
