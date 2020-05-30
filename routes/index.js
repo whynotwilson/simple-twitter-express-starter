@@ -23,4 +23,5 @@ module.exports = (app) => {
   app.get('/', (req, res) => res.redirect('/tweets'))
   // 首頁
   app.get('/tweets', authenticated, tweetsController.getTweets)
+  app.post('/tweets', authenticated, tweetsController.postTweets)
 }

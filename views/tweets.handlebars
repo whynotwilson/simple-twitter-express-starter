@@ -1,8 +1,8 @@
 <div class="row justify-content-center my-3">
   <div class="col-md-6">
-    <form action="">
+    <form action="/tweets" method="POST">
       <div class="input-group">
-        <textarea class="form-control" aria-label="With textarea" placeholder="what's on your mind?"  style="border-radius: 8px; height: 150px"></textarea>
+        <textarea id="tweets" name="tweets" class="form-control" aria-label="With textarea" placeholder="what's on your mind?"  style="border-radius: 8px; height: 150px"></textarea>
       </div>
       <button class="btn btn-primary float-right" type="submit">Tweet</button>
     </form>
@@ -36,7 +36,9 @@
           </div>
           <div class="col-md-8">
             <div class="card-body">
-              <h5 class="card-title">{{ this.name }}</h5>
+              <h5 class="card-title">
+                <a href="/users/{{this.id}}/tweets">{{ this.name }}</a>
+              </h5>
               <p class="card-text">{{ this.introduction}}.</p>
               <p class="card-text"><small class="text-muted">{{ fromNow createdAt }}</small></p>
             </div>
