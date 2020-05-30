@@ -17,8 +17,6 @@ const tweetController = {
         description: tweet.description.substring(0, 100)
       }))
 
-      console.log('tweets', tweets)
-
       User.findAll({
         raw: true,
         nest: true,

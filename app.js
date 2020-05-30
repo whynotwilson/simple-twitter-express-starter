@@ -1,7 +1,6 @@
 const express = require('express')
 const helpers = require('./_helpers')
 const handlebars = require('express-handlebars')
-const userController = require('./controllers/userController')
 const app = express()
 const port = 3000
 
