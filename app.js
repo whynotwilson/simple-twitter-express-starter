@@ -13,20 +13,13 @@ if (process.env.NODE_ENV !== 'production') {
 }
 const passport = require('./config/passport')
 const exphbs = require('express-handlebars')
-// const flash = require('connect-flash')
 
 // use helpers.getUser(req) to replace req.user
 // use helpers.ensureAuthenticated(req) to replace req.isAuthenticated()
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
 app.use('/upload', express.static(__dirname + '/upload'))
-// app.use(flash())
 
-// app.use((req, res, next) => {
-//   res.locals.success_msg = req.flash('success_msg')
-//   res.locals.warning_msg = req.flash('warning_msg')
-//   next()
-// })
 
 app.use('/users', require('./routes/user'))
 app.use('/', require('./routes/home'))
