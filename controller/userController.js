@@ -25,6 +25,8 @@ const userController = {
       if (!dataValues) {
         throw new Error("user is not found")
       }
+      let user = {}
+      user = { ...dataValues, introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null }
 
       const tweets = dataValues.Tweets.map(tweet => ({
         ...tweet,
@@ -34,7 +36,7 @@ const userController = {
 
       // let isOwn = userId === req.user.id ? true : false
 
-      return res.render('getTweets', { dataValues, tweets })
+      return res.render('getTweets', { user, tweets })
     } catch (error) {
       console.log('error', error)
     }
@@ -59,8 +61,55 @@ const userController = {
     //   })
     // })
   },
-  getFollowings: (req, res) => {
+  getFollowings: async (req, res) => {
+    try {
+      const userId = req.params.id
+      const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId, {
+        include: [
+          { model: User, as: 'Followers' },
+          { model: User, as: 'Followings' },
+          Like,
+          Tweet,
+          Reply
+        ]
+      }) : null
 
+      if (!dataValues) {
+        throw new Error("user is not found")
+      }
+      let user = {}
+      user = { ...dataValues, introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null }
+
+      const dummyFollowing = {
+        name: 'test',
+        introduction: 'helloweorijeoiwrjkdksmkdmfkdsmfkdsfmkd'
+      }
+      // const followings = dataValues.Followings.map(following => ({
+      //   // ...following,
+      //   // introduction: following.introduction ? following.introduction.substring(0, 20) : null,
+      //   name: dummyFollowing.name,
+      //   introduction: dummyFollowing.introduction.substring(0, 20)
+      // }))
+      const followings = [{
+        name: dummyFollowing.name,
+        introduction: dummyFollowing.introduction.substring(0, 20)
+      },
+      {
+        name: dummyFollowing.name,
+        introduction: dummyFollowing.introduction.substring(0, 20)
+      },
+      {
+        name: dummyFollowing.name,
+        introduction: dummyFollowing.introduction.substring(0, 20)
+      }]
+      console.log(followings)
+
+      // let isOwn = userId === req.user.id ? true : false
+
+      return res.render('getFollowings', { user, followings })
+    } catch (error) {
+      console.log('error', error)
+    }
   },
   getFollowers: (req, res) => {
 

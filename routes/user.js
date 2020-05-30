@@ -4,5 +4,7 @@ const userController = require('../controller/userController')
 
 
 router.get('/:id/tweets', userController.getTweets)
+router.get('/:id/followings', userController.getFollowings)
+
 
 module.exports = router
