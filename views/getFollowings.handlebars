@@ -37,7 +37,7 @@
         <a href="/users/{{userData.id}}/edit" class="btn btn-primary mt-5"> Edit Profile</a>
         {{else}}
 
-        {{#if userData.isFollowing}}
+        {{#if userData.isFollowed}}
         <form action="/followships/{{userData.id}}?_method=DELETE" method="POST">
           <button type="submit" class="btn btn-danger">Unfollow</button>
         </form>
@@ -46,7 +46,6 @@
           <button type="submit" class="btn btn-primary">Follow </button>
         </form>
         {{/if}}
-        </form>
         {{/if}}
       </div>
     </div>

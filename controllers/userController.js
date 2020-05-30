@@ -60,8 +60,8 @@ const userController = {
 
     try {
 
-      const userId = req.params.id
-      let isOwner = (Number(userId) === req.user.id) ? true : false;
+      const userId = Number(req.params.id)
+      let isOwner = userId === req.user.id ? true : false;
 
       const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId, {
         include: [
@@ -96,8 +96,8 @@ const userController = {
   getFollowings: async (req, res) => {
     try {
 
-      const userId = req.params.id
-      let isOwner = (Number(userId) === req.user.id) ? true : false;
+      const userId = Number(req.params.id)
+      let isOwner = userId === req.user.id ? true : false;
 
       const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId, {
         include: [
@@ -132,8 +132,8 @@ const userController = {
   getFollowers: async (req, res) => {
     try {
 
-      const userId = req.params.id
-      let isOwner = (Number(userId) === req.user.id) ? true : false;
+      const userId = Number(req.params.id)
+      let isOwner = userId === req.user.id ? true : false;
       const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId, {
         include: [
           { model: User, as: 'Followers' },
@@ -156,6 +156,7 @@ const userController = {
       const followers = dataValues.Followers.map(follower => ({
         ...follower.dataValues,
         introduction: follower.introduction ? follower.introduction.substring(0, 20) : null,
+        isOwnFollower: follower.dataValues.id === req.user.id ? true : false
       }))
 
       return res.render('getFollowers', { userData, followers: followers, isOwner })
@@ -166,8 +167,8 @@ const userController = {
   getLikes: async (req, res) => {
     try {
 
-      const userId = req.params.id
-      let isOwner = (Number(userId) === req.user.id) ? true : false;
+      const userId = Number(req.params.id)
+      let isOwner = userId === req.user.id ? true : false;
       const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId, {
         include: [
           { model: User, as: 'Followers' },
@@ -203,7 +204,6 @@ const userController = {
         updatedAt: tweet.updatedAt ? moment(tweet.updatedAt).format(`YYYY-MM-DD, hh:mm`) : '-'
       }))
 
-      console.log(tweets[0].dataValues.Likes)
       return res.render('getLikes', { userData, tweets, isOwner })
     } catch (error) {
       console.log('error', error)
@@ -231,8 +231,8 @@ const userController = {
       }).then((followship) => {
         followship.destroy()
       })
-
       return res.redirect('back')
+
     } catch (error) {
       console.log('error', error)
     }

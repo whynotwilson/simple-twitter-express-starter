@@ -46,7 +46,6 @@
           <button type="submit" class="btn btn-primary">Follow </button>
         </form>
         {{/if}}
-        </form>
         {{/if}}
       </div>
     </div>
@@ -67,8 +66,9 @@
                   @{{this.name}}
                 </h5>
                 <p class="card-text">{{this.introduction}}</p>
-
-                {{#if isFollowing}}
+                {{#if this.isOwnFollower}}
+                {{else}}
+                {{#if userData.isFollowing}}
                 <form action="/followships/{{this.id}}?_method=DELETE" method="POST">
                   <button type="submit" class="btn btn-danger">Unfollow</button>
                 </form>
@@ -76,6 +76,7 @@
                 <form action="/followships/{{this.id}}" method="POST">
                   <button type="submit" class="btn btn-primary">Follow</button>
                 </form>
+                {{/if}}
                 {{/if}}
               </div>
             </div>
