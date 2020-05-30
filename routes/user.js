@@ -1,4 +1,5 @@
 const express = require('express')
+const app = express()
 const router = express.Router()
 const userController = require('../controllers/userController.js')
 
@@ -14,5 +15,4 @@ router.get('/:id/followers', userController.getFollowers)
 router.get('/:id/likes', userController.getLikes)
 router.get('/:id/edit', userController.getEdit)
 router.post('/:id/edit', upload.single('avatar'), userController.postEdit)
-
-module.exports = router
+}

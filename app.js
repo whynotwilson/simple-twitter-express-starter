@@ -28,9 +28,6 @@ app.use('/upload', express.static(__dirname + '/upload'))
 //   next()
 // })
 
-app.use('/users', require('./routes/user'))
-app.use('/', require('./routes/home'))
-
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 

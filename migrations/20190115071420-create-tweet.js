@@ -21,6 +21,11 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
+      },
+      likedCounter: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+        default: 0
       }
     });
   },
