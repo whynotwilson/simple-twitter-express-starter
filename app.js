@@ -15,11 +15,7 @@ app.engine('handlebars', handlebars({
 
 app.set('view engine', 'handlebars')
 
-app.get('/', (req, res) => res.send('Hello World!'))
-app.get('/signup', userController.signUpPage)
-// app.post('/signup', userController.signUp)
-app.get('/signin', userController.signInPage)
-// app.post('/signin', userController.signIn)
+require('./routes')(app)
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
 
