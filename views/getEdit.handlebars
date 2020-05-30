@@ -18,11 +18,11 @@
   <form action="/users/{{user.id}}/edit?_method=PUT" method="POST" enctype="multipart/form-data">
     <div class="row" style="justify-content: space-evenly">
       <div class="col-md-4">
-
         <div class="form-group">
           <img src="{{user.avatar}}" alt="avatar" style="width: 250px;margin-bottom: 25px;"
             accept="image/gif, image/jpeg, image/png" id="avatar" />
         </div>
+        {{>messages}}
         <div class="form-group">
           <input type="file" class="form-control-file" id="avatar" name="avatar" onchange="readURL(this)">
         </div>
