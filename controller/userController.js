@@ -142,8 +142,47 @@ const userController = {
       console.log('error', error)
     }
   },
-  getLikes: (req, res) => {
+  getLikes: async (req, res) => {
+    try {
+      //判斷是否為isOwn
 
+      const userId = req.params.id
+      const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId, {
+        include: [
+          { model: User, as: 'Followers' },
+          { model: User, as: 'Followings' },
+          Like,
+          Tweet,
+          Reply
+        ]
+      }) : null
+
+      if (!dataValues) {
+        throw new Error("user is not found")
+      }
+      let Tweets = {}
+      Tweets = await Tweet.findAll({ raw: true, nest: true },
+        { include: User })
+
+      let user = {}
+      user = { ...dataValues, introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null }
+
+      const likedTweets = Tweets.filter(tweet =>
+        user.Likes.map(like => like.dataValues.TweetId).includes(tweet.id)
+      )
+
+      const tweets = likedTweets.map(tweet => ({
+        ...tweet,
+        description: tweet.description ? tweet.description.substring(0, 50) : null,
+        updatedAt: tweet.updatedAt ? moment(tweet.updatedAt).format(`YYYY-MM-DD, hh:mm`) : '-'
+      }))
+
+      // let isOwn = userId === req.user.id ? true : false
+
+      return res.render('getLikes', { user, tweets })
+    } catch (error) {
+      console.log('error', error)
+    }
   },
   addFollowing: async (req, res) => {
     try {
