@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const userController = require('../controller/userController')
+const userController = require('../controllers/userController')
 
 //上傳圖片
 const multer = require('multer')
