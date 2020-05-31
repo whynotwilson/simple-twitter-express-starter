@@ -201,20 +201,24 @@ const userController = {
   },
   getEdit: async (req, res) => {
     try {
-      // let isOwn = userId === req.user.id ? true : false
+      const userId = Number(req.params.id)
+      //判斷是否為owner 不然退出
+      if (userId === req.user.id) {
+        const { dataValues } = (await User.findByPk(userId))
+          ? await User.findByPk(userId)
+          : null;
 
-      const userId = req.params.id;
-      const { dataValues } = (await User.findByPk(userId))
-        ? await User.findByPk(userId)
-        : null;
+        if (!dataValues) {
+          throw new Error("user is not found");
+        }
+        let user = {};
+        user = { ...dataValues };
 
-      if (!dataValues) {
-        throw new Error("user is not found");
+        return res.render("getEdit", { user });
+      } else {
+        return res.redirect('/')
       }
-      let user = {};
-      user = { ...dataValues };
 
-      return res.render("getEdit", { user });
     } catch (error) {
       console.log("error", error);
     }
