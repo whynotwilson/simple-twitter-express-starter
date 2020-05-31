@@ -16,14 +16,14 @@ const userController = {
       const userId = req.params.id;
       const { dataValues } = (await User.findByPk(userId))
         ? await User.findByPk(userId, {
-            include: [
-              { model: User, as: "Followers" },
-              { model: User, as: "Followings" },
-              Like,
-              Tweet,
-              Reply,
-            ],
-          })
+          include: [
+            { model: User, as: "Followers" },
+            { model: User, as: "Followings" },
+            Like,
+            Tweet,
+            Reply,
+          ],
+        })
         : null;
 
       if (!dataValues) {
@@ -62,14 +62,14 @@ const userController = {
       const userId = req.params.id;
       const { dataValues } = (await User.findByPk(userId))
         ? await User.findByPk(userId, {
-            include: [
-              { model: User, as: "Followers" },
-              { model: User, as: "Followings" },
-              Like,
-              Tweet,
-              Reply,
-            ],
-          })
+          include: [
+            { model: User, as: "Followers" },
+            { model: User, as: "Followings" },
+            Like,
+            Tweet,
+            Reply,
+          ],
+        })
         : null;
 
       if (!dataValues) {
@@ -106,14 +106,14 @@ const userController = {
       const userId = req.params.id;
       const { dataValues } = (await User.findByPk(userId))
         ? await User.findByPk(userId, {
-            include: [
-              { model: User, as: "Followers" },
-              { model: User, as: "Followings" },
-              Like,
-              Tweet,
-              Reply,
-            ],
-          })
+          include: [
+            { model: User, as: "Followers" },
+            { model: User, as: "Followings" },
+            Like,
+            Tweet,
+            Reply,
+          ],
+        })
         : null;
 
       if (!dataValues) {
@@ -161,14 +161,14 @@ const userController = {
       const userId = req.params.id;
       const { dataValues } = (await User.findByPk(userId))
         ? await User.findByPk(userId, {
-            include: [
-              { model: User, as: "Followers" },
-              { model: User, as: "Followings" },
-              Like,
-              Tweet,
-              Reply,
-            ],
-          })
+          include: [
+            { model: User, as: "Followers" },
+            { model: User, as: "Followings" },
+            Like,
+            Tweet,
+            Reply,
+          ],
+        })
         : null;
 
       if (!dataValues) {

@@ -47,8 +47,6 @@ app.use((req, res, next) => {
   next()
 })
 
-require('./routes')(app)
-
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
 
-module.exports = app
+require('./routes')(app)
