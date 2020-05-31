@@ -16,8 +16,6 @@ const tweetController = {
         {model: User, as: 'LikedUsers'}
       ],
     }).then((tweets) => {
-      console.log('tweets', tweets)
-
       tweets = tweets.map((tweet) => ({
         ...tweet.dataValues,
         description: tweet.description.substring(0, 100),
@@ -27,11 +25,20 @@ const tweetController = {
       }));
 
       User.findAll({
-        raw: true,
-        nest: true,
         limit: 10,
         order: [["createdAt", "DESC"]],
+        include: [
+          {model: User, as: 'Followers'}
+        ]
       }).then((users) => {
+        users = users.map(user => ({
+          ...user.dataValues,
+          followersCount: user.Followers.length,
+          isFollowed: helpers.getUser(req).Followings.map(d => d.id).includes(user.id)
+        }))
+
+        users.sort((a, b) => b.followersCount - a.followersCount)
+
         return res.render("tweets", {
           tweets,
           users,

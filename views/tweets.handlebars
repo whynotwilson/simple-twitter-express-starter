@@ -64,8 +64,20 @@
             <h5 class="card-title">
               <a href="/users/{{this.id}}/tweets">{{ this.name }}</a>
             </h5>
-            <p class="card-text">{{ this.introduction}}.</p>
-            <p class="card-text"><small class="text-muted">{{ fromNow createdAt }}</small></p>
+            <p class="card-text">{{ this.introduction}}</p>
+            {{#if this.isFollowed }}
+              <form class="text-right" action="/followships/{{this.id}}?_method=DELETE" method="POST">
+                <button type="submit" class="btn btn-danger" name="id" value={{this.id}}>
+                  Unfollow <i class="fa fa-user" aria-hidden="true"></i>
+                </button>
+              </form>
+            {{else}}
+              <form class="text-right" action="/followships/{{this.id}}" method="POST">
+                <button type="submit" class="btn btn-info" name="id" value={{this.id}}>
+                  Follow <i class="fa fa-user-plus" aria-hidden="true"></i>
+                </button>
+              </form>
+            {{/if}}
           </div>
         </div>
       </div>
