@@ -2,6 +2,7 @@ const db = require("../models");
 const Tweet = db.Tweet;
 const User = db.User;
 const Like = db.Like;
+const Reply = db.Reply;
 const helpers = require("../_helpers");
 
 const tweetController = {
@@ -11,14 +12,18 @@ const tweetController = {
       order: [["createdAt", "DESC"]],
       include: [
         User,
+        Reply,
         {model: User, as: 'LikedUsers'}
       ],
     }).then((tweets) => {
+      console.log('tweets', tweets)
+
       tweets = tweets.map((tweet) => ({
         ...tweet.dataValues,
         description: tweet.description.substring(0, 100),
         isLiked: tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id),
-        likedCount: tweet.LikedUsers.length
+        likedCount: tweet.LikedUsers.length,
+        replyCount: tweet.Replies.length
       }));
 
       User.findAll({

@@ -27,6 +27,7 @@
             <p class="card-text"><small class="text-muted">{{ fromNow this.createdAt }}</small></p>
           </div>
           <div class="card-body text-right inline-block mt-1">
+            <a href="/tweets/{{this.id}}/replies" class="btn btn-primary mr-2">Reply({{ this.replyCount }})</a>
             {{#if this.isLiked }}
               <form action="/tweets/{{this.id}}/unlike" method="POST" style="display: contents;">
                 <button type="submit" class="btn btn-danger">
