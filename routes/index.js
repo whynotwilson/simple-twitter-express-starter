@@ -1,6 +1,7 @@
 const userController = require('../controllers/userController')
 const tweetsController = require('../controllers/tweetsController')
-const passport = require('passport')
+
+const passport = require('../config/passport')
 
 const authenticated = (req, res, next) => {
   if (req.isAuthenticated()) {
@@ -23,4 +24,5 @@ module.exports = (app) => {
   app.get('/', authenticated, (req, res) => res.redirect('/tweets'))
   // 首頁
   app.get('/tweets', authenticated, tweetsController.getTweets)
+  app.post('/tweets', authenticated, tweetsController.postTweets)
 }
