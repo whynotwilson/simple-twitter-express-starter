@@ -10,6 +10,9 @@ const bcrypt = require('bcryptjs')
 
 const fs = require('fs')
 
+const imgur = require('imgur-node-api')
+const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
+
 const userController = {
   getTweets: async (req, res) => {
     try {
@@ -226,19 +229,25 @@ const userController = {
 
       const { file } = req;
       if (file) {
-        const data = fs.readFileSync(file.path);
-        const writeFile = fs.writeFileSync(`upload/${file.originalname}`, data);
+        imgur.setClientID(IMGUR_CLIENT_ID)
+        // const data = fs.readFileSync(file.path);
+        // const writeFile = fs.writeFileSync(`upload/${file.originalname}`, data);
+        const uploadImage = await imgur.upload(file.path, async (err, image) => {
+          try {
+            const updateUser = await User.findByPk(userId).then((user) => {
+              user.update({
+                name: req.body.name,
+                introduction: req.body.introduction,
+                avatar: file ? image.data.link : null,
+              });
+            });
+            req.flash('success_messages', "變更已成功儲存")
+            return res.redirect(`/users/${userId}/tweets`);
+          } catch (error) {
+            console.log('error', error)
+          }
 
-        const updateUser = await User.findByPk(userId).then((user) => {
-          user.update({
-            name: req.body.name,
-            introduction: req.body.introduction,
-            avatar: file ? `/upload/${file.originalname}` : null,
-          });
-        });
-
-        req.flash('success_messages', "變更已成功儲存")
-        return res.redirect(`/users/${userId}/tweets`);
+        })
       } else {
         const updateUser = await User.findByPk(userId).then((user) => {
           user.update({
