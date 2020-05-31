@@ -65,19 +65,21 @@
               <a href="/users/{{this.id}}/tweets">{{ this.name }}</a>
             </h5>
             <p class="card-text">{{ this.introduction}}</p>
-            {{#if this.isFollowed }}
-              <form class="text-right" action="/followships/{{this.id}}?_method=DELETE" method="POST">
-                <button type="submit" class="btn btn-danger" name="id" value={{this.id}}>
-                  Unfollow <i class="fa fa-user" aria-hidden="true"></i>
-                </button>
-              </form>
-            {{else}}
-              <form class="text-right" action="/followships/{{this.id}}" method="POST">
-                <button type="submit" class="btn btn-info" name="id" value={{this.id}}>
-                  Follow <i class="fa fa-user-plus" aria-hidden="true"></i>
-                </button>
-              </form>
-            {{/if}}
+            {{#ifNotCond this.id ../user.id}}
+              {{#if this.isFollowed }}
+                <form class="text-right" action="/followships/{{this.id}}?_method=DELETE" method="POST">
+                  <button type="submit" class="btn btn-danger" name="id" value={{this.id}}>
+                    Unfollow <i class="fa fa-user" aria-hidden="true"></i>
+                  </button>
+                </form>
+              {{else}}
+                <form class="text-right" action="/followships/{{this.id}}" method="POST">
+                  <button type="submit" class="btn btn-info" name="id" value={{this.id}}>
+                    Follow <i class="fa fa-user-plus" aria-hidden="true"></i>
+                  </button>
+                </form>
+              {{/if}}
+            {{/ifNotCond}}
           </div>
         </div>
       </div>

@@ -67,20 +67,22 @@
       </ul>
     </div>
     <div class='text-right'>
-      {{#if targetUser.isFollowed}}
-      <form action="/followships/{{targetUser.id}}?_method=DELETE" method='POST'>
-        <button type='submit' class='btn btn-danger'>
-          Unfollow <i class='fa fa-user px-2' aria-hidden='true'></i>
-        </button>
-      </form>
-      {{else}}
-      <form action='/followships/{{targetUser.id}}' method='POST'>
-        <input type='hidden' name='id' value="{{targetUser.id}}" />
-        <button type='submit' class='btn btn-info'>
-          Follow <i class='fa fa-user-plus px-2' aria-hidden='true'></i>
-        </button>
-      </form>
-      {{/if}}
+      {{#ifNotCond currentUserId targetUser.id}}
+        {{#if targetUser.isFollowed}}
+        <form action="/followships/{{targetUser.id}}?_method=DELETE" method='POST'>
+          <button type='submit' class='btn btn-danger'>
+            Unfollow <i class='fa fa-user px-2' aria-hidden='true'></i>
+          </button>
+        </form>
+        {{else}}
+        <form action='/followships/{{targetUser.id}}' method='POST'>
+          <input type='hidden' name='id' value="{{targetUser.id}}" />
+          <button type='submit' class='btn btn-info'>
+            Follow <i class='fa fa-user-plus px-2' aria-hidden='true'></i>
+          </button>
+        </form>
+        {{/if}}
+      {{/ifNotCond}}
     </div>
   </div>
   <div class='col-md-8'>
