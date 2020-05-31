@@ -61,7 +61,8 @@
           <div class="col-md-8">
             <div class="card-body">
               <h5 class="card-title">
-                @{{this.dataValues.User.name}} <small class="text-muted">{{this.updatedAt}}</small>
+                <a href="/users/{{ ../userData.id }}/tweets">{{ ../userData.name }}</a> <small
+                  class="text-muted">{{this.updatedAt}}</small>
               </h5>
               <p class="card-text">{{this.description}}</p>
               <a href="/users/{{this.dataValues.User.id}}/replies" class="btn btn-primary mt-5">

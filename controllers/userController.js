@@ -7,6 +7,7 @@ const Reply = db.Reply
 const moment = require('moment')
 const Followship = db.Followship
 const bcrypt = require('bcryptjs')
+const helpers = require("../_helpers");
 
 const fs = require('fs')
 
@@ -24,7 +25,7 @@ const userController = {
         include: [
           { model: User, as: 'Followers' },
           { model: User, as: 'Followings' },
-          { model: Tweet, include: [Like, Reply] },
+          { model: Tweet, include: [Like, Reply, { model: User, as: 'LikedUsers' }] },
           Like,
           Reply
         ]
@@ -47,6 +48,8 @@ const userController = {
         updatedAt: tweet.updatedAt
           ? moment(tweet.updatedAt).format(`YYYY-MM-DD, hh:mm`)
           : "-",
+        isLiked: tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id),
+        likedCount: tweet.LikedUsers.length,
       }));
 
       return res.render('getTweets', { userData, tweets, isOwner })
@@ -241,7 +244,7 @@ const userController = {
                 avatar: file ? image.data.link : null,
               });
             });
-            req.flash('success_messages', "變更已成功儲存")
+            req.flash('success_messages', "個人資料已成功修改")
             return res.redirect(`/users/${userId}/tweets`);
           } catch (error) {
             console.log('error', error)
@@ -257,7 +260,7 @@ const userController = {
           });
         });
 
-        req.flash('success_messages', "變更已成功儲存")
+        req.flash('success_messages', "個人資料已成功修改")
         return res.redirect(`/users/${userId}/tweets`);
       }
     } catch (error) {

@@ -13,7 +13,7 @@ const tweetController = {
       include: [
         User,
         Reply,
-        {model: User, as: 'LikedUsers'}
+        { model: User, as: 'LikedUsers' }
       ],
     }).then((tweets) => {
       tweets = tweets.map((tweet) => ({
@@ -28,7 +28,7 @@ const tweetController = {
         limit: 10,
         order: [["createdAt", "DESC"]],
         include: [
-          {model: User, as: 'Followers'}
+          { model: User, as: 'Followers' }
         ]
       }).then((users) => {
         users = users.map(user => ({
@@ -57,7 +57,7 @@ const tweetController = {
         return res.redirect('/tweets')
       });
     } else {
-      req.flash("error_msg", "輸入不可為空白！");
+      req.flash('error_messages', "輸入不可為空白！");
       return res.redirect("/tweets");
     }
   },
@@ -66,7 +66,7 @@ const tweetController = {
       UserId: helpers.getUser(req).id,
       TweetId: req.params.id
     }).then(like => {
-      return res.redirect('/tweets')
+      return res.redirect('back')
     })
   },
   removeLike: (req, res) => {
