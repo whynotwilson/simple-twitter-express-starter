@@ -66,7 +66,7 @@ const tweetController = {
       UserId: helpers.getUser(req).id,
       TweetId: req.params.id
     }).then(like => {
-      return res.redirect('/tweets')
+      return res.redirect('back')
     })
   },
   removeLike: (req, res) => {
