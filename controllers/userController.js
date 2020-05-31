@@ -217,10 +217,11 @@ const userController = {
   },
   postEdit: async (req, res) => {
     try {
-      // if (!req.body.name) {
-      //   req.flash('error_messages', "請至少輸入姓名")
-      //   return res.redirect('back')
-      // }
+      if (!req.body.name) {
+        req.flash('error_messages', "請至少輸入姓名")
+        return res.redirect('back')
+      }
+
       const userId = req.params.id;
 
       const { file } = req;
@@ -236,9 +237,8 @@ const userController = {
           });
         });
 
-        // 可以加flash - 更新成功
-
-        return res.redirect(`/users/${userId}/edit`);
+        req.flash('success_messages', "變更已成功儲存")
+        return res.redirect(`/users/${userId}/tweets`);
       } else {
         const updateUser = await User.findByPk(userId).then((user) => {
           user.update({
@@ -248,6 +248,7 @@ const userController = {
           });
         });
 
+        req.flash('success_messages', "變更已成功儲存")
         return res.redirect(`/users/${userId}/tweets`);
       }
     } catch (error) {
