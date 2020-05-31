@@ -21,8 +21,8 @@ const userController = {
         include: [
           { model: User, as: 'Followers' },
           { model: User, as: 'Followings' },
+          { model: Tweet, include: [Like, Reply] },
           Like,
-          Tweet,
           Reply
         ]
       }) : null
@@ -131,32 +131,24 @@ const userController = {
         include: [
           { model: User, as: 'Followers' },
           { model: User, as: 'Followings' },
-          Like,
-          Tweet,
-          Reply
+          { model: Like, include: [{ model: Tweet, include: [Like, Reply, User] }] },
+          Reply,
+          Tweet
         ]
       }) : null
 
       if (!dataValues) {
         throw new Error("user is not found");
       }
-      let tweetsData = {}
-      tweetsData = await Tweet.findAll({
-        include: [
-          User,
-          Like,
-          Reply
-        ]
-      })
 
       let userData = {}
       userData = { ...dataValues, introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null, isFollowing: req.user.Followings.map(d => d.id).includes(userId) }
 
-      const likedTweets = tweetsData.filter(tweet =>
-        userData.Likes.map(like => like.dataValues.TweetId).includes(tweet.dataValues.id)
+      let tweetsData = {}
+      tweetsData = dataValues.Likes.map(d =>
+        d.dataValues.Tweet
       )
-
-      const tweets = likedTweets.map(tweet => ({
+      const tweets = tweetsData.map(tweet => ({
         ...tweet,
         description: tweet.description
           ? tweet.description.substring(0, 50)
@@ -165,7 +157,7 @@ const userController = {
           ? moment(tweet.updatedAt).format(`YYYY-MM-DD, hh:mm`)
           : "-",
       }));
-
+      console.log(tweets)
       return res.render('getLikes', { userData, tweets, isOwner })
     } catch (error) {
       console.log("error", error);
