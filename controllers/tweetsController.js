@@ -7,8 +7,6 @@ const helpers = require("../_helpers");
 const tweetController = {
   getTweets: (req, res) => {
     Tweet.findAll({
-      raw: true,
-      nest: true,
       limit: 10,
       order: [["createdAt", "DESC"]],
       include: [
@@ -17,13 +15,11 @@ const tweetController = {
       ],
     }).then((tweets) => {
       tweets = tweets.map((tweet) => ({
-        ...tweet,
+        ...tweet.dataValues,
         description: tweet.description.substring(0, 100),
-        isLiked: tweet.LikedUsers.id === helpers.getUser(req).id,
+        isLiked: tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id),
         likedCount: tweet.LikedUsers.length
       }));
-
-      console.log('tweets', tweets)
 
       User.findAll({
         raw: true,
@@ -59,6 +55,19 @@ const tweetController = {
       TweetId: req.params.id
     }).then(like => {
       return res.redirect('/tweets')
+    })
+  },
+  removeLike: (req, res) => {
+    Like.findOne({
+      where: {
+        UserId: helpers.getUser(req).id,
+        TweetId: req.params.id
+      }
+    }).then(like => {
+      like.destroy()
+        .then(like => {
+          return res.redirect('back')
+        })
     })
   }
 };
