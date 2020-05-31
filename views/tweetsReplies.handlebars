@@ -1,6 +1,7 @@
 <div class='row'>
+  {{> messages}}
   <div class='col-md-4 pr-5 display-flex justify-content-center'>
-    <img class='my-5 rounded' src="{{targetUser.avatar}}" alt="{{targetUser.name}}" width='200px' height='200px' />
+    <img class='rounded' src="{{targetUser.avatar}}" alt="{{targetUser.name}}" width='200px' height='200px' />
     <h2 class='mb-4'>
       <strong>{{targetUser.name}}</strong>
     </h2>
@@ -82,25 +83,23 @@
       {{/if}}
     </div>
   </div>
-  <div class='col-md-8 mt-5'>
-    <h1 class="text-info mb-3">
+  <div class='col-md-8'>
+    <h2 class="text-info mb-3">
       <strong>Tweets</strong>
-    </h1>
+    </h2>
     <div class='card'>
       <div class='card-body'>
         <div class='row'>
           <div class='col-4'>
-            <img src="{{targetUser.avatar}}" width='170px' height='170px' class='rounded ml-3' />
+            <img src="{{targetUser.avatar}}" class='rounded ml-3 w-100 h-auto' />
           </div>
           <div class='col-8 justify-content-around'>
-            <div class='card-body'>
-              <h5 class='card-title'>
-                <a href="/users/{{targetUser.id}}/tweets">@{{targetUser.name}}</a>
-              </h5>
-              <p class="card-text">{{targetUser.introduction}}</p>
-              <p class="card-text"><small class="text-muted">{{fromNow this.createdAt}}</small></p>
-            </div>
-            <div class='card-body text-right inline-block mt-1'>
+            <h5 class='card-title'>
+              <a href="/users/{{targetUser.id}}/tweets" style="text-decoration: none;">@{{targetUser.name}}</a>
+            </h5>
+            <p class="card-text">{{targetUser.introduction}}</p>
+            <p class="card-text"><small class="text-muted">{{fromNow this.createdAt}}</small></p>
+            <div class='text-right inline-block mt-1'>
               <a href="/tweets/{{tweet.id}}/replies" class='btn btn-primary mr-2'>Reply ({{tweet.replies.length}})</a>
               {{#if tweet.isLiked}}
                 <form action="/tweets/{{tweet.id}}/unlike" method='POST' style='display: contents;'>
@@ -125,24 +124,22 @@
     </div>
 
     <div class='pt-4'>
-      <h1 class="text-info mb-3">
+      <h2 class="text-info mb-3">
         <strong>Replies</strong>
-      </h1>
+      </h2>
       {{#each tweet.replies}}
       <div class='card mb-3'>
         <div class='card-body'>
           <div class='row'>
             <div class='col-4'>
-              <img src="{{this.User.avatar}}" width='170px' height='170px' class='rounded ml-3' />
+              <img src="{{this.User.avatar}}" class='rounded ml-3 w-100 h-auto' />
             </div>
-            <div class='col-8 justify-content-around'>
-              <div class='card-body'>
-                <h5 class='card-title'>
-                  <a href="/users/{{this.User.id}}/tweets">@{{this.User.name}}</a>
-                  <small class='pl-2'>&nbsp;{{fromNow this.createdAt}}</small>
-                </h5>
-                <p class='card-text pl-1'>{{this.comment}}</p>
-              </div>
+            <div class='col-8'>
+              <h5 class='card-title'>
+                <a href="/users/{{this.User.id}}/tweets" style="text-decoration: none;">@{{this.User.name}}</a>
+              </h5>
+              <p class="card-text">{{this.comment}}</p>
+              <p class="card-text"><small>{{fromNow this.createdAt}}</small></p>
             </div>
           </div>
         </div>
@@ -152,7 +149,7 @@
 
     <form action="/tweets/{{tweet.id}}/replies" method='POST'>
       <div class='form-group'>
-        <textarea class='form-control' id='text' name='text' rows='3'></textarea>
+        <textarea class='form-control' id='comment' name='comment' rows='3'></textarea>
       </div>
       <button type='submit' class='btn btn-primary float-right'>Reply</button>
     </form>

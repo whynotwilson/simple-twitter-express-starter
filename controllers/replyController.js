@@ -45,6 +45,22 @@ const replyController = {
       });
     });
   },
+  postReply: (req, res) => {
+    const comments = req.body.comment.trim()
+
+    if (comments.length === 0) {
+      req.flash('error_messages', '輸入不可為空白！')
+      return res.redirect(`/tweets/${req.params.tweet_id}/replies`)
+    } else {
+      return Reply.create({
+        comment: req.body.comment,
+        UserId: helpers.getUser(req).id,
+        TweetId: req.params.tweet_id
+      }).then(reply => {
+        return res.redirect(`/tweets/${req.params.tweet_id}/replies`)
+      })
+    }
+  }
 };
 
 module.exports = replyController;

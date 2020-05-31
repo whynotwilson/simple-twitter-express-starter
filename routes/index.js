@@ -30,4 +30,5 @@ module.exports = (app) => {
   app.post('/tweets/:id/unlike', authenticated, tweetsController.removeLike)
 
   app.get('/tweets/:tweet_id/replies', authenticated, replyController.getReplies)
+  app.post('/tweets/:tweet_id/replies', authenticated, replyController.postReply)
 }
