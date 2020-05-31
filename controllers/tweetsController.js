@@ -1,6 +1,7 @@
 const db = require("../models");
 const Tweet = db.Tweet;
 const User = db.User;
+const Like = db.Like;
 const helpers = require("../_helpers");
 
 const tweetController = {
@@ -10,12 +11,19 @@ const tweetController = {
       nest: true,
       limit: 10,
       order: [["createdAt", "DESC"]],
-      include: [User],
+      include: [
+        User,
+        {model: User, as: 'LikedUsers'}
+      ],
     }).then((tweets) => {
       tweets = tweets.map((tweet) => ({
         ...tweet,
         description: tweet.description.substring(0, 100),
+        isLiked: tweet.LikedUsers.id === helpers.getUser(req).id,
+        likedCount: tweet.LikedUsers.length
       }));
+
+      console.log('tweets', tweets)
 
       User.findAll({
         raw: true,
@@ -45,6 +53,14 @@ const tweetController = {
       return res.redirect("/tweets");
     }
   },
+  addLike: (req, res) => {
+    return Like.create({
+      UserId: helpers.getUser(req).id,
+      TweetId: req.params.id
+    }).then(like => {
+      return res.redirect('/tweets')
+    })
+  }
 };
 
 module.exports = tweetController;

@@ -24,4 +24,5 @@ module.exports = (app) => {
   // 首頁
   app.get('/tweets', authenticated, tweetsController.getTweets)
   app.post('/tweets', authenticated, tweetsController.postTweets)
+  app.post('/tweets/:id/like', authenticated, tweetsController.addLike)
 }
