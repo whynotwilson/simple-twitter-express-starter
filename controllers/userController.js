@@ -10,34 +10,36 @@ const bcrypt = require('bcryptjs')
 
 const fs = require('fs')
 
+const imgur = require('imgur-node-api')
+const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
+
 const userController = {
   getTweets: async (req, res) => {
     try {
-      const userId = req.params.id;
-      const { dataValues } = (await User.findByPk(userId))
-        ? await User.findByPk(userId, {
-          include: [
-            { model: User, as: "Followers" },
-            { model: User, as: "Followings" },
-            Like,
-            Tweet,
-            Reply,
-          ],
-        })
-        : null;
+
+      const userId = Number(req.params.id)
+      let isOwner = userId === req.user.id ? true : false;
+
+      const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId, {
+        include: [
+          { model: User, as: 'Followers' },
+          { model: User, as: 'Followings' },
+          { model: Tweet, include: [Like, Reply] },
+          Like,
+          Reply
+        ]
+      }) : null
 
       if (!dataValues) {
         throw new Error("user is not found");
       }
-      let user = {};
-      user = {
-        ...dataValues,
-        introduction: dataValues.introduction
-          ? dataValues.introduction.substring(0, 30)
-          : null,
-      };
+      let userData = {}
+      userData = {
+        ...dataValues, introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null,
+        isFollowing: req.user.Followings.map(d => d.id).includes(userId)
+      }
 
-      const tweets = dataValues.Tweets.map((tweet) => ({
+      const tweets = dataValues.Tweets.map(tweet => ({
         ...tweet,
         description: tweet.description
           ? tweet.description.substring(0, 50)
@@ -47,152 +49,109 @@ const userController = {
           : "-",
       }));
 
-      // let isOwn = userId === req.user.id ? true : false
-
-      return res.render("getTweets", { user, tweets });
+      return res.render('getTweets', { userData, tweets, isOwner })
     } catch (error) {
       console.log("error", error);
     }
   },
   getFollowings: async (req, res) => {
     try {
-      // let isOwn = userId === req.user.id ? true : false
-      //判斷不是owner 要退出
 
-      const userId = req.params.id;
-      const { dataValues } = (await User.findByPk(userId))
-        ? await User.findByPk(userId, {
-          include: [
-            { model: User, as: "Followers" },
-            { model: User, as: "Followings" },
-            Like,
-            Tweet,
-            Reply,
-          ],
-        })
-        : null;
+      const userId = Number(req.params.id)
+      let isOwner = userId === req.user.id ? true : false;
+
+      const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId, {
+        include: [
+          { model: User, as: 'Followers' },
+          { model: User, as: 'Followings' },
+          Like,
+          Tweet,
+          Reply
+        ]
+      }) : null
 
       if (!dataValues) {
         throw new Error("user is not found");
       }
-      let user = {};
-      user = {
-        ...dataValues,
-        introduction: dataValues.introduction
-          ? dataValues.introduction.substring(0, 30)
-          : null,
-      };
+      let userData = {}
+      userData = {
+        ...dataValues, introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null,
+        isFollowing: req.user.Followings.map(d => d.id).includes(userId)
+      }
 
-      const followings = dataValues.Followings.map((following) => ({
+
+      const followings = dataValues.Followings.map(following => ({
         ...following.dataValues,
-        introduction: following.introduction
-          ? following.introduction.substring(0, 20)
-          : null,
-      }));
+        introduction: following.introduction ? following.introduction.substring(0, 20) : null,
+      }))
 
-      return res.render("getFollowings", {
-        user: user,
-        followings: followings,
-      });
+      return res.render('getFollowings', { userData, followings: followings, isOwner })
     } catch (error) {
       console.log("error", error);
     }
   },
   getFollowers: async (req, res) => {
     try {
-      // let isOwn = userId === req.user.id ? true : false
-      //判斷不是owner 要退出
 
-      const userId = req.params.id;
-      const { dataValues } = (await User.findByPk(userId))
-        ? await User.findByPk(userId, {
-          include: [
-            { model: User, as: "Followers" },
-            { model: User, as: "Followings" },
-            Like,
-            Tweet,
-            Reply,
-          ],
-        })
-        : null;
+      const userId = Number(req.params.id)
+      let isOwner = userId === req.user.id ? true : false;
+      const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId, {
+        include: [
+          { model: User, as: 'Followers' },
+          { model: User, as: 'Followings' },
+          Like,
+          Tweet,
+          Reply
+        ]
+      }) : null
 
       if (!dataValues) {
         throw new Error("user is not found");
       }
-      let user = {};
-      user = {
-        ...dataValues,
-        introduction: dataValues.introduction
-          ? dataValues.introduction.substring(0, 30)
-          : null,
-      };
+      let userData = {}
+      userData = {
+        ...dataValues, introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null,
+        isFollowing: req.user.Followings.map(d => d.id).includes(userId)
+      }
 
-      const followers = dataValues.Followers.map((follower) => ({
+      const followers = dataValues.Followers.map(follower => ({
         ...follower.dataValues,
-        introduction: follower.introduction
-          ? follower.introduction.substring(0, 20)
-          : null,
-      }));
+        introduction: follower.introduction ? follower.introduction.substring(0, 20) : null,
+        isOwnFollower: follower.dataValues.id === req.user.id ? true : false
+      }))
 
-      const followings = dataValues.Followings.map((following) => ({
-        ...following.dataValues,
-      }));
-
-      // 確認是否追蹤
-      const isFollowing = followings.every((following) => {
-        followers.every((follower) => {
-          following.id === follower.id;
-        });
-      });
-
-      return res.render("getFollowers", {
-        user: user,
-        followers: followers,
-        isFollowing: isFollowing,
-      });
+      return res.render('getFollowers', { userData, followers: followers, isOwner })
     } catch (error) {
       console.log("error", error);
     }
   },
   getLikes: async (req, res) => {
     try {
-      //判斷是否為isOwn
 
-      const userId = req.params.id;
-      const { dataValues } = (await User.findByPk(userId))
-        ? await User.findByPk(userId, {
-          include: [
-            { model: User, as: "Followers" },
-            { model: User, as: "Followings" },
-            Like,
-            Tweet,
-            Reply,
-          ],
-        })
-        : null;
+      const userId = Number(req.params.id)
+      let isOwner = userId === req.user.id ? true : false;
+      const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId, {
+        include: [
+          { model: User, as: 'Followers' },
+          { model: User, as: 'Followings' },
+          { model: Like, include: [{ model: Tweet, include: [Like, Reply, User] }] },
+          Reply,
+          Tweet
+        ]
+      }) : null
 
       if (!dataValues) {
         throw new Error("user is not found");
       }
-      let Tweets = {};
-      Tweets = await Tweet.findAll(
-        { raw: true, nest: true },
-        { include: User }
-      );
 
-      let user = {};
-      user = {
-        ...dataValues,
-        introduction: dataValues.introduction
-          ? dataValues.introduction.substring(0, 30)
-          : null,
-      };
+      let userData = {}
+      userData = { ...dataValues, introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null, isFollowing: req.user.Followings.map(d => d.id).includes(userId) }
 
-      const likedTweets = Tweets.filter((tweet) =>
-        user.Likes.map((like) => like.dataValues.TweetId).includes(tweet.id)
-      );
-
-      const tweets = likedTweets.map((tweet) => ({
+      let tweetsData = {}
+      tweetsData = dataValues.Likes.map(d =>
+        d.dataValues.Tweet
+      )
+      const tweets = tweetsData.map(tweet => ({
         ...tweet,
         description: tweet.description
           ? tweet.description.substring(0, 50)
@@ -201,10 +160,8 @@ const userController = {
           ? moment(tweet.updatedAt).format(`YYYY-MM-DD, hh:mm`)
           : "-",
       }));
-
-      // let isOwn = userId === req.user.id ? true : false
-
-      return res.render("getLikes", { user, tweets });
+      console.log(tweets)
+      return res.render('getLikes', { userData, tweets, isOwner })
     } catch (error) {
       console.log("error", error);
     }
@@ -229,59 +186,68 @@ const userController = {
           followingId: req.params.userId,
         },
       }).then((followship) => {
-        followship.destroy();
-      });
+        followship.destroy()
+      })
+      return res.redirect('back')
 
-      return res.redirect("back");
     } catch (error) {
       console.log("error", error);
     }
   },
   getEdit: async (req, res) => {
     try {
-      //驗證isOwn
-      // let isOwn = userId === req.user.id ? true : false
+      const userId = Number(req.params.id)
+      //判斷是否為owner 不然退出
+      if (userId === req.user.id) {
+        const { dataValues } = (await User.findByPk(userId))
+          ? await User.findByPk(userId)
+          : null;
 
-      const userId = req.params.id;
-      const { dataValues } = (await User.findByPk(userId))
-        ? await User.findByPk(userId)
-        : null;
+        if (!dataValues) {
+          throw new Error("user is not found");
+        }
+        let user = {};
+        user = { ...dataValues };
 
-      if (!dataValues) {
-        throw new Error("user is not found");
+        return res.render("getEdit", { user });
+      } else {
+        return res.redirect('/')
       }
-      let user = {};
-      user = { ...dataValues };
 
-      return res.render("getEdit", { user });
     } catch (error) {
       console.log("error", error);
     }
   },
   postEdit: async (req, res) => {
     try {
-      // if (!req.body.name) {
-      //   req.flash('error_messages', "請至少輸入姓名")
-      //   return res.redirect('back')
-      // }
+      if (!req.body.name) {
+        req.flash('error_messages', "請至少輸入姓名")
+        return res.redirect('back')
+      }
+
       const userId = req.params.id;
 
       const { file } = req;
       if (file) {
-        const data = fs.readFileSync(file.path);
-        const writeFile = fs.writeFileSync(`upload/${file.originalname}`, data);
+        imgur.setClientID(IMGUR_CLIENT_ID)
+        // const data = fs.readFileSync(file.path);
+        // const writeFile = fs.writeFileSync(`upload/${file.originalname}`, data);
+        const uploadImage = await imgur.upload(file.path, async (err, image) => {
+          try {
+            const updateUser = await User.findByPk(userId).then((user) => {
+              user.update({
+                name: req.body.name,
+                introduction: req.body.introduction,
+                avatar: file ? image.data.link : null,
+              });
+            });
+            req.flash('success_messages', "變更已成功儲存")
+            return res.redirect(`/users/${userId}/tweets`);
+          } catch (error) {
+            console.log('error', error)
+          }
 
-        const updateUser = await User.findByPk(userId).then((user) => {
-          user.update({
-            name: req.body.name,
-            introduction: req.body.introduction,
-            avatar: file ? `/upload/${file.originalname}` : null,
-          });
-        });
-
-        // 可以加flash - 更新成功
-
-        return res.redirect(`/users/${userId}/edit`);
+        })
       } else {
         const updateUser = await User.findByPk(userId).then((user) => {
           user.update({
@@ -291,6 +257,7 @@ const userController = {
           });
         });
 
+        req.flash('success_messages', "變更已成功儲存")
         return res.redirect(`/users/${userId}/tweets`);
       }
     } catch (error) {
@@ -302,7 +269,6 @@ const userController = {
   },
 
   signUp: (req, res) => {
-    console.log('req.body', req.body)
     // confirm password
     if (req.body.passwordCheck !== req.body.password) {
       req.flash("error_messages", "兩次密碼輸入不同！");

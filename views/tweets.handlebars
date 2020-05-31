@@ -3,11 +3,11 @@
     <form action="/tweets" method="POST">
       <div class="input-group">
         <textarea id="tweets" name="tweets" class="form-control" aria-label="With textarea"
-          placeholder="what's on your mind?" rows="3" oninput="charactersLeft()"></textarea>
+          placeholder="what's on your mind?" rows="3" oninput="tweetsLeft()"></textarea>
       </div>
       <div class="text-muted">
-        <small>characters left:</small>
-        <span id="charactersLeft"><small></small></span>
+        <small id="tweetsText">characters left:</small>
+        <span id="tweetsNumber">140</span>
       </div>
       <button id="tweetBtn" class="btn btn-primary float-right" type="submit">Tweet</button>
     </form>
@@ -55,21 +55,23 @@
 </div>
 
 <script>
-  function charactersLeft() {
+  function tweetsLeft() {
     const tweets = document.getElementById('tweets').value
     let tweetsCount = 140 - tweets.length
-    const tweetsRemain = document.getElementById('charactersLeft')
+    const tweetsRemain = document.getElementById('tweetsNumber')
+    const tweetsTitle = document.getElementById('tweetsText')
     const tweetsButton = document.getElementById('tweetBtn')
 
     if (tweetsCount <= 0) {
       tweetsRemain.className = "text-danger"
       tweetsRemain.textContent = 'Tweets exceed 140'
       tweetsButton.disabled = true
-      return
+      tweetsTitle.style.display = 'none'
     } else {
       tweetsRemain.className = "text-muted"
       tweetsRemain.textContent = tweetsCount
       tweetsButton.disabled = false
+      tweetsTitle.style.display = 'inline'
     }
   }
 </script>

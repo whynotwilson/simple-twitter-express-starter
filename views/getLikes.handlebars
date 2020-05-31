@@ -1,40 +1,52 @@
 <div class="container py-5">
   <div class="row" style="justify-content: space-evenly">
     <div col="col-md-4">
-      <img src="{{user.avatar}}" alt="avatar" style="width: 250px;margin-bottom: 25px;" />
-      <div class="userProfile">
+      <img src="{{userData.avatar}}" alt="avatar" style="width: 250px;margin-bottom: 25px;" />
+      <div class="userDataProfile">
         <ul class="list-group" style="list-style-type:none">
           <li>
-            <h3>{{user.name}}</h3>
+            <h3>{{userData.name}}</h3>
           </li>
-          <li>{{user.introduction}}</li>
+          <li>{{userData.introduction}}</li>
           <li>
-            <a href="/users/{{user.id}}/tweets">
+            <a href="/users/{{userData.id}}/tweets">
               Tweet &nbsp
-              <span class="badge badge-primary badge-pill">{{user.Tweets.length}}</span>
+              <span class="badge badge-primary badge-pill">{{userData.Tweets.length}}</span>
             </a>
           </li>
           <li>
-            <a href="/users/{{user.id}}/followings">
+            <a href="/users/{{userData.id}}/followings">
               Followings &nbsp
-              <span class="badge badge-primary badge-pill">{{user.Followings.length}}</span>
+              <span class="badge badge-primary badge-pill">{{userData.Followings.length}}</span>
             </a>
           </li>
           <li>
-            <a href="/users/{{user.id}}/followers">
+            <a href="/users/{{userData.id}}/followers">
               Followers &nbsp
-              <span class="badge badge-primary badge-pill">{{user.Followers.length}}</span>
+              <span class="badge badge-primary badge-pill">{{userData.Followers.length}}</span>
             </a>
           </li>
           <li>
-            <a href="/users/{{user.id}}/likes">
+            <a href="/users/{{userData.id}}/likes">
               Like &nbsp
-              <span class="badge badge-primary badge-pill">{{user.Likes.length}}</span>
+              <span class="badge badge-primary badge-pill">{{userData.Likes.length}}</span>
             </a>
           </li>
         </ul>
-        <a href="/users/{{user.id}}/edit" class="btn btn-primary mt-5"> Edit Profile</a>
+        {{#if isOwner}}
+        <a href="/users/{{userData.id}}/edit" class="btn btn-primary mt-5"> Edit Profile</a>
+        {{else}}
 
+        {{#if userData.isFollowing}}
+        <form action="/followships/{{userData.id}}?_method=DELETE" method="POST">
+          <button type="submit" class="btn btn-danger">Unfollow</button>
+        </form>
+        {{else}}
+        <form action="/followships/{{userData.id}}" method="POST">
+          <button type="submit" class="btn btn-primary">Follow </button>
+        </form>
+        {{/if}}
+        {{/if}}
       </div>
     </div>
 
@@ -44,18 +56,18 @@
       <div class="card mb-3" style="max-width: 540px;">
         <div class="row no-gutters">
           <div class="col-md-4">
-            <img src="{{../user.avatar}}" class="card-img" alt="avatar">
+            <img src="{{this.dataValues.User.avatar}}" class="card-img" alt="avatar">
           </div>
           <div class="col-md-8">
             <div class="card-body">
               <h5 class="card-title">
-                @{{../user.name}} <small class="text-muted">{{this.updatedAt}}</small>
+                @{{this.dataValues.User.name}} <small class="text-muted">{{this.updatedAt}}</small>
               </h5>
               <p class="card-text">{{this.description}}</p>
-              <a href="/users/{{../user.id}}/replies" class="btn btn-primary mt-5">
-                Reply({{../user.Replies.length}})</a>
-              <a href="/users/{{../user.id}}/likes" class="btn btn-danger mt-5">
-                Like({{../user.Likes.length}})</a>
+              <a href="/users/{{this.dataValues.User.id}}/replies" class="btn btn-primary mt-5">
+                Reply({{this.dataValues.Replies.length}})</a>
+              <a href="/users/{{this.dataValues.User.id}}/likes" class="btn btn-danger mt-5">
+                Like({{this.dataValues.Likes.length}})</a>
 
             </div>
           </div>

@@ -1,41 +1,52 @@
 <div class="container py-5">
   <div class="row" style="justify-content: space-evenly">
     <div col="col-md-4">
-      <img src="{{user.avatar}}" alt="avatar" style="width: 250px;margin-bottom: 25px;" />
-      <div class="userProfile">
+      <img src="{{userData.avatar}}" alt="avatar" style="width: 250px;margin-bottom: 25px;" />
+      <div class="userDataProfile">
         <ul class="list-group" style="list-style-type:none">
           <li>
-            <h3>{{user.name}}</h3>
+            <h3>{{userData.name}}</h3>
           </li>
-          <li>{{user.introduction}}</li>
+          <li>{{userData.introduction}}</li>
           <li>
-            <a href="/users/{{user.id}}/tweets">
+            <a href="/users/{{userData.id}}/tweets">
               Tweet &nbsp
-              <span class="badge badge-primary badge-pill">{{user.Tweets.length}}</span>
+              <span class="badge badge-primary badge-pill">{{userData.Tweets.length}}</span>
             </a>
           </li>
           <li>
-            <a href="/users/{{user.id}}/followings">
+            <a href="/users/{{userData.id}}/followings">
               Followings &nbsp
-              <span class="badge badge-primary badge-pill">{{user.Followings.length}}</span>
+              <span class="badge badge-primary badge-pill">{{userData.Followings.length}}</span>
             </a>
           </li>
           <li>
-            <a href="/users/{{user.id}}/followers">
+            <a href="/users/{{userData.id}}/followers">
               Followers &nbsp
-              <span class="badge badge-primary badge-pill">{{user.Followers.length}}</span>
+              <span class="badge badge-primary badge-pill">{{userData.Followers.length}}</span>
             </a>
           </li>
           <li>
-            <a href="/users/{{user.id}}/likes">
+            <a href="/users/{{userData.id}}/likes">
               Like &nbsp
-              <span class="badge badge-primary badge-pill">{{user.Likes.length}}</span>
+              <span class="badge badge-primary badge-pill">{{userData.Likes.length}}</span>
             </a>
           </li>
         </ul>
+        {{#if isOwner}}
+        <a href="/users/{{userData.id}}/edit" class="btn btn-primary mt-5"> Edit Profile</a>
+        {{else}}
 
-        <a href="/users/{{user.id}}/edit" class="btn btn-primary mt-5"> Edit Profile</a>
-
+        {{#if userData.isFollowing}}
+        <form action="/followships/{{userData.id}}?_method=DELETE" method="POST">
+          <button type="submit" class="btn btn-danger">Unfollow</button>
+        </form>
+        {{else}}
+        <form action="/followships/{{userData.id}}" method="POST">
+          <button type="submit" class="btn btn-primary">Follow </button>
+        </form>
+        {{/if}}
+        {{/if}}
       </div>
     </div>
 
@@ -55,8 +66,9 @@
                   @{{this.name}}
                 </h5>
                 <p class="card-text">{{this.introduction}}</p>
-
-                {{#if isFollowing}}
+                {{#if this.isOwnFollower}}
+                {{else}}
+                {{#if userData.isFollowing}}
                 <form action="/followships/{{this.id}}?_method=DELETE" method="POST">
                   <button type="submit" class="btn btn-danger">Unfollow</button>
                 </form>
@@ -64,6 +76,7 @@
                 <form action="/followships/{{this.id}}" method="POST">
                   <button type="submit" class="btn btn-primary">Follow</button>
                 </form>
+                {{/if}}
                 {{/if}}
               </div>
             </div>

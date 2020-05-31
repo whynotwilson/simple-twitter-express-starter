@@ -13,20 +13,17 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
 const passport = require('./config/passport')
-// const flash = require('connect-flash')
+
 
 // use helpers.getUser(req) to replace req.user
 // use helpers.ensureAuthenticated(req) to replace req.isAuthenticated()
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
 app.use('/upload', express.static(__dirname + '/upload'))
-// app.use(flash())
 
-// app.use((req, res, next) => {
-//   res.locals.success_msg = req.flash('success_msg')
-//   res.locals.warning_msg = req.flash('warning_msg')
-//   next()
-// })
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
+
 
 app.engine('handlebars', handlebars({
   defaultLayout: 'main',

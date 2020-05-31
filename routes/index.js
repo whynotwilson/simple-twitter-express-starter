@@ -37,7 +37,7 @@ module.exports = (app) => {
   app.delete('/admin/tweets/:id', authenticatedAdmin, adminController.deleteTweet)
 
   // 導向首頁
-  app.get('/', (req, res) => res.redirect('/tweets'))
+  app.get('/', authenticated, (req, res) => res.redirect('/tweets'))
   // 首頁
   app.get('/tweets', authenticated, tweetsController.getTweets)
   app.post('/tweets', authenticated, tweetsController.postTweets)
