@@ -29,6 +29,8 @@ const replyController = {
           { model: Tweet, as: "LikedTweets" },
         ],
       }).then((user) => {
+        const currentUserId = helpers.getUser(req).id
+
         user.dataValues.tweetsCount = user.Tweets.length;
         user.dataValues.followerCount = user.Followers.length;
         user.dataValues.followingCount = user.Followings.length;
@@ -41,6 +43,7 @@ const replyController = {
         return res.render("tweetsReplies", {
           tweet: tweet.toJSON(),
           targetUser: user.toJSON(),
+          currentUserId
         });
       });
     });
