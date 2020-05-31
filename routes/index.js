@@ -1,5 +1,6 @@
 const userController = require('../controllers/userController')
 const tweetsController = require('../controllers/tweetsController')
+const replyController = require('../controllers/replyController')
 const passport = require('../config/passport')
 
 const authenticated = (req, res, next) => {
@@ -27,4 +28,6 @@ module.exports = (app) => {
   app.post('/tweets', authenticated, tweetsController.postTweets)
   app.post('/tweets/:id/like', authenticated, tweetsController.addLike)
   app.post('/tweets/:id/unlike', authenticated, tweetsController.removeLike)
+
+  app.get('/tweets/:tweet_id/replies', authenticated, replyController.getReplies)
 }
