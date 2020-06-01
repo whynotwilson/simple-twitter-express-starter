@@ -1,0 +1,43 @@
+<div>
+  <div class="row" style="margin: 40px;">
+    <div class="col-md-12 mb-3">
+      <a href='/admin/tweets'>
+        <button type="button" class="btn btn-primary">All Tweets</button>
+      </a>
+      <a href='/admin/users'>
+        <button type="button" class="btn btn-primary">All Users</button>
+      </a>
+      <br />
+    </div>
+
+    <div class="col-md-12">
+      {{#each tweets}}
+      <div class="card mb-3">
+        <div class="row no-gutters">
+          <div class="col-md-3">
+            <img src="{{this.User.avatar}}" class="card-img" alt="user avatar">
+          </div>
+          <div class="col-md-9 row">
+            <div class="col-md-6 ml-3 mt-3">
+              <h5>
+                <a href="/users/{{ this.User.id }}/tweets">{{ this.User.name }}</a>
+              </h5>
+              <p class="card-text">{{ this.description }}</p>
+              <p class="card-text">按讚人數： {{ this.likedCounter}}</p>
+              <p class="card-text"><small class="text-muted">{{ fromNow this.createdAt }}</small></p>
+            </div>
+            <div class="col-md-3"></div>
+            <div class="col-md-2 d-flex align-items-end">
+              <form action="/admin/tweets/{{this.id}}?_method=DELETE" method="POST">
+                <div>
+                  <button class="btn btn-danger">刪除</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+</div>

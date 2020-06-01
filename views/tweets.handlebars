@@ -1,0 +1,112 @@
+<div class="row justify-content-center my-3">
+  <div class="col-md-6">
+    <form action="/tweets" method="POST">
+      <div class="input-group">
+        <textarea id="tweets" name="tweets" class="form-control" aria-label="With textarea"
+          placeholder="what's on your mind?" rows="3" oninput="tweetsLeft()"></textarea>
+      </div>
+      <div class="text-muted">
+        <small id="tweetsText">characters left:</small>
+        <span id="tweetsNumber">140</span>
+      </div>
+      <button id="tweetBtn" class="btn btn-primary float-right" type="submit">Tweet</button>
+    </form>
+    <br>
+    <br>
+    {{#each tweets}}
+    <div class="card mb-3" style="max-width: 540px;">
+      <div class="row no-gutters">
+        <div class="col-md-4">
+          <img src="{{this.User.avatar}}" class="card-img" alt="user avatar">
+        </div>
+        <div class="col-md-8">
+          <div class="card-body">
+            <h5 class="card-title">
+              <a href="/users/{{ this.User.id }}/tweets">{{ this.User.name }}</a>
+            </h5>
+            <p class="card-text">{{ this.description }}</p>
+            <p class="card-text"><small class="text-muted">{{ fromNow this.createdAt }}</small></p>
+          </div>
+          <div class="card-body text-right inline-block mt-1">
+            <a href="/tweets/{{this.id}}/replies" class="btn btn-primary mr-2">Reply({{ this.replyCount }})</a>
+            {{#if this.isLiked }}
+            <form action="/tweets/{{this.id}}/unlike" method="POST" style="display: contents;">
+              <button type="submit" class="btn btn-danger">
+                <i class="fa fa-heart" aria-hidden="true"></i>
+                unlike({{ this.likedCount }})
+              </button>
+            </form>
+            {{else}}
+            <form action="/tweets/{{this.id}}/like" method="POST" style="display: contents;">
+              <input type="hidden" name="userId" value="{{this.id}}" />
+              <button type="submit" class="btn btn-primary">
+                <i class="fa fa-heart" aria-hidden="true"></i>
+                like({{ this.likedCount }})
+              </button>
+            </form>
+            {{/if}}
+          </div>
+        </div>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+  <div class="col-md-4">
+    <p class="h1">Popular Users</p>
+    <br>
+    {{#each users}}
+    <div class="card mb-3" style="max-width: 400px;">
+      <div class="row no-gutters">
+        <div class="col-md-4">
+          <img src="{{this.avatar}}" class="card-img" alt="user avatar">
+        </div>
+        <div class="col-md-8">
+          <div class="card-body">
+            <h5 class="card-title">
+              <a href="/users/{{this.id}}/tweets">{{ this.name }}</a>
+            </h5>
+            <p class="card-text">{{ this.introduction}}</p>
+            {{#ifNotCond this.id ../user.id}}
+            {{#if this.isFollowed }}
+            <form class="text-right" action="/followships/{{this.id}}?_method=DELETE" method="POST">
+              <button type="submit" class="btn btn-danger" name="id" value={{this.id}}>
+                Unfollow <i class="fa fa-user" aria-hidden="true"></i>
+              </button>
+            </form>
+            {{else}}
+            <form class="text-right" action="/followships/{{this.id}}" method="POST">
+              <button type="submit" class="btn btn-info" name="id" value={{this.id}}>
+                Follow <i class="fa fa-user-plus" aria-hidden="true"></i>
+              </button>
+            </form>
+            {{/if}}
+            {{/ifNotCond}}
+          </div>
+        </div>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+</div>
+
+<script>
+  function tweetsLeft() {
+    const tweets = document.getElementById('tweets').value
+    let tweetsCount = 140 - tweets.length
+    const tweetsRemain = document.getElementById('tweetsNumber')
+    const tweetsTitle = document.getElementById('tweetsText')
+    const tweetsButton = document.getElementById('tweetBtn')
+
+    if (tweetsCount <= 0) {
+      tweetsRemain.className = "text-danger"
+      tweetsRemain.textContent = 'Tweets exceed 140'
+      tweetsButton.disabled = true
+      tweetsTitle.style.display = 'none'
+    } else {
+      tweetsRemain.className = "text-muted"
+      tweetsRemain.textContent = tweetsCount
+      tweetsButton.disabled = false
+      tweetsTitle.style.display = 'inline'
+    }
+  }
+</script>
