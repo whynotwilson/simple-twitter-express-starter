@@ -224,7 +224,7 @@ const userController = {
   postEdit: async (req, res) => {
     try {
       if (!req.body.name) {
-        req.flash('error_messages', "請至少輸入姓名")
+        req.flash('error_messages', { error_messages: "請至少輸入姓名" })
         return res.redirect('back')
       }
 
@@ -271,32 +271,55 @@ const userController = {
     return res.render("signup");
   },
 
-  signUp: (req, res) => {
-    // confirm password
-    if (req.body.passwordCheck !== req.body.password) {
-      req.flash("error_messages", "兩次密碼輸入不同！");
-      return res.redirect("/signup");
-    } else {
+  signUp: async (req, res) => {
+    try {
+      const error_messages = []
+
+      if (req.body.passwordCheck !== req.body.password) {
+        error_messages.push({ error_messages: '兩次密碼輸入不同！' })
+      }
+
+      if (!req.body.name || !req.body.password || !req.body.email || !req.body.passwordCheck) {
+        error_messages.push({ error_messages: '請填寫所有欄位！' })
+      }
+
+      if (req.body.password.length < 8) {
+        error_messages.push({ error_messages: '密碼至少 8 位數！' })
+      }
+
+      // confirm unique name
+      let user = await User.findOne({ where: { name: req.body.name } })
+      if (user) {
+        error_messages.push({ error_messages: '暱稱重複！' })
+      }
+
       // confirm unique user
-      User.findOne({ where: { email: req.body.email } }).then((user) => {
-        if (user) {
-          req.flash("error_messages", "信箱重複！");
-          return res.redirect("/signup");
-        } else {
-          User.create({
-            name: req.body.name,
-            email: req.body.email,
-            password: bcrypt.hashSync(
-              req.body.password,
-              bcrypt.genSaltSync(10),
-              null
-            ),
-          }).then((user) => {
-            req.flash("success_messages", "成功註冊帳號！");
-            return res.redirect("/signin");
-          });
-        }
-      });
+      user = await User.findOne({ where: { email: req.body.email } })
+      if (user) {
+        error_messages.push({ error_messages: '信箱重複！' })
+      }
+
+      if (error_messages.length !== 0) {
+        req.flash('error_messages', error_messages)
+        return res.redirect("/signup");
+      }
+
+      await User.create({
+        name: req.body.name,
+        email: req.body.email,
+        password: bcrypt.hashSync(
+          req.body.password,
+          bcrypt.genSaltSync(10),
+          null
+        ),
+      })
+
+      req.flash("success_messages", "成功註冊帳號！");
+      return res.redirect("/signin");
+    } catch (error) {
+      console.log(error)
+      req.flash('success_messages', { error_messages: '資料庫異常，註冊帳號失敗！' });
+      return res.redirect("/signup");
     }
   },
 

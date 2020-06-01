@@ -52,7 +52,7 @@ const replyController = {
     const comments = req.body.comment.trim()
 
     if (comments.length === 0) {
-      req.flash('error_messages', '輸入不可為空白！')
+      req.flash('error_messages', { error_messages: '輸入不可為空白！' })
       return res.redirect(`/tweets/${req.params.tweet_id}/replies`)
     } else {
       return Reply.create({
