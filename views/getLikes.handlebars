@@ -1,7 +1,7 @@
 <div class="container py-5">
   <div class="row" style="justify-content: space-evenly">
     <div col="col-md-4">
-      <img src="{{userData.avatar}}" alt="avatar" style="width: 250px;margin-bottom: 25px;" />
+      <img src="{{this.dataValues.User.avatar}}" alt="avatar" style="width: 250px;margin-bottom: 25px;" />
       <div class="userDataProfile">
         <ul class="list-group" style="list-style-type:none">
           <li>
@@ -9,7 +9,7 @@
           </li>
           <li>{{userData.introduction}}</li>
           <li>
-            <a href="/users/{{userData.id}}/tweets">
+            <a href="/users/{{this.dataValues.id}}/tweets">
               Tweet &nbsp
               <span class="badge badge-primary badge-pill">{{userData.Tweets.length}}</span>
             </a>
@@ -50,7 +50,6 @@
       </div>
     </div>
 
-
     <div col="col-md-8">
       {{#each tweets}}
       <div class="card mb-3" style="max-width: 540px;">
@@ -65,11 +64,27 @@
                   class="text-muted">{{this.updatedAt}}</small>
               </h5>
               <p class="card-text">{{this.description}}</p>
-              <a href="/users/{{this.dataValues.User.id}}/replies" class="btn btn-primary mt-5">
-                Reply({{this.dataValues.Replies.length}})</a>
+              <a href="/tweets/{{this.dataValues.id}}/replies" class="btn btn-primary">
+                Reply({{this.Replies.length}})
+              </a>
+              {{#if this.isLiked }}
+              <form action="/tweets/{{this.dataValues.id}}/unlike" method="POST" style="display: contents;">
+                <button type="submit" class="btn btn-danger">
+                  <i class="fa fa-heart" aria-hidden="true"></i>
+                  unlike({{ this.likedCount}})
+                </button>
+              </form>
+              {{else}}
+              <form action="/tweets/{{this.dataValues.id}}/like" method="POST" style="display: contents;">
+                <input type="hidden" name="userId" value="{{this.id}}" />
+                <button type="submit" class="btn btn-primary">
+                  <i class="fa fa-heart" aria-hidden="true"></i>
+                  like({{ this.likedCount }})
+                </button>
+              </form>
+              {{/if}}
               <a href="/users/{{this.dataValues.User.id}}/likes" class="btn btn-danger mt-5">
                 Like({{this.dataValues.Likes.length}})</a>
-
             </div>
           </div>
         </div>

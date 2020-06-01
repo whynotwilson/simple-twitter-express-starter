@@ -137,7 +137,7 @@ const userController = {
         include: [
           { model: User, as: 'Followers' },
           { model: User, as: 'Followings' },
-          { model: Like, include: [{ model: Tweet, include: [Like, Reply, User] }] },
+          { model: Like, include: [{ model: Tweet, include: [Like, Reply, User, { model: User, as: 'LikedUsers' }] }] },
           Reply,
           Tweet
         ]
@@ -162,6 +162,8 @@ const userController = {
         updatedAt: tweet.updatedAt
           ? moment(tweet.updatedAt).format(`YYYY-MM-DD, hh:mm`)
           : "-",
+        isLiked: tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id),
+        likedCount: tweet.LikedUsers.length
       }));
       console.log(tweets)
       return res.render('getLikes', { userData, tweets, isOwner })
