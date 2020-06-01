@@ -57,7 +57,7 @@ const tweetController = {
         return res.redirect('/tweets')
       });
     } else {
-      req.flash('error_messages', "輸入不可為空白！");
+      req.flash('error_messages', { error_messages: '輸入不可為空白！' });
       return res.redirect("/tweets");
     }
   },
