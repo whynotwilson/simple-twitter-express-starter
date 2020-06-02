@@ -54,6 +54,15 @@ app.get('/chat', (req, res) => {
 
 io.on('connection', (socket) => {
   console.log('a user connected')
+
+  socket.on('send message', (msg) => {
+    console.log(`message: ${msg}`)
+    io.emit('chat message', msg)
+  })
+
+  socket.on('disconnect', () => {
+    console.log('user disconnected')
+  })
 })
 
 http.listen(port, () => console.log(`Example app listening on port ${port}!`))
