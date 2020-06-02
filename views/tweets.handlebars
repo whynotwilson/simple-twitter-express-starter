@@ -1,9 +1,12 @@
+<div id="textarea" contenteditable="true" placeholder="what's on your mind?"></div>
+
+
 <div class="row justify-content-center my-3">
   <div class="col-md-6">
-    <form action="/tweets" method="POST">
+    <form action="/tweets" method="POST" onsubmit="return getTweetsContent()">
       <div class="input-group">
         <textarea id="tweets" name="tweets" class="form-control" aria-label="With textarea"
-          placeholder="what's on your mind?" rows="3" oninput="tweetsLeft()"></textarea>
+          placeholder="what's on your mind?" rows="3" oninput="tweetsLeft()" style="display: none;"></textarea>
       </div>
       <div class="text-muted">
         <small id="tweetsText">characters left:</small>
@@ -24,7 +27,7 @@
             <h5 class="card-title">
               <a href="/users/{{ this.User.id }}/tweets">{{ this.User.name }}</a>
             </h5>
-            <p class="card-text">{{ this.description }}</p>
+            <p class="card-text">{{{ this.description }}}</p>
             <p class="card-text"><small class="text-muted">{{ fromNow this.createdAt }}</small></p>
           </div>
           <div class="card-body text-right inline-block mt-1">
@@ -89,7 +92,34 @@
   </div>
 </div>
 
-<script>
+<script type="text/javascript">
+
+  const t = document.getElementById('textarea')
+  t.addEventListener('input', markFriend)
+
+  function markFriend(e) {
+
+    if (e.target.innerHTML === '@') {
+      //判斷@後面正確字串丟出好友篩選下拉選單
+      e.target.innerHTML += `<select id="mySelect" class="custom-select" onchange="myFunction()">
+        {{#each users}}
+  <option value="{{this.name}}">{{this.name}}</option>
+  {{/each}}
+ 
+</select>`
+      //判斷空白取消或enter轉為連結 
+    }
+  }
+
+  function getTweetsContent() {
+    document.getElementById('tweets').value = document.getElementById('textarea').innerHTML
+  }
+
+  function myFunction() {
+    let x = document.getElementById("mySelect").value;
+    t.innerHTML = '@' + x
+  }
+
   function tweetsLeft() {
     const tweets = document.getElementById('tweets').value
     let tweetsCount = 140 - tweets.length
@@ -109,4 +139,6 @@
       tweetsTitle.style.display = 'inline'
     }
   }
+
+
 </script>

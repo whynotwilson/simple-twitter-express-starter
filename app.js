@@ -33,6 +33,7 @@ app.set('view engine', 'handlebars')
 
 app.use(session({ secret: 'secret', resave: false, saveUninitialized: false }))
 app.use(flash())
+app.use(express.static('public'))
 
 app.use(passport.initialize())
 app.use(passport.session())
