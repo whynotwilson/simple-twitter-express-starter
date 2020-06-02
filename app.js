@@ -47,4 +47,9 @@ app.use((req, res, next) => {
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
 
+// let io = require('socket.io').listen(app);
+// io.sockets.on('connection', function(socket){
+
+// })
+
 require('./routes')(app)
