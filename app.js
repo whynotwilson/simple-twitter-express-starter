@@ -18,6 +18,8 @@ if (process.env.NODE_ENV !== 'production') {
 }
 const passport = require('./config/passport')
 
+const db = require('./models')
+const User = db.User
 
 // use helpers.getUser(req) to replace req.user
 // use helpers.ensureAuthenticated(req) to replace req.isAuthenticated()
@@ -56,6 +58,14 @@ io.on('connection', (socket) => {
     io.emit('chat message', msg)
   })
 
+  socket.on('test', (data) => {
+
+    User.findAll({ raw: true, nest: true }, { where: { name: data } }).then((users) => {
+
+      io.emit('tag', users)
+    })
+  })
+
   socket.on('disconnect', () => {
     console.log('user disconnected')
   })
@@ -69,3 +79,4 @@ http.listen(port, () => console.log(`Example app listening on port ${port}!`))
 // })
 
 require('./routes')(app)
+module.exports = http

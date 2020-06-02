@@ -14,7 +14,9 @@ const fs = require('fs')
 const imgur = require('imgur-node-api')
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 
+
 const userController = {
+
   getTweets: async (req, res) => {
     try {
 
@@ -339,6 +341,7 @@ const userController = {
     req.logout()
     res.redirect('/signin')
   }
+
 }
 
 module.exports = userController;
