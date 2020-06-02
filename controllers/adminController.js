@@ -2,26 +2,29 @@ const db = require('../models')
 const User = db.User
 const Tweet = db.Tweet
 const moment = require('moment')
+const helpers = require("../_helpers")
 
 const adminController = {
   getTweets: async (req, res) => {
     try {
-      const dataValues = await Tweet.findAll({
-        include: [User],
-        raw: true,
-        nest: true,
+      let tweets = await Tweet.findAll({
+        include: [User, { model: User, as: 'LikedUsers' }],
         limit: 20,
-        order: [
-          ['likedCounter', 'DESC']
-        ]
+        // order: [
+        //   ['LikedUsers', 'DESC']
+        // ]
       })
-
-      const tweets = dataValues.map(tweet => ({
-        ...tweet,
+      // console.log('tweets[0]', tweets[0])
+      tweets = tweets.map(tweet => ({
+        ...tweet.dataValues,
         description: tweet.description ? tweet.description.substring(0, 50) : null,
-        updatedAt: tweet.updatedAt ? moment(tweet.updatedAt).format('YYYY-MM-DD, hh:mm') : '-'
+        updatedAt: tweet.updatedAt ? moment(tweet.updatedAt).format('YYYY-MM-DD, hh:mm') : '-',
+        // isLiked: tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id),
+        likedCount: tweet.LikedUsers.length
       }))
-      // return res.render('/admin/tweets')
+      console.log('tweets', tweets)
+      // console.log('tweets.isLiked', tweets.isLiked)
+      // console.log('tweets.likedCount', tweets.likedCount)
       return res.render('admin/tweets', { tweets })
     } catch (error) {
       console.log(error)
