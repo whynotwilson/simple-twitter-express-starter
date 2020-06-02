@@ -9,12 +9,8 @@ const adminController = {
     try {
       let tweets = await Tweet.findAll({
         include: [User, { model: User, as: 'LikedUsers' }],
-        limit: 20,
-        // order: [
-        //   ['LikedUsers', 'DESC']
-        // ]
+        limit: 20
       })
-      // console.log('tweets[0]', tweets[0])
       tweets = tweets.map(tweet => ({
         ...tweet.dataValues,
         description: tweet.description ? tweet.description.substring(0, 50) : null,
@@ -22,9 +18,11 @@ const adminController = {
         // isLiked: tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id),
         likedCount: tweet.LikedUsers.length
       }))
-      console.log('tweets', tweets)
-      // console.log('tweets.isLiked', tweets.isLiked)
-      // console.log('tweets.likedCount', tweets.likedCount)
+      
+      tweets = tweets.sort((a, b) => 
+        b.likedCount - a.likedCount
+      )
+
       return res.render('admin/tweets', { tweets })
     } catch (error) {
       console.log(error)
