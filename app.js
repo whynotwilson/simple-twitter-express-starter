@@ -7,7 +7,11 @@ const bodyParser = require('body-parser')
 const flash = require('connect-flash')
 const session = require('express-session')
 const methodOverride = require('method-override')
+
 const app = express()
+const http = require('http').createServer(app)
+const io = require('socket.io')(http)
+
 const port = process.env.PORT || 3000
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
@@ -44,6 +48,14 @@ app.use((req, res, next) => {
   next()
 })
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+app.get('/chat', (req, res) => {
+  res.sendFile(__dirname + '/public/index.html')
+})
+
+io.on('connection', (socket) => {
+  console.log('a user connected')
+})
+
+http.listen(port, () => console.log(`Example app listening on port ${port}!`))
 
 require('./routes')(app)
