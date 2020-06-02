@@ -48,15 +48,10 @@ app.use((req, res, next) => {
   next()
 })
 
-app.get('/chat', (req, res) => {
-  res.sendFile(__dirname + '/public/index.html')
-})
-
 io.on('connection', (socket) => {
   console.log('a user connected')
 
   socket.on('send message', (msg) => {
-    console.log(`message: ${msg}`)
     io.emit('chat message', msg)
   })
 

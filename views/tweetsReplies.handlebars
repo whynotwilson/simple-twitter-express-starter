@@ -82,6 +82,10 @@
         </form>
         {{/if}}
       {{/ifNotCond}}
+
+      <a class='btn btn-outline-success mb-3' role='button' onclick="window.open('http://localhost:3000/chat/{{targetUser.id}}', 'Chatroom', config='height=592, width=500')">
+        Chat With {{targetUser.name}}
+      </a>
     </div>
   </div>
   <div class='col-md-8'>
