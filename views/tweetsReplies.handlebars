@@ -83,7 +83,7 @@
         {{/if}}
       {{/ifNotCond}}
 
-      <a class='btn btn-outline-success mb-3' role='button' onclick="window.open('http://localhost:3000/chat/{{targetUser.id}}', 'Chatroom', config='height=592, width=500')">
+      <a class="btn btn-primary" href="/tweets/{{tweet.id}}/replies" role="button" onclick="window.open('http://localhost:3000/chat/{{targetUser.id}}', 'Chatroom', config='height=592, width=500')">
         Chat With {{targetUser.name}}
       </a>
     </div>
