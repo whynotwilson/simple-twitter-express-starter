@@ -2,7 +2,6 @@ const db = require('../models')
 const User = db.User
 const Tweet = db.Tweet
 const moment = require('moment')
-const helpers = require("../_helpers")
 
 const adminController = {
   getTweets: async (req, res) => {
@@ -15,11 +14,10 @@ const adminController = {
         ...tweet.dataValues,
         description: tweet.description ? tweet.description.substring(0, 50) : null,
         updatedAt: tweet.updatedAt ? moment(tweet.updatedAt).format('YYYY-MM-DD, hh:mm') : '-',
-        // isLiked: tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id),
         likedCount: tweet.LikedUsers.length
       }))
-      
-      tweets = tweets.sort((a, b) => 
+
+      tweets = tweets.sort((a, b) =>
         b.likedCount - a.likedCount
       )
 
@@ -42,18 +40,32 @@ const adminController = {
   getUsers: async (req, res) => {
     try {
       let users = await User.findAll({
-        // raw: true,
-        // nest: true,
-        limit: 20,
+        // limit: 20,
         include: [
-          { model: User, as: 'Followers' }
+          Tweet,
+          { model: User, as: 'Followers' },
+          { model: User, as: 'Followings' },
+          { model: Tweet, as: 'LikedTweets' }
         ]
       })
 
       users = users.map(user => ({
         ...user.dataValues,
-        FollowerCount: user.Followers.length,
-        createdAt: user.createdAt.toISOString().slice(0, 10)
+        Followers: user.dataValues.Followers.map(follower => ({
+          ...follower.dataValues
+        })),
+
+        Followings: user.dataValues.Followings.map(following => ({
+          ...following.dataValues
+        })),
+
+        LikedTweets: user.dataValues.LikedTweets.map(likedTweet => ({
+          ...likedTweet.dataValues
+        })),
+
+        Tweets: user.dataValues.Tweets.map(tweet => ({
+          ...tweet.dataValues
+        }))
       }))
 
       // 依追蹤者人數排序清單
