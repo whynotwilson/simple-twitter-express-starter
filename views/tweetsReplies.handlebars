@@ -65,7 +65,7 @@
         </li>
       </ul>
     </div>
-    <div class='text-right'>
+    <div class='text-right d-flex justify-content-between'>
       {{#ifNotCond currentUserId targetUser.id}}
         {{#if targetUser.isFollowed}}
         <form action="/followships/{{targetUser.id}}?_method=DELETE" method='POST'>
@@ -81,6 +81,12 @@
           </button>
         </form>
         {{/if}}
+      {{/ifNotCond}}
+
+      {{#ifNotCond currentUserId targetUser.id}}
+        <a class="btn btn-primary" href="/tweets/{{tweet.id}}/replies" role="button" onclick="window.open('http://localhost:3000/chat/{{targetUser.id}}', 'Chatroom', config='height=592, width=500')">
+          Chat With {{targetUser.name}}
+        </a>
       {{/ifNotCond}}
     </div>
   </div>
