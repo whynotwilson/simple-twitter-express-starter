@@ -12,31 +12,49 @@
 
     <div class="col-md-12">
       {{#each tweets}}
-      <div class="card mb-3">
-        <div class="row no-gutters">
-          <div class="col-md-3">
-            <img src="{{this.User.avatar}}" class="card-img" alt="user avatar">
-          </div>
-          <div class="col-md-9 row">
-            <div class="col-md-6 ml-3 mt-3">
-              <h5>
-                <a href="/users/{{ this.User.id }}/tweets">{{ this.User.name }}</a>
-              </h5>
-              <p class="card-text">{{ this.description }}</p>
-              <p class="card-text">按讚人數： {{ this.likedCount}}</p>
+        <div class="col-md-12  border rounded mb-5">
+          {{!-- 使用者資訊 --}}
+          <div class="row col-md-12 mb-3 mt-3">
+            <div class="mr-3" style="max-height: 70px;">
+              <img style="max-height: 70px;" src="{{this.User.avatar}}" alt="avatar" class="rounded-circle">
+            </div>
+            <div class="" style="max-height: 70px;">
+              <strong class="" style="font-size: large;">{{this.User.name}}</strong>
               <p class="card-text"><small class="text-muted">{{ fromNow this.createdAt }}</small></p>
             </div>
-            <div class="col-md-3"></div>
-            <div class="col-md-2 d-flex align-items-end">
-              <form action="/admin/tweets/{{this.id}}?_method=DELETE" method="POST">
-                <div>
-                  <button class="btn btn-danger">刪除</button>
-                </div>
-              </form>
+          </div>
+
+          {{!-- Tweet 內容 --}}
+          <div class="col-md-12">
+            <div class="col-md-12">
+              <h4>{{this.description}}</h3>
+            </div>
+            <div class="col-md-12">
+              <hr>
+              <i class="fas fa-thumbs-up">  {{this.LikedUsers.length}}</i>
+              {{#if this.Replies}}<hr>{{/if}}
             </div>
           </div>
+
+          {{!-- 留言內容 --}}
+          {{#if this.Replies}}
+            <div class="col-md-12">
+              {{#each this.Replies}}
+                <div class="col-md-12">
+                  <div class="col-md-12 row">
+                    <div class="">
+                      <img class="rounded-circle" style="max-height: 30px;" src="{{this.User.avatar}}" alt="avatar">
+                    </div>
+                    <div class="ml-2" style="background-color: rgba(249, 250, 251, 0.801);">
+                      <strong>{{this.User.name}}</strong>
+                      <pre>{{this.comment}}</pre>
+                    </div>
+                  </div>
+                </div>
+                {{/each}}
+            </div>
+          {{/if}}
         </div>
-      </div>
       {{/each}}
     </div>
   </div>
