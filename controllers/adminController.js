@@ -1,17 +1,38 @@
 const db = require('../models')
 const User = db.User
 const Tweet = db.Tweet
+const Reply = db.Reply
 const moment = require('moment')
 
 const adminController = {
   getTweets: async (req, res) => {
     try {
       let tweets = await Tweet.findAll({
-        include: [User, { model: User, as: 'LikedUsers' }],
+        include: [User,
+          { model: Reply, include: [User] },
+          { model: User, as: 'LikedUsers' }
+        ],
         limit: 20
       })
+
+      // 整理 tweets 資料，把 dataValues 都拿掉
+      // 原本 tweets.dataValues.User.dataValues
+      // 變成 tweets.User
+      // 例子 tweets.Replies.User
       tweets = tweets.map(tweet => ({
         ...tweet.dataValues,
+
+        User: tweet.dataValues.User.dataValues,
+
+        Replies: tweet.dataValues.Replies.map(reply => ({
+          ...reply.dataValues,
+          User: reply.User.dataValues
+        })),
+
+        LikedUsers: tweet.dataValues.LikedUsers.map(user => ({
+          ...user.dataValues
+        })),
+
         description: tweet.description ? tweet.description.substring(0, 50) : null,
         updatedAt: tweet.updatedAt ? moment(tweet.updatedAt).format('YYYY-MM-DD, hh:mm') : '-',
         likedCount: tweet.LikedUsers.length
