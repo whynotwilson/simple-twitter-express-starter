@@ -12,6 +12,16 @@ const app = express()
 const http = require('http').createServer(app)
 const io = require('socket.io')(http)
 
+const sessionMiddleware = session({ 
+  secret: 'secret', 
+  resave: false, 
+  saveUninitialized: false 
+})
+
+io.use((socket, next) => {
+  sessionMiddleware(socket.request, socket.request.res || {}, next)
+})
+
 const port = process.env.PORT || 3000
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
@@ -35,7 +45,7 @@ app.engine('handlebars', handlebars({
 }))
 app.set('view engine', 'handlebars')
 
-app.use(session({ secret: 'secret', resave: false, saveUninitialized: false }))
+app.use(sessionMiddleware)
 app.use(flash())
 
 app.use(passport.initialize())
@@ -53,11 +63,14 @@ app.use((req, res, next) => {
 
 io.on('connection', (socket) => {
   console.log('a user connected')
+  
+  const currentUser = socket.request.session
 
   socket.on('send message', (msg) => {
     io.emit('chat message', {
       msg,
-      avatar: user.avatar,
+      avatar: currentUser.avatar,
+      name: currentUser.username,
       sendTime: helpers.fromNow(new Date())
     })
   })

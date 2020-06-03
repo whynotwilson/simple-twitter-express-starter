@@ -65,11 +65,9 @@
 
     /* Style images */
     .container img {
-      float: left;
       max-width: 50px;
       width: 100%;
       height: 50px;
-      margin-right: 20px;
       border-radius: 50%;
     }
 
@@ -92,10 +90,23 @@
       color: #999;
     }
 
-    #messages li:nth-child(even) > .container > img {
+    #messages li:nth-child(even) > .container > .profile {
       float: right;
       margin-left: 20px;
       margin-right:0;
+    }
+
+    .profile {
+      float: left;
+      margin-right: 20px;
+      position: relative;
+    }
+
+    .profile span {
+      position: absolute;
+      bottom: -30%;
+      left: 50%;
+      transform: translateX(-50%);
     }
   </style>
 </head>
@@ -125,7 +136,10 @@
         const template = `
           <li>
             <div class="container">
-              <img src=${user.avatar} alt="Avatar">
+              <div class="profile">
+                <img src=${user.avatar} alt="Avatar">
+                <span>${user.name}</span>
+              </div>
               <p>${user.msg}</p>
               <span>${user.sendTime}</span>
             </div>
