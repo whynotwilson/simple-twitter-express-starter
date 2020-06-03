@@ -100,39 +100,58 @@
   const t = document.getElementById('textarea')
   t.addEventListener('input', markFriend)
 
-
   function markFriend(e) {
 
 
-    let regExp = /^(.*\s@\w+|@\w+)/
-
+    let regExp = /^(.*\s+@\w+|@\w+)/
+    let keyword = ''
     if (regExp.test(e.target.innerHTML)) {
 
       //切割字串
+
       let indices = []
       let idx = e.target.innerHTML.indexOf('@');
       while (idx != -1) {
         indices.push(idx);
         idx = e.target.innerHTML.indexOf('@', idx + 1);
+      };
+      //超過兩個@的情況
+      if (indices.length > 1) {
+        keyword = e.target.innerHTML.slice(indices[indices.length - 1] + 1, indices[indices.length - 1] + 2)
+      } else {
+        keyword = e.target.innerHTML.slice(e.target.innerHTML.indexOf('@') + 1, e.target.innerHTML.length + 1)
       }
-
-      let keyword = e.target.innerHTML.slice(indices[indices.length - 1], e.target.innerHTML.length - 1)
 
       //emit
       socket.emit('test', keyword)
 
-      socket.on('tag', function (users) {
+      socket.on('tag', function (obj) {
 
         let x = ``
-        x = `<select id="mySelect" class="custom-select" onchange="myFunction()">`;
+        x = `<select id="mySelect" class="custom-select" onchange="myFunction()">  <option selected>Tag Friend</option>
+`;
 
-        users.forEach((e) => {
-          x += `<option value="${e.name}">${e.name}</option>`
+        let { userName } = obj
+
+        userName.forEach((name) => {
+          x += `<option value="${name}">${name}</option>`
         })
+
+
 
         x += `</select >`
 
-        t.innerHTML += x
+        let indices = []
+        let idx = e.target.innerHTML.indexOf('@');
+        while (idx != -1) {
+          indices.push(idx);
+          idx = e.target.innerHTML.indexOf('@', idx + 1);
+        }
+
+        const result = t.innerHTML.slice(0, indices[indices.length - 1] + 2)
+
+        t.innerHTML = result + x
+
         t.contentEditable = "false";
 
       }
@@ -146,12 +165,12 @@
   }
 
   function myFunction() {
-    let x = document.getElementById("mySelect");
 
-    let y = x.value
+    const mySelect = document.getElementById("mySelect");
+    let y = mySelect.value
 
     const template = `<a>${y}</a>`
-    x.remove()
+    mySelect.remove()
 
     //取得@之前字串
     const z = t.innerHTML

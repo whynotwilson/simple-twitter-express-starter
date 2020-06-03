@@ -12,10 +12,10 @@ const app = express()
 const http = require('http').createServer(app)
 const io = require('socket.io')(http)
 
-const sessionMiddleware = session({ 
-  secret: 'secret', 
-  resave: false, 
-  saveUninitialized: false 
+const sessionMiddleware = session({
+  secret: 'secret',
+  resave: false,
+  saveUninitialized: false
 })
 
 io.use((socket, next) => {
@@ -66,7 +66,7 @@ app.use((req, res, next) => {
 
 io.on('connection', (socket) => {
   console.log('a user connected')
-  
+
   const currentUser = socket.request.session
 
   socket.on('send message', (msg) => {
@@ -79,10 +79,17 @@ io.on('connection', (socket) => {
   })
 
   socket.on('test', (keyword) => {
+    User.findAll({ raw: true, nest: true, order: [['name', 'ASC']] }).then((users) => {
 
-    User.findAll({ raw: true, nest: true }, { where: { name: keyword } }).then((users) => {
+      let userName = users.map(user =>
+        user.name
+      )
 
-      io.emit('tag', users)
+      userName = userName.filter(name =>
+        name.indexOf(keyword) !== -1
+      ).slice(0, 10)
+
+      io.emit('tag', { userName })
     })
   })
 
