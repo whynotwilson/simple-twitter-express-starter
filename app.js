@@ -58,9 +58,9 @@ io.on('connection', (socket) => {
     io.emit('chat message', msg)
   })
 
-  socket.on('test', (data) => {
+  socket.on('test', (keyword) => {
 
-    User.findAll({ raw: true, nest: true }, { where: { name: data } }).then((users) => {
+    User.findAll({ raw: true, nest: true }, { where: { name: keyword } }).then((users) => {
 
       io.emit('tag', users)
     })

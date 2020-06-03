@@ -113,20 +113,36 @@
 </select>`
     //判斷空白取消或enter轉為連結 
   }*/
-    if (e.target.innerHTML === '@') {
-      socket.emit('test', e.target.innerHTML)
-      socket.on('tag', function (data) {
+
+    let regExp = /^(.*\s@\w+|@\w+)/
+
+
+    if (regExp.test(e.target.innerHTML)) {
+
+      //切割字串
+      let indices = []
+      let idx = e.target.innerHTML.indexOf('@');
+      while (idx != -1) {
+        indices.push(idx);
+        idx = e.target.innerHTML.indexOf('@', idx + 1);
+      }
+
+      let keyword = e.target.innerHTML.slice(indices[indices.length - 1], e.target.innerHTML.length - 1)
+
+      //emit
+      socket.emit('test', keyword)
+      socket.on('tag', function (users) {
+
         let x = ``
-        x = e.target.innerHTML + `<select id="mySelect" class="custom-select" onchange="myFunction()">`
-        data.forEach((e) => {
+        x = `<select id="mySelect" class="custom-select" onchange="myFunction()">`;
 
+        users.forEach((e) => {
           x += `<option value="${e.name}">${e.name}</option>`
-
         })
 
         x += `</select >`
 
-        e.target.innerHTML = x
+        t.innerHTML += x
       }
       )
     }
@@ -138,8 +154,22 @@
   }
 
   function myFunction() {
-    let x = document.getElementById("mySelect").value;
-    t.innerHTML = '@' + x
+    let x = document.getElementById("mySelect");
+
+    let y = x.value
+    x.remove()
+    const z = t.innerHTML
+
+    let indices = []
+    let idx = z.indexOf('@');
+    while (idx != -1) {
+      indices.push(idx);
+      idx = z.indexOf('@', idx + 1);
+    }
+
+
+    t.innerHTML = t.innerHTML + x.value
+
   }
 
   function tweetsLeft() {
