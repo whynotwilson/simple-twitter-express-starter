@@ -157,18 +157,22 @@
     let x = document.getElementById("mySelect");
 
     let y = x.value
-    x.remove()
-    const z = t.innerHTML
 
+    const template = `<a>${y}</a>`
+    x.remove()
+
+    //取得@之前字串
+    const z = t.innerHTML
     let indices = []
     let idx = z.indexOf('@');
     while (idx != -1) {
       indices.push(idx);
       idx = z.indexOf('@', idx + 1);
     }
+    const result = z.slice(0, indices[indices.length - 1] + 1)
 
-
-    t.innerHTML = t.innerHTML + x.value
+    //合併輸出
+    t.innerHTML = result + template
 
   }
 
