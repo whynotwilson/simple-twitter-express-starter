@@ -20,12 +20,12 @@
     <div class="card mb-3" style="max-width: 540px;">
       <div class="row no-gutters">
         <div class="col-md-4">
-          <img src="{{this.User.avatar}}" class="card-img" alt="user avatar">
+          <img src="{{this.User.dataValues.avatar}}" class="card-img" alt="user avatar">
         </div>
         <div class="col-md-8">
           <div class="card-body">
             <h5 class="card-title">
-              <a href="/users/{{ this.User.id }}/tweets">{{ this.User.name }}</a>
+              <a href="/users/{{ this.User.dataValues.id }}/tweets">{{ this.User.dataValues.name }}</a>
             </h5>
             <p class="card-text">{{{ this.description }}}</p>
             <p class="card-text"><small class="text-muted">{{ fromNow this.createdAt }}</small></p>
@@ -103,19 +103,8 @@
 
   function markFriend(e) {
 
-    //if (e.target.innerHTML === '@') {
-    //判斷@後面正確字串丟出好友篩選下拉選單
-    /*e.target.innerHTML += `<select id="mySelect" class="custom-select" onchange="myFunction()">
-      {{#each users}}
-<option value="{{this.name}}">{{this.name}}</option>
-{{/each}}
- 
-</select>`
-    //判斷空白取消或enter轉為連結 
-  }*/
 
     let regExp = /^(.*\s@\w+|@\w+)/
-
 
     if (regExp.test(e.target.innerHTML)) {
 
@@ -131,6 +120,7 @@
 
       //emit
       socket.emit('test', keyword)
+
       socket.on('tag', function (users) {
 
         let x = ``
@@ -143,6 +133,8 @@
         x += `</select >`
 
         t.innerHTML += x
+        t.contentEditable = "false";
+
       }
       )
     }
@@ -173,6 +165,7 @@
 
     //合併輸出
     t.innerHTML = result + template
+    t.contentEditable = "true";
 
   }
 
