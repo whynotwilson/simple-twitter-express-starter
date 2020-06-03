@@ -41,10 +41,13 @@ app.use(flash())
 app.use(passport.initialize())
 app.use(passport.session())
 
+let user = {}
+
 app.use((req, res, next) => {
   res.locals.success_messages = req.flash('success_messages')
   res.locals.error_messages = req.flash('error_messages')
   res.locals.user = req.user
+  user = req.user
   next()
 })
 
@@ -52,7 +55,11 @@ io.on('connection', (socket) => {
   console.log('a user connected')
 
   socket.on('send message', (msg) => {
-    io.emit('chat message', msg)
+    io.emit('chat message', {
+      msg,
+      avatar: user.avatar,
+      sendTime: helpers.fromNow(new Date())
+    })
   })
 
   socket.on('disconnect', () => {
