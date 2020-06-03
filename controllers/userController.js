@@ -332,6 +332,8 @@ const userController = {
   },
 
   signIn: (req, res) => {
+    req.session.username = helpers.getUser(req).name
+    req.session.avatar = helpers.getUser(req).avatar
     req.flash("success_messages", "成功登入！");
     res.redirect("/tweets");
   },
