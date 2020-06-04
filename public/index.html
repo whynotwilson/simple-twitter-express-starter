@@ -124,12 +124,12 @@
     $(function() {
       const socket = io();
 
-      $('#message-input').keypress(function (e) {
-        if(e.keyCode === 13) {
-          socket.emit('send message', $('#message-input').val());
-          $('#message-input').val('');
-          return false;
-        }
+      $('form').submit(function (e) {
+        e.preventDefault();
+
+        socket.emit('send message', $('#message-input').val());
+        $('#message-input').val('');
+        return false;
       })
 
       socket.on('chat message', function(user) {
