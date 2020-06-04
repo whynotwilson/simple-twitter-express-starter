@@ -12,49 +12,51 @@
 
     <div class="col-md-12">
       {{#each tweets}}
-        <div class="col-md-12  border rounded mb-5">
-          {{!-- 使用者資訊 --}}
-          <div class="row col-md-12 mb-3 mt-3">
-            <div class="mr-3" style="max-height: 70px;">
-              <img style="max-height: 70px;" src="{{this.User.avatar}}" alt="avatar" class="rounded-circle">
-            </div>
-            <div class="" style="max-height: 70px;">
-              <strong class="" style="font-size: large;">{{this.User.name}}</strong>
-              <p class="card-text"><small class="text-muted">{{ fromNow this.createdAt }}</small></p>
-            </div>
+      <div class="col-md-12  border rounded mb-5" style="background-color: #eeeeee;">
+        {{!-- 使用者資訊 --}}
+        <div class="row col-md-12 mb-3 mt-3">
+          <div class="mr-3" style="max-height: 70px;">
+            <img style="max-height: 70px;" src="{{this.User.avatar}}" alt="avatar" class="rounded-circle">
           </div>
-
-          {{!-- Tweet 內容 --}}
-          <div class="col-md-12">
-            <div class="col-md-12">
-              <h4>{{this.description}}</h3>
-            </div>
-            <div class="col-md-12">
-              <hr>
-              <i class="fas fa-thumbs-up">  {{this.LikedUsers.length}}</i>
-              {{#if this.Replies}}<hr>{{/if}}
-            </div>
+          <div class="" style="max-height: 70px;">
+            <strong class="" style="font-size: large;">{{this.User.name}}</strong>
+            <p class="card-text"><small class="text-muted">{{ fromNow this.createdAt }}</small></p>
           </div>
-
-          {{!-- 留言內容 --}}
-          {{#if this.Replies}}
-            <div class="col-md-12">
-              {{#each this.Replies}}
-                <div class="col-md-12">
-                  <div class="col-md-12 row">
-                    <div class="">
-                      <img class="rounded-circle" style="max-height: 30px;" src="{{this.User.avatar}}" alt="avatar">
-                    </div>
-                    <div class="ml-2" style="background-color: rgba(249, 250, 251, 0.801);">
-                      <strong>{{this.User.name}}</strong>
-                      <pre>{{this.comment}}</pre>
-                    </div>
-                  </div>
-                </div>
-                {{/each}}
-            </div>
-          {{/if}}
         </div>
+
+        {{!-- Tweet 內容 --}}
+        <div class="col-md-12">
+          <div class="col-md-12">
+            <h4>{{this.description}}</h3>
+          </div>
+          <div class="col-md-12">
+            <hr>
+            <i class="fas fa-thumbs-up"> {{this.LikedUsers.length}}</i>
+            {{#if this.Replies}}
+            <hr>{{/if}}
+          </div>
+        </div>
+
+        {{!-- 留言內容 --}}
+        {{#if this.Replies}}
+        <div class="col-md-12">
+          {{#each this.Replies}}
+          <div class="col-md-12 mb-2">
+            <div class="col-md-12 row">
+              <div class="mr-2">
+                <img class="rounded-circle" style="max-height: 30px;" src="{{this.User.avatar}}" alt="avatar">
+              </div>
+              <div class="col-md-10" style="background-color: #dfdfdf;  border-radius: 10px;">
+                <strong>{{this.User.name}}</strong>
+                <p>{{this.comment}}</p>
+              </div>
+              <div class="pl-1"></div>
+            </div>
+          </div>
+          {{/each}}
+        </div>
+        {{/if}}
+      </div>
       {{/each}}
     </div>
   </div>

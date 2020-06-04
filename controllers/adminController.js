@@ -11,8 +11,8 @@ const adminController = {
         include: [User,
           { model: Reply, include: [User] },
           { model: User, as: 'LikedUsers' }
-        ],
-        limit: 20
+        ]
+        // limit: 20
       })
 
       // 整理 tweets 資料，把 dataValues 都拿掉
@@ -89,8 +89,9 @@ const adminController = {
         }))
       }))
 
-      // 依追蹤者人數排序清單
-      users = users.sort((a, b) => b.FollowerCount - a.FollowerCount)
+      // 依發文數量排序，由多至少
+      users = users.sort((a, b) => b.Tweets.length - a.Tweets.length)
+
       return res.render('admin/users', { users })
     } catch (error) {
       console.log(error)
