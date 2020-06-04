@@ -4,6 +4,7 @@ const User = db.User
 const Tweet = db.Tweet
 const Like = db.Like
 const Reply = db.Reply
+const Blockship = db.Blockship
 const moment = require('moment')
 const Followship = db.Followship
 const bcrypt = require('bcryptjs')
@@ -269,6 +270,44 @@ const userController = {
       console.log("error", error);
     }
   },
+
+  postBlock: async (req, res) => {
+    try {
+      // 先找出封鎖者與被封鎖者有無 follow 關係
+      // 有 => 先刪除 follow 關係再建立封鎖關係
+      // 無 => 直接建立封鎖關係
+      let destroyFollow = await Followship.findOne({
+        where: {
+          followerId: req.user.id,
+          followingId: req.params.userId
+        }
+      })
+      if (destroyFollow) {
+        await destroyFollow.destroy()
+      }
+
+      destroyFollow = await Followship.findOne({
+        where: {
+          followerId: req.params.userId,
+          followingId: req.user.id
+        }
+      })
+      if (destroyFollow) {
+        await destroyFollow.destroy()
+      }
+
+      const Blockships = await Blockship.create({
+        blockerId: req.params.userId,
+        blockingId: req.user.id
+      })
+
+      req.flash('success_messages', '已成功封鎖該用戶')
+      return res.redirect('/')
+    } catch (error) {
+      console.log(error)
+    }
+  },
+
   signUpPage: (req, res) => {
     return res.render("signup");
   },

@@ -1,11 +1,11 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
-  const blockship = sequelize.define('blockship', {
+  const Blockship = sequelize.define('Blockship', {
     blockerId: DataTypes.INTEGER,
     blockingId: DataTypes.INTEGER
   }, {});
-  blockship.associate = function(models) {
+  Blockship.associate = function(models) {
     // associations can be defined here
   };
-  return blockship;
+  return Blockship;
 };
