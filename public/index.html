@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat room</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      margin: 20px 5px;
+    }
+
+    form {
+      background: #000;
+      position: fixed;
+      bottom: 0;
+      width: 94%;
+    }
+
+    form input {
+      border: 10px solid #000;
+      bottom: 0;
+      height: 30px;
+      left: 0;
+      outline: none;
+      padding-left: 10px;
+      position: absolute;
+      right: 0;
+      width: 100%;
+    }
+
+    #messages {
+      list-style-type: none;
+      margin-top: 30px;
+      padding: 0;
+      position: relative;
+      bottom: 40px;
+    }
+
+    #messages li {
+      padding: 5px;
+    }
+
+    /* Chat containers */
+    .container {
+      border: 2px solid #dedede;
+      background-color: #f1f1f1;
+      border-radius: 5px;
+      padding: 10px;
+      margin: 10px 0;
+    }
+
+    /* Clear floats */
+    .container::after {
+      content: "";
+      clear: both;
+      display: table;
+    }
+
+    /* Style images */
+    .container img {
+      max-width: 50px;
+      width: 100%;
+      height: 50px;
+      border-radius: 50%;
+    }
+
+    .container p {
+      overflow-wrap: break-word;
+    }
+
+    #messages li:nth-child(even) > .container {
+      border-color: #ccc;
+      background-color: #ddd;
+    }
+
+    #messages li:nth-child(odd) > .container > span {
+      float: right;
+      color: #aaa;
+    }
+
+    #messages li:nth-child(even) > .container > span {
+      float: left;
+      color: #999;
+    }
+
+    #messages li:nth-child(even) > .container > .profile {
+      float: right;
+      margin-left: 20px;
+      margin-right:0;
+    }
+
+    .profile {
+      float: left;
+      margin-right: 20px;
+      position: relative;
+    }
+
+    .profile span {
+      position: absolute;
+      bottom: -30%;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Chat room</h1>
+
+  <ul id="messages"></ul>
+  <form>
+    <input id="message-input" autocomplete="off" placeholder="Type here..." autofocus />
+  </form>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script>
+    $(function() {
+      const socket = io();
+
+      $('#message-input').keypress(function (e) {
+        if(e.keyCode === 13) {
+          socket.emit('send message', $('#message-input').val());
+          $('#message-input').val('');
+          return false;
+        }
+      })
+
+      socket.on('chat message', function(user) {
+        const template = `
+          <li>
+            <div class="container">
+              <div class="profile">
+                <img src=${user.avatar} alt="Avatar">
+                <span>${user.name}</span>
+              </div>
+              <p>${user.msg}</p>
+              <span>${user.sendTime}</span>
+            </div>
+          </li>
+        `
+
+        $('#messages').append(template)
+
+        $(document).scrollTop($(document).height());
+      })
+    })
+  </script>
+</body>
+
+</html>
