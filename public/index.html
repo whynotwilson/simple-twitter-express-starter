@@ -75,17 +75,17 @@
       overflow-wrap: break-word;
     }
 
-    #messages li:nth-child(even) > .container {
+    /* #messages li:nth-child(even) > .container {
       border-color: #ccc;
       background-color: #ddd;
-    }
+    } */
 
-    #messages li:nth-child(odd) > .container > span {
+    /* #messages li:nth-child(odd) > .container > span {
       float: right;
       color: #aaa;
-    }
+    } */
 
-    #messages li:nth-child(even) > .container > span {
+    /* #messages li:nth-child(even) > .container > span {
       float: left;
       color: #999;
     }
@@ -94,6 +94,26 @@
       float: right;
       margin-left: 20px;
       margin-right:0;
+    } */
+    #messages li > .left > span {
+      float: right;
+      color: #aaa;
+    }
+
+    #messages li > .container.right {
+      border-color: #ccc;
+      background-color: #ddd;
+    }
+
+    #messages .profile.right {
+      float: right;
+      margin-left: 20px;
+      margin-right:0;
+    }
+
+    #messages li > .right > span {
+      float: left;
+      color: #999;
     }
 
     .profile {
@@ -133,18 +153,70 @@
       })
 
       socket.on('chat message', function(user) {
-        const template = `
-          <li>
-            <div class="container">
-              <div class="profile">
-                <img src=${user.avatar} alt="Avatar">
-                <span>${user.name}</span>
+        const targetUserId = Number(window.location.pathname.split('/').slice(-1)[0])
+        let template = ''
+
+        console.log(targetUserId, user.id)
+
+        if(targetUserId === user.id) {
+          template = `
+            <li>
+              <div class="container left">
+                <div class="profile left">
+                  <img src=${user.avatar} alt="Avatar">
+                  <span>${user.name}</span>
+                </div>
+                <p>${user.msg}</p>
+                <span>${user.sendTime}</span>
               </div>
-              <p>${user.msg}</p>
-              <span>${user.sendTime}</span>
-            </div>
-          </li>
-        `
+            </li>
+          `
+        } else {
+          template = `
+            <li>
+              <div class="container right">
+                <div class="profile right">
+                  <img src=${user.avatar} alt="Avatar">
+                  <span>${user.name}</span>
+                </div>
+                <p>${user.msg}</p>
+                <span>${user.sendTime}</span>
+              </div>
+            </li>
+          `
+        }
+        // user.allUsers.forEach(oneUser => {
+        //   if(oneUser.id === user.id) {
+        //     const template = `
+        //       <li>
+        //         <div class="container">
+        //           <p>right</p>
+        //           <div class="profile">
+        //             <img src=${user.avatar} alt="Avatar">
+        //             <span>${user.name}</span>
+        //           </div>
+        //           <p>${user.msg}</p>
+        //           <span>${user.sendTime}</span>
+        //         </div>
+        //       </li>
+        //     `
+
+        //     $('#messages').append(template)
+        //   }
+        // })
+
+        // const template = `
+        //   <li>
+        //     <div class="container">
+        //       <div class="profile">
+        //         <img src=${user.avatar} alt="Avatar">
+        //         <span>${user.name}</span>
+        //       </div>
+        //       <p>${user.msg}</p>
+        //       <span>${user.sendTime}</span>
+        //     </div>
+        //   </li>
+        // `
 
         $('#messages').append(template)
 
