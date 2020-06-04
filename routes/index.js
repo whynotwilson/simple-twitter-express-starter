@@ -67,4 +67,9 @@ module.exports = (app) => {
   app.get('/chat/:id', authenticated, (req, res) => {
     res.sendFile(process.cwd() + '/public/index.html')
   })
+
+  // notification
+  app.get('/notification', authenticated, (req, res) => {
+    res.sendFile(process.cwd() + '/notification/index.html')
+  })
 }

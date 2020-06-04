@@ -61,6 +61,12 @@ app.use((req, res, next) => {
   next()
 })
 
+app.use(express.static(__dirname + '/notification/public'));
+
+app.get('/notification', function (req, res) {
+  res.sendfile(__dirname + '/notification/index.html');
+});
+
 io.on('connection', (socket) => {
   console.log('a user connected')
   
@@ -75,6 +81,11 @@ io.on('connection', (socket) => {
       sendTime: helpers.fromNow(new Date())
     })
   })
+
+  socket.on('notification', function (msg) {
+    console.log(msg);
+    io.emit('notification', msg);
+  });
 
   socket.on('disconnect', () => {
     console.log('user disconnected')
