@@ -69,6 +69,7 @@ io.on('connection', (socket) => {
       msg,
       avatar: currentUser.avatar,
       name: currentUser.username,
+      id: currentUser.passport.user,
       sendTime: helpers.fromNow(new Date())
     })
   })
