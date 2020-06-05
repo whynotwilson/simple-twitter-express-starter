@@ -84,7 +84,7 @@
       {{/ifNotCond}}
 
       {{#ifNotCond currentUserId targetUser.id}}
-        <a class="btn btn-primary" href="/tweets/{{tweet.id}}/replies" role="button" onclick="window.open('http://localhost:3000/chat/{{targetUser.id}}?cid={{currentUserId}}', 'Chatroom', config='height=592, width=500')">
+        <a class="btn btn-primary" href="/tweets/{{tweet.id}}/replies" role="button" onclick="window.open('http://localhost:3000/chat/{{targetUser.id}}?cid={{currentUserId}}', '_blank', 'Chatroom, height=592, width=500')">
           Chat With {{targetUser.name}}
         </a>
       {{/ifNotCond}}

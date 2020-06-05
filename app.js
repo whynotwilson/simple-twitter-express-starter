@@ -64,9 +64,13 @@ io.on('connection', (socket) => {
 
   const currentUser = socket.request.session
 
-  socket.on('send message', (msg) => {
-    io.emit('chat message', {
-      msg,
+  socket.on('send message', (chat) => {
+    let chatRoomNum = `${chat.senderId ^ chat.receiverId}`
+
+    socket.join(chatRoomNum)
+
+    io.sockets.in(chatRoomNum).emit('chat message', {
+      msg: chat.message,
       avatar: currentUser.avatar,
       name: currentUser.username,
       id: currentUser.passport.user,
