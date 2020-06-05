@@ -3,7 +3,7 @@
     <div col="col-md-4">
       <img src="{{otherUser.avatar}}" alt="avatar" style="width: 250px;margin-bottom: 25px;" />
       <div class="userDataProfile">
-        <ul class="list-group" style="list-style-type:none">
+        <ul class="list-group mb-2" style="list-style-type:none">
           <li>
             <h3>{{otherUser.name}}</h3>
           </li>
@@ -38,23 +38,19 @@
         {{else}}
 
         {{#if otherUser.isFollowing}}
-        <form action="/followships/{{otherUser.id}}?_method=DELETE" method="POST">
+        <form style="display: inline-block;" action="/followships/{{otherUser.id}}?_method=DELETE" method="POST">
           <button type="submit" class="btn btn-danger">Unfollow</button>
         </form>
         {{else}}
-        <form action="/followships/{{otherUser.id}}" method="POST">
+        <form style="display: inline-block;" action="/followships/{{otherUser.id}}" method="POST">
           <button type="submit" class="btn btn-primary">Follow </button>
         </form>
         {{/if}}
-        {{!-- {{#if otherUser.isBlocking}}
-        <form action="/blockships/{{otherUser.id}}?_method=DELETE" method="POST">
-          <button type="submit" class="btn btn-danger">解除封鎖</button>
+        {{!-- 封鎖按鈕 --}}
+        <form style="display: inline-block;" action="/blockships" method="POST">
+          <input type="hidden" name="userId" value="{{otherUser.id}}">
+          <button type="submit" class="btn btn-danger">封鎖</button>
         </form>
-        {{else}}
-        <form action="/blockships/{{otherUser.id}}" method="POST">
-          <button type="submit" class="btn btn-primary">封鎖</button>
-        </form>
-        {{/if}} --}}
         {{/if}}
       </div>
     </div>

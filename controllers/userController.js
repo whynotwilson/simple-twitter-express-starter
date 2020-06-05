@@ -29,6 +29,8 @@ const userController = {
         include: [
           { model: User, as: 'Followers' },
           { model: User, as: 'Followings' },
+          { model: User, as: 'Blockers' },
+          { model: User, as: 'Blockings' },
           Like
         ]
       })
@@ -38,18 +40,26 @@ const userController = {
       }
 
       // ------------------ otherUser 資料整理 -------------------
-      otherUser = otherUser.dataValues
-      otherUser.introduction = otherUser.introduction.substring(0, 30)
-      otherUser.Followers = otherUser.Followers.map(follower => ({
-        ...follower.dataValues
-      }))
-      otherUser.Followings = otherUser.Followings.map(following => ({
-        ...following.dataValues
-      }))
-      otherUser.Likes = otherUser.Likes.map(like => ({
-        ...like.dataValues
-      }))
-      otherUser.isFollowing = otherUser.Followers.map(d => d.id).includes(req.user.id)
+      otherUser = {
+        ...otherUser.dataValues,
+        introduction: otherUser.introduction.substring(0, 30),
+        Followers: otherUser.Followers.map(follower => ({
+          ...follower.dataValues
+        })),
+        Followings: otherUser.Followings.map(following => ({
+          ...following.dataValues
+        })),
+        Blockers: otherUser.Blockers.map(blocker => ({
+          ...blocker.dataValues
+        })),
+        Blockings: otherUser.Blockings.map(blocking => ({
+          ...blocking.dataValues
+        })),
+        Likes: otherUser.Likes.map(like => ({
+          ...like.dataValues
+        })),
+        isFollowing: otherUser.Followers.map(d => d.id).includes(req.user.id)
+      }
 
       let tweets = await Tweet.findAll({
         where: {
@@ -303,36 +313,40 @@ const userController = {
       // 先找出封鎖者與被封鎖者有無 follow 關係
       // 有 => 先刪除 follow 關係再建立封鎖關係
       // 無 => 直接建立封鎖關係
-      let destroyFollow = await Followship.findOne({
+      const follower = await Followship.findOne({
         where: {
-          followerId: req.user.id,
-          followingId: req.params.userId
+          [Op.and]: [
+            { followerId: req.user.id },
+            { followingId: req.params.userId }
+          ]
         }
       })
-
-      if (destroyFollow) {
-        await destroyFollow.destroy()
+      if (follower) {
+        await follower.destroy()
       }
 
-      destroyFollow = await Followship.findOne({
+      const following = await Followship.findOne({
         where: {
-          followerId: req.params.userId,
-          followingId: req.user.id
+          [Op.and]: [
+            { followerId: req.params.userId },
+            { followingId: req.user.id }
+          ]
         }
       })
-      if (destroyFollow) {
-        await destroyFollow.destroy()
+      if (following) {
+        await following.destroy()
       }
 
-      const Blockships = await Blockship.create({
-        blockerId: req.params.userId,
-        blockingId: req.user.id
+      const blockships = await Blockship.create({
+        blockerId: req.user.id,
+        blockingId: req.body.userId
       })
 
       req.flash('success_messages', '已成功封鎖該用戶')
       return res.redirect('/')
     } catch (error) {
       console.log(error)
+      req.flash('error_messages', { error_messages: '資料庫異常，未能成功封鎖該用戶！' })
     }
   },
 
