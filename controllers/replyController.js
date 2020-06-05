@@ -19,7 +19,12 @@ const replyController = {
       tweet.dataValues.isLiked = tweet.LikedUsers.map((d) => d.id).includes(
         helpers.getUser(req).id
       );
-      tweet.dataValues.replies = tweet.Replies.sort((a, b) => b.createdAt - a.createdAt);
+      tweet.dataValues.replies = tweet.Replies.map(reply => ({
+        ...reply.dataValues,
+        User: reply.User.dataValues
+      })).sort((a, b) => b.createdAt - a.createdAt);
+
+      console.log('tweet', tweet)
 
       User.findByPk(tweet.UserId, {
         include: [
