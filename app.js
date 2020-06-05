@@ -30,6 +30,7 @@ const passport = require('./config/passport')
 
 const db = require('./models')
 const User = db.User
+const { Op } = require('sequelize')
 
 // use helpers.getUser(req) to replace req.user
 // use helpers.ensureAuthenticated(req) to replace req.isAuthenticated()
@@ -79,17 +80,20 @@ io.on('connection', (socket) => {
   })
 
   socket.on('test', (keyword) => {
-    User.findAll({ raw: true, nest: true, order: [['name', 'ASC']] }).then((users) => {
 
-      let userName = users.map(user =>
-        user.name
-      )
+    User.findAll({
+      raw: true, nest: true, order: [['name', 'ASC']], where: {
+        name: { [Op.like]: '%' + keyword + '%' }
+      }
+    }).then((users) => {
 
-      userName = userName.filter(name =>
-        name.indexOf(keyword) !== -1
-      ).slice(0, 10)
+      const searchedUsers = users.map(user => ({
+        id: user.id,
+        name: user.name,
+        avatar: user.avatar
+      }))
 
-      io.emit('tag', { userName })
+      io.emit('tag', { searchedUsers })
     })
   })
 

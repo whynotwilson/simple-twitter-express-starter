@@ -1,16 +1,4 @@
-<div id="textarea" contenteditable="true" placeholder="what's on your mind?"></div>
-
-<div class="row-fluid">
-  <select class="selectpicker" data-show-subtext="true" data-live-search="true">
-    <option data-subtext="Rep California">Tom Foolery</option>
-    <option data-subtext="Sen California">Bill Gordon</option>
-    <option data-subtext="Sen Massacusetts">Elizabeth Warren</option>
-    <option data-subtext="Rep Alabama">Mario Flores</option>
-    <option data-subtext="Rep Alaska">Don Young</option>
-    <option data-subtext="Rep California" disabled="disabled">Marvin Martinez</option>
-  </select>
-  <span class="help-inline">With <code>data-show-subtext="true" data-live-search="true"</code>. Try searching for
-    california</span>
+<div id="textarea" contenteditable="true" placeholder="what's on your mind?">
 </div>
 
 
@@ -114,104 +102,142 @@
 
 
 <script type="text/javascript">
+  function sleep(second) {
+    return new Promise(wake => setTimeout(wake, second * 1000))
+  }
+  let text = ''
+  let lastInputTime
+  let ifInputChangeBySelected = false
+  const timeOut = 0.8 // second
+  async function handleInputDebounce() {
+    const current = Date.now()
+    lastInputTime = current
+    await sleep(timeOut)
 
-  $('.selectpicker').selectpicker()
-
-</script>
-<script type="text/javascript">
-
-  const socket = io()
-
-  const textarea = document.getElementById('textarea')
-  textarea.addEventListener('input', markFriend)
-
-  function markFriend(e) {
-
-
-    let regExp = /^(.*\s+@\w+|@\w+)/
-    let keyword = ''
-    if (regExp.test(e.target.innerHTML)) {
-
-      //切割字串
-
-      let indices = []
-      let idx = e.target.innerHTML.indexOf('@');
-      while (idx != -1) {
-        indices.push(idx);
-        idx = e.target.innerHTML.indexOf('@', idx + 1);
-      };
-      //超過兩個@的情況
-      if (indices.length > 1) {
-        keyword = e.target.innerHTML.slice(indices[indices.length - 1] + 1, indices[indices.length - 1] + 2)
-      } else {
-        keyword = e.target.innerHTML.slice(e.target.innerHTML.indexOf('@') + 1, e.target.innerHTML.length + 1)
-      }
-
-      //emit
-      socket.emit('test', keyword)
-
-      socket.on('tag', function (obj) {
-
-        console.log(obj)
-        let x = ``
-        x = `<select id="mySelect" class="selectpicker" data-live-search="true" onchange="myFunction()">  
-`;
-
-        let { userName } = obj
-
-        userName.forEach((name) => {
-          x += `<option value="${name}">${name}</option>`
-        })
-
-
-
-        x += `</select >`
-
-        let indices = []
-        let idx = e.target.innerHTML.indexOf('@');
-        while (idx != -1) {
-          indices.push(idx);
-          idx = e.target.innerHTML.indexOf('@', idx + 1);
-        }
-
-        const result = textarea.innerHTML.slice(0, indices[indices.length - 1] + 2)
-
-        textarea.innerHTML = result + x
-
-        textarea.contentEditable = "false";
-
-      }
-      )
+    if (lastInputTime != current) { console.log('debounce') }
+    else if (ifInputChangeBySelected === true) {
+      ifInputChangeBySelected = false
+      console.log('debounce')
+    }
+    else {
+      markFriend()
     }
 
   }
+
+  const socket = io()
+  const textarea = document.getElementById('textarea')
+  textarea.addEventListener('input', handleInputDebounce)
+
+  function markFriend(e) {
+
+    let regExp = /^(.*\s+@\w+|@\w+)/
+    const textTemp = textarea.textContent
+
+    if (regExp.test(textTemp)) {
+
+      textarea.contentEditable = false
+
+      //當資料變多可以用keyword進資料庫先篩選
+      let keyword = ''
+
+      let indices = []
+      let idx = textTemp.indexOf('@');
+      while (idx != -1) {
+        indices.push(idx);
+        idx = textTemp.indexOf('@', idx + 1);
+      }
+
+      if (indices.length > 1) {
+        keyword = textTemp.slice(indices[indices.length - 1] + 1, textTemp.length)
+      } else {
+        keyword = textTemp.slice(indices[0] + 1, textTemp.length)
+      }
+      //emit
+      socket.emit('test', keyword)
+      socket.on('tag', function (users) {
+
+        const { searchedUsers } = users
+
+        /*const selector = document.createElement('select')
+        selector.setAttribute('class', 'selectpicker')
+        selector.setAttribute('id', 'mySelect')
+        selector.setAttribute('data-live-serach', 'true')
+        selector.setAttribute('onchange', 'myFunction()')
+        textarea.appendChild(selector)
+        const mySelect = document.getElementById("mySelect");
+        const option = document.createElement('option')
+        option.setAttribute('selected', true)
+        option.text = 'tag your friend'
+        mySelect.appendChild(option)
+        if (searchedUsers.length === 0) {
+          const options = document.createElement('option')
+          options.setAttribute('value', '')
+          options.text = '查無用戶'
+          mySelect.appendChild(options)
+        }
+        for (const user of searchedUsers) {
+          const options = document.createElement('option')
+          options.setAttribute('value', user.name)
+          options.setAttribute('data-id', user.id)
+          options.setAttribute('data-thumbnail', user.avatar)
+          options.text = user.name
+          mySelect.appendChild(options)
+        }*/
+        let selectTemp = ``
+        selectTemp += `<select id="mySelect" onchange="tagFriend()"><option selected>Tag your friend</option>`
+        if (searchedUsers.length === 0) {
+          selectTemp += `<option value="">查無用戶</option>`
+        }
+        for (const user of searchedUsers) {
+          selectTemp += `<option value="${user.name}" data-id="${user.id}" data-thumbnail="${user.avatar}">${user.name}</option>`
+        }
+        selectTemp += `</select>`
+
+        let textareaTemp = textarea.innerHTML.slice(0, indices[indices.length - 1] + keyword.length + 1)
+        console.log(textareaTemp)
+        textarea.innerHTML = textareaTemp + selectTemp
+
+      })
+
+
+    }
+  }
+
+
 
   function getTweetsContent() {
     document.getElementById('tweets').value = document.getElementById('textarea').innerHTML
   }
 
-  function myFunction() {
+  function tagFriend() {
 
+    ifInputChangeBySelected = true
     const mySelect = document.getElementById("mySelect");
-    let y = mySelect.value
+    const options = document.querySelectorAll('option')
 
-    const template = `<a>${y}</a>`
-    mySelect.remove()
+    let template = ``
+    for (const option of options) {
+      if (option.value === mySelect.value) {
+        template = `<a href="/users/${option.dataset.id}/tweets">＠${option.value}</a >`
+      }
+    }
 
     //取得@之前字串
-    const z = textarea.innerHTML
+    const textareaTemp = textarea.innerHTML
     let indices = []
-    let idx = z.indexOf('@');
+    let idx = textareaTemp.indexOf('@');
     while (idx != -1) {
       indices.push(idx);
-      idx = z.indexOf('@', idx + 1);
+      idx = textareaTemp.indexOf('@', idx + 1);
     }
-    const result = z.slice(0, indices[indices.length - 1] + 1)
+    const result = textareaTemp.slice(0, indices[indices.length - 1])
 
+    text += result + template
     //合併輸出
+
     textarea.innerHTML = result + template
     textarea.contentEditable = "true";
-
   }
 
   function tweetsLeft() {
@@ -233,6 +259,5 @@
       tweetsTitle.style.display = 'inline'
     }
   }
-
 
 </script>
