@@ -42,7 +42,9 @@ module.exports = (app) => {
   app.post('/followships/:userId', authenticated, userController.addFollowing)
   app.delete('/followships/:userId', authenticated, userController.deleteFollowing)
 
+  app.get('/users/:id/blockings', authenticated, userController.getBlockings)
   app.post('/blockships', authenticated, userController.postBlock)
+  app.delete('/blockships/:id', authenticated, userController.deleteBlock)
 
   // signin / logout / signup
   app.get('/signup', userController.signUpPage)

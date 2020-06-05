@@ -100,7 +100,6 @@ const userController = {
   },
   getFollowings: async (req, res) => {
     try {
-
       const userId = Number(req.params.id)
       let isOwner = userId === req.user.id ? true : false;
 
@@ -308,6 +307,94 @@ const userController = {
     }
   },
 
+  getBlockings: async (req, res) => {
+    try {
+      const otherUserId = Number(req.params.id)
+      let isOwner = false
+      if (otherUserId === req.user.id) {
+        isOwner = true
+      }
+
+      let otherUser = await User.findByPk(otherUserId, {
+        include: [
+          { model: User, as: 'Followers' },
+          { model: User, as: 'Followings' },
+          // { model: User, as: 'Blockings' },
+          Like
+        ]
+      })
+
+      if (!otherUser) {
+        throw new Error('otherUser is not found')
+      }
+
+      // ------------------ otherUser 資料整理 -------------------
+      otherUser = {
+        ...otherUser.dataValues,
+        introduction: otherUser.introduction.substring(0, 30),
+        Followers: otherUser.Followers.map(follower => ({
+          ...follower.dataValues
+        })),
+        Followings: otherUser.Followings.map(following => ({
+          ...following.dataValues
+        })),
+        // Blockings: otherUser.Blockings.map(blocking => ({
+        //   ...blocking.dataValues
+        // })),
+        Likes: otherUser.Likes.map(like => ({
+          ...like.dataValues
+        })),
+        isFollowing: otherUser.Followers.map(d => d.id).includes(req.user.id)
+      }
+
+      let blockings = await User.findByPk(req.user.id, {
+        include: [{ model: User, as: 'Blockings' }]
+      })
+
+      blockings = blockings.dataValues.Blockings.map(blocking => ({
+        ...blocking.dataValues
+      }))
+
+      console.log('blockings', blockings)
+
+      let tweets = await Tweet.findAll({
+        where: {
+          UserId: otherUserId
+        },
+        include: [
+          Like,
+          User,
+          { model: Reply, include: [User] },
+          { model: User, as: 'LikedUsers' }
+        ]
+      })
+
+      // ------------------ Tweets 資料整理 -------------------
+      tweets = tweets.map(tweet => ({
+        ...tweet.dataValues,
+
+        User: tweet.User.dataValues,
+
+        Replies: tweet.dataValues.Replies.map(reply => ({
+          ...reply.dataValues,
+          User: reply.User.dataValues
+        })),
+
+        LikedUsers: tweet.dataValues.LikedUsers.map(user => ({
+          ...user.dataValues
+        })),
+        isLiked: tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id),
+        description: tweet.description ? tweet.description.substring(0, 50) : null,
+        updatedAt: tweet.updatedAt ? moment(tweet.updatedAt).format('YYYY-MM-DD, hh:mm') : '-',
+        likedCount: tweet.LikedUsers.length
+      }))
+
+      return res.render('getBlockings', { otherUser, tweets, isOwner, blockings })
+    } catch (error) {
+      console.log('error', error)
+    }
+  },
+
   postBlock: async (req, res) => {
     try {
       // 先找出封鎖者與被封鎖者有無 follow 關係
@@ -337,16 +424,28 @@ const userController = {
         await following.destroy()
       }
 
-      const blockships = await Blockship.create({
-        blockerId: req.user.id,
-        blockingId: req.body.userId
+      const blockships = await Blockship.findOne({
+        where: {
+          [Op.and]: [
+            { blockerId: req.user.id },
+            { blockingId: req.body.userId }
+          ]
+        }
       })
+
+      if (!blockships) {
+        await Blockship.create({
+          blockerId: req.user.id,
+          blockingId: req.body.userId
+        })
+      }
 
       req.flash('success_messages', '已成功封鎖該用戶')
       return res.redirect('/')
     } catch (error) {
       console.log(error)
       req.flash('error_messages', { error_messages: '資料庫異常，未能成功封鎖該用戶！' })
+      return res.redirect('/')
     }
   },
 
@@ -354,16 +453,20 @@ const userController = {
     try {
       const destroyBlock = await Blockship.findOne({
         where: {
-          blockerId: req.user.id,
-          blockingId: req.params.userId
+          [Op.and]: [
+            { blockerId: req.user.id },
+            { blockingId: req.params.id }
+          ]
         }
-      }).then((followship) => {
-        followship.destroy()
       })
-      return res.redirect('back')
 
+      req.flash('success_messages', '已成功解除封鎖該用戶')
+      await destroyBlock.destroy()
+      return res.redirect('back')
     } catch (error) {
-      console.log("error", error);
+      console.log(error)
+      req.flash('error_messages', { error_messages: '資料庫異常，未能成功解除封鎖該用戶！' })
+      return res.redirect('/')
     }
   },
 
