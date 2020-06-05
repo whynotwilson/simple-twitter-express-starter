@@ -24,8 +24,6 @@ const replyController = {
         User: reply.User.dataValues
       })).sort((a, b) => b.createdAt - a.createdAt);
 
-      console.log('tweet', tweet)
-
       User.findByPk(tweet.UserId, {
         include: [
           { model: Tweet, include: [User, Reply, Like] },
