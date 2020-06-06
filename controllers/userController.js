@@ -502,6 +502,11 @@ const userController = {
         ...blocking.dataValues
       }))
 
+      blockings = blockings.map(blocking => ({
+        ...blocking,
+        introduction: blocking.introduction.substring(0, 30)
+      }))
+
       let tweets = await Tweet.findAll({
         where: {
           UserId: otherUserId
