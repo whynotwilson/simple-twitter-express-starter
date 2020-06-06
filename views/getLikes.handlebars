@@ -43,7 +43,8 @@
           <button type="submit" class="btn btn-danger">Unfollow</button>
         </form>
         {{else}}
-        <form action="/followships/{{userData.id}}" method="POST">
+        <form action="/followships" method="POST">
+          <input type="hidden" name="id" value={{userData.id}}>
           <button type="submit" class="btn btn-primary">Follow </button>
         </form>
         {{/if}}

@@ -126,9 +126,8 @@ const userController = {
         FollowersNumber: dataValues.Followers.length,
         FollowingsNumber: dataValues.Followings.length,
         LikesNumber: dataValues.Likes.length,
-        isFollowing: req.user.Followings.map(d => d.id).includes(userId)
+        isFollowed: helpers.getUser(req).Followings.map(d => d.id).includes(userId)
       }
-
 
       const followings = dataValues.Followings.map(following => ({
         id: following.id,
@@ -242,11 +241,22 @@ const userController = {
     }
   },
   addFollowing: async (req, res) => {
+    // console.log('req.body.id', req.body.id)
     try {
-      const newFollow = await Followship.create({
-        followerId: req.user.id,
-        followingId: req.body.id,
-      });
+      const findOne = await Followship.findOne({
+        where: {
+          [Op.and]: [
+            { followerId: req.user.id },
+            { followingId: req.body.id }
+          ]
+        }
+      })
+      if (!findOne) {
+        await Followship.create({
+          followerId: req.user.id,
+          followingId: req.body.id
+        })
+      }
 
       return res.redirect("back");
     } catch (error) {
