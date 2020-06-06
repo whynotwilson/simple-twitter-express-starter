@@ -21,7 +21,7 @@ const userController = {
     try {
       const otherUserId = Number(req.params.id)
       let isOwner = false
-      if (otherUserId === req.user.id) {
+      if (otherUserId === helpers.getUser(req).id) {
         isOwner = true
       }
 
@@ -92,7 +92,7 @@ const userController = {
     try {
 
       const userId = Number(req.params.id)
-      let isOwner = userId === req.user.id ? true : false;
+      let isOwner = userId === helpers.getUser(req).id ? true : false;
 
       const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId, {
         include: [
@@ -128,7 +128,7 @@ const userController = {
     try {
 
       const userId = Number(req.params.id)
-      let isOwner = userId === req.user.id ? true : false;
+      let isOwner = userId === helpers.getUser(req).id ? true : false;
       const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId, {
         include: [
           { model: User, as: 'Followers' },
@@ -163,40 +163,53 @@ const userController = {
     try {
 
       const userId = Number(req.params.id)
-      let isOwner = userId === req.user.id ? true : false;
+      let isOwner = userId === helpers.getUser(req).id ? true : false;
+
       const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId, {
         include: [
           { model: User, as: 'Followers' },
           { model: User, as: 'Followings' },
-          { model: Like, include: [{ model: Tweet, include: [Like, Reply, User, { model: User, as: 'LikedUsers' }] }] },
-          Reply,
-          Tweet
+          Like,
+          Tweet,
+          { model: Tweet, as: 'LikedTweets', include: [Like, Reply, User] }
         ]
       }) : null
+
 
       if (!dataValues) {
         throw new Error("user is not found");
       }
 
-      let userData = {}
-      userData = { ...dataValues, introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null, isFollowing: req.user.Followings.map(d => d.id).includes(userId) }
 
-      let tweetsData = {}
-      tweetsData = dataValues.Likes.map(d =>
-        d.dataValues.Tweet
-      )
-      const tweets = tweetsData.map(tweet => ({
-        ...tweet,
+      let userData = {}
+      userData = {
+        id: dataValues.id,
+        name: dataValues.name,
+        avatar: dataValues.avatar,
+        introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null,
+        TweetsNumber: dataValues.Tweets.length,
+        FollowersNumber: dataValues.Followers.length,
+        FollowingsNumber: dataValues.Followings.length,
+        LikesNumber: dataValues.Likes.length,
+        isFollowing: req.user.Followings.map(d => d.id).includes(userId)
+      }
+
+      const tweets = dataValues.LikedTweets.map(tweet => ({
+        id: tweet.id,
         description: tweet.description
           ? tweet.description.substring(0, 50)
           : null,
         updatedAt: tweet.updatedAt
           ? moment(tweet.updatedAt).format(`YYYY-MM-DD, hh:mm`)
           : "-",
-        isLiked: tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id),
-        likedCount: tweet.LikedUsers.length
+        likedCount: tweet.Likes.length,
+        repliesCount: tweet.Replies.length,
+        userId: tweet.UserId,
+        userAvatar: tweet.User.avatar,
+        userName: tweet.User.name
       }));
-      // console.log(tweets)
+      console.log(tweets)
+
       return res.render('getLikes', { userData, tweets, isOwner })
     } catch (error) {
       console.log("error", error);
