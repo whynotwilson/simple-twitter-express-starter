@@ -11,25 +11,25 @@
           <li>
             <a href="/users/{{userData.id}}/tweets">
               Tweet &nbsp
-              <span class="badge badge-primary badge-pill">{{userData.Tweets.length}}</span>
+              <span class="badge badge-primary badge-pill">{{userData.TweetsNumber}}</span>
             </a>
           </li>
           <li>
             <a href="/users/{{userData.id}}/followings">
               Followings &nbsp
-              <span class="badge badge-primary badge-pill">{{userData.Followings.length}}</span>
+              <span class="badge badge-primary badge-pill">{{userData.FollowingsNumber}}</span>
             </a>
           </li>
           <li>
             <a href="/users/{{userData.id}}/followers">
               Followers &nbsp
-              <span class="badge badge-primary badge-pill">{{userData.Followers.length}}</span>
+              <span class="badge badge-primary badge-pill">{{userData.FollowersNumber}}</span>
             </a>
           </li>
           <li>
             <a href="/users/{{userData.id}}/likes">
               Like &nbsp
-              <span class="badge badge-primary badge-pill">{{userData.Likes.length}}</span>
+              <span class="badge badge-primary badge-pill">{{userData.LikesNumber}}</span>
             </a>
           </li>
         </ul>
@@ -56,34 +56,24 @@
       <div class="card mb-3" style="max-width: 540px;">
         <div class="row no-gutters">
           <div class="col-md-4">
-            <img src="{{this.dataValues.User.avatar}}" class="card-img" alt="avatar">
+            <img src="{{this.userAvatar}}" class="card-img" alt="avatar">
           </div>
           <div class="col-md-8">
             <div class="card-body">
               <h5 class="card-title">
-                <a href="/users/{{ this.dataValues.User.id }}/tweets">{{ this.dataValues.User.name }}</a> <small
+                <a href="/users/{{ this.userId }}/tweets">{{ this.userName }}</a> <small
                   class="text-muted">{{this.updatedAt}}</small>
               </h5>
               <p class="card-text">{{this.description}}</p>
-              <a href="/tweets/{{this.dataValues.id}}/replies" class="btn btn-primary">
-                Reply({{this.Replies.length}})
+              <a href="/tweets/{{this.id}}/replies" class="btn btn-primary">
+                Reply({{this.repliesCount}})
               </a>
-              {{#if this.isLiked }}
-              <form action="/tweets/{{this.dataValues.id}}/unlike" method="POST" style="display: contents;">
+              <form action="/tweets/{{this.id}}/unlike" method="POST" style="display: contents;">
                 <button type="submit" class="btn btn-danger">
                   <i class="fa fa-heart" aria-hidden="true"></i>
                   unlike({{ this.likedCount}})
                 </button>
               </form>
-              {{else}}
-              <form action="/tweets/{{this.dataValues.id}}/like" method="POST" style="display: contents;">
-                <input type="hidden" name="userId" value="{{this.id}}" />
-                <button type="submit" class="btn btn-primary">
-                  <i class="fa fa-heart" aria-hidden="true"></i>
-                  like({{ this.likedCount }})
-                </button>
-              </form>
-              {{/if}}
             </div>
           </div>
         </div>

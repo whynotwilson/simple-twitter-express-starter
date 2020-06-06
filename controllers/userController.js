@@ -21,7 +21,7 @@ const userController = {
     try {
       const otherUserId = Number(req.params.id)
       let isOwner = false
-      if (otherUserId === req.user.id) {
+      if (otherUserId === helpers.getUser(req).id) {
         isOwner = true
       }
 
@@ -101,7 +101,7 @@ const userController = {
   getFollowings: async (req, res) => {
     try {
       const userId = Number(req.params.id)
-      let isOwner = userId === req.user.id ? true : false;
+      let isOwner = userId === helpers.getUser(req).id ? true : false;
 
       const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId, {
         include: [
@@ -118,16 +118,24 @@ const userController = {
       }
       let userData = {}
       userData = {
-        ...dataValues, introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null,
+        id: dataValues.id,
+        avatar: dataValues.avatar,
+        name: dataValues.name,
+        introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null,
+        TweetsNumber: dataValues.Tweets.length,
+        FollowersNumber: dataValues.Followers.length,
+        FollowingsNumber: dataValues.Followings.length,
+        LikesNumber: dataValues.Likes.length,
         isFollowing: req.user.Followings.map(d => d.id).includes(userId)
       }
 
 
       const followings = dataValues.Followings.map(following => ({
-        ...following.dataValues,
+        id: following.id,
+        avatar: following.avatar,
+        name: following.name,
         introduction: following.introduction ? following.introduction.substring(0, 20) : null,
       }))
-
       return res.render('getFollowings', { userData, followings: followings, isOwner })
     } catch (error) {
       console.log("error", error);
@@ -137,7 +145,7 @@ const userController = {
     try {
 
       const userId = Number(req.params.id)
-      let isOwner = userId === req.user.id ? true : false;
+      let isOwner = userId === helpers.getUser(req).id ? true : false;
       const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId, {
         include: [
           { model: User, as: 'Followers' },
@@ -153,16 +161,26 @@ const userController = {
       }
       let userData = {}
       userData = {
-        ...dataValues, introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null,
-        isFollowing: req.user.Followings.map(d => d.id).includes(userId)
+        id: dataValues.id,
+        avatar: dataValues.avatar,
+        name: dataValues.name,
+        introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null,
+        TweetsNumber: dataValues.Tweets.length,
+        FollowersNumber: dataValues.Followers.length,
+        FollowingsNumber: dataValues.Followings.length,
+        LikesNumber: dataValues.Likes.length,
+        isFollowing: helpers.getUser(req).Followings.map(d => d.id).includes(userId)
       }
 
       const followers = dataValues.Followers.map(follower => ({
-        ...follower.dataValues,
+        id: follower.id,
+        avatar: follower.avatar,
+        name: follower.name,
         introduction: follower.introduction ? follower.introduction.substring(0, 20) : null,
-        isOwnFollower: follower.dataValues.id === req.user.id ? true : false
+        isOwnFollower: follower.id === helpers.getUser(req).id ? true : false,
+        isFollowed: helpers.getUser(req).Followings.map(d => d.id).includes(follower.id)
       }))
-
+      console.log(followers)
       return res.render('getFollowers', { userData, followers: followers, isOwner })
     } catch (error) {
       console.log("error", error);
@@ -172,40 +190,52 @@ const userController = {
     try {
 
       const userId = Number(req.params.id)
-      let isOwner = userId === req.user.id ? true : false;
+      let isOwner = userId === helpers.getUser(req).id ? true : false;
+
       const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId, {
         include: [
           { model: User, as: 'Followers' },
           { model: User, as: 'Followings' },
-          { model: Like, include: [{ model: Tweet, include: [Like, Reply, User, { model: User, as: 'LikedUsers' }] }] },
-          Reply,
-          Tweet
+          Like,
+          Tweet,
+          { model: Tweet, as: 'LikedTweets', include: [Like, Reply, User] }
         ]
       }) : null
+
 
       if (!dataValues) {
         throw new Error("user is not found");
       }
 
-      let userData = {}
-      userData = { ...dataValues, introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null, isFollowing: req.user.Followings.map(d => d.id).includes(userId) }
 
-      let tweetsData = {}
-      tweetsData = dataValues.Likes.map(d =>
-        d.dataValues.Tweet
-      )
-      const tweets = tweetsData.map(tweet => ({
-        ...tweet,
+      let userData = {}
+      userData = {
+        id: dataValues.id,
+        name: dataValues.name,
+        avatar: dataValues.avatar,
+        introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null,
+        TweetsNumber: dataValues.Tweets.length,
+        FollowersNumber: dataValues.Followers.length,
+        FollowingsNumber: dataValues.Followings.length,
+        LikesNumber: dataValues.Likes.length,
+        isFollowing: req.user.Followings.map(d => d.id).includes(userId)
+      }
+
+      const tweets = dataValues.LikedTweets.map(tweet => ({
+        id: tweet.id,
         description: tweet.description
           ? tweet.description.substring(0, 50)
           : null,
         updatedAt: tweet.updatedAt
           ? moment(tweet.updatedAt).format(`YYYY-MM-DD, hh:mm`)
           : "-",
-        isLiked: tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id),
-        likedCount: tweet.LikedUsers.length
+        likedCount: tweet.Likes.length,
+        repliesCount: tweet.Replies.length,
+        userId: tweet.UserId,
+        userAvatar: tweet.User.avatar,
+        userName: tweet.User.name
       }));
-      // console.log(tweets)
+
       return res.render('getLikes', { userData, tweets, isOwner })
     } catch (error) {
       console.log("error", error);
@@ -215,7 +245,7 @@ const userController = {
     try {
       const newFollow = await Followship.create({
         followerId: req.user.id,
-        followingId: req.params.userId,
+        followingId: req.body.id,
       });
 
       return res.redirect("back");

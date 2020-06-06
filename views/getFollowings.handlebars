@@ -11,25 +11,25 @@
           <li>
             <a href="/users/{{userData.id}}/tweets">
               Tweet &nbsp
-              <span class="badge badge-primary badge-pill">{{userData.Tweets.length}}</span>
+              <span class="badge badge-primary badge-pill">{{userData.TweetsNumber}}</span>
             </a>
           </li>
           <li>
             <a href="/users/{{userData.id}}/followings">
               Followings &nbsp
-              <span class="badge badge-primary badge-pill">{{userData.Followings.length}}</span>
+              <span class="badge badge-primary badge-pill">{{userData.FollowingsNumber}}</span>
             </a>
           </li>
           <li>
             <a href="/users/{{userData.id}}/followers">
               Followers &nbsp
-              <span class="badge badge-primary badge-pill">{{userData.Followers.length}}</span>
+              <span class="badge badge-primary badge-pill">{{userData.FollowersNumber}}</span>
             </a>
           </li>
           <li>
             <a href="/users/{{userData.id}}/likes">
               Like &nbsp
-              <span class="badge badge-primary badge-pill">{{userData.Likes.length}}</span>
+              <span class="badge badge-primary badge-pill">{{userData.LikesNumber}}</span>
             </a>
           </li>
         </ul>
@@ -43,7 +43,8 @@
           <button type="submit" class="btn btn-danger">Unfollow</button>
         </form>
         {{else}}
-        <form action="/followships/{{userData.id}}" method="POST">
+        <form action="/followships" method="POST">
+          <input type="hidden" name="id" value={{userData.id}}>
           <button type="submit" class="btn btn-primary">Follow </button>
         </form>
         {{/if}}
@@ -64,7 +65,8 @@
             <div class="col-md-8">
               <div class="card-body">
                 <h5 class="card-title">
-                  <a href="/users/{{ this.id }}/tweets">{{ this.name }}</a>
+                  <a href="/users/{{ this.id }}/tweets">
+                    @{{ this.name }}</a>
                 </h5>
                 <p class="card-text">{{this.introduction}}</p>
 
