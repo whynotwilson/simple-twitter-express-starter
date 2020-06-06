@@ -189,15 +189,13 @@ const userController = {
           { model: User, as: 'Followings' },
           Like,
           Tweet,
-          { model: Tweet, as: 'LikedTweets', include: [Like, Reply, User] }
+          Reply
         ]
       }) : null
-
 
       if (!dataValues) {
         throw new Error("user is not found");
       }
-
 
       let userData = {}
       userData = {
@@ -212,7 +210,11 @@ const userController = {
         isFollowing: req.user.Followings.map(d => d.id).includes(userId)
       }
 
-      const tweets = dataValues.LikedTweets.map(tweet => ({
+      const tweetsData = await Tweet.findAll({ include: [Like, Reply, User] })
+      const likedTweets = tweetsData.filter(tweet =>
+        dataValues.Likes.map(like => like.TweetId).includes(tweet.id)
+      )
+      const tweets = likedTweets.map(tweet => ({
         id: tweet.id,
         description: tweet.description
           ? tweet.description.substring(0, 50)
