@@ -64,7 +64,11 @@
             <div class="col-md-8">
               <div class="card-body">
                 <h5 class="card-title">
-                  <a href="/users/{{ this.id }}/tweets">{{ this.name }}</a>
+                  <a href="/users/{{ this.id }}/tweets">
+                    {{#if this.isFollowed}}
+                    @
+                    {{/if}}
+                    {{this.name}}</a>
                 </h5>
                 <p class="card-text">{{this.introduction}}</p>
                 {{#if this.isOwnFollower}}
