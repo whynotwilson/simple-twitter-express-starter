@@ -208,7 +208,6 @@ const userController = {
         userAvatar: tweet.User.avatar,
         userName: tweet.User.name
       }));
-      console.log(tweets)
 
       return res.render('getLikes', { userData, tweets, isOwner })
     } catch (error) {
