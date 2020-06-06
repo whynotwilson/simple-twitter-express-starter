@@ -144,16 +144,26 @@ const userController = {
       }
       let userData = {}
       userData = {
-        ...dataValues, introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null,
-        isFollowing: req.user.Followings.map(d => d.id).includes(userId)
+        id: dataValues.id,
+        avatar: dataValues.avatar,
+        name: dataValues.name,
+        introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null,
+        TweetsNumber: dataValues.Tweets.length,
+        FollowersNumber: dataValues.Followers.length,
+        FollowingsNumber: dataValues.Followings.length,
+        LikesNumber: dataValues.Likes.length,
+        isFollowing: helpers.getUser(req).Followings.map(d => d.id).includes(userId)
       }
 
       const followers = dataValues.Followers.map(follower => ({
-        ...follower.dataValues,
+        id: follower.id,
+        avatar: follower.avatar,
+        name: follower.name,
         introduction: follower.introduction ? follower.introduction.substring(0, 20) : null,
-        isOwnFollower: follower.dataValues.id === req.user.id ? true : false
+        isOwnFollower: follower.id === helpers.getUser(req).id ? true : false,
+        isFollowed: helpers.getUser(req).Followings.map(d => d.id).includes(follower.id)
       }))
-
+      console.log(followers)
       return res.render('getFollowers', { userData, followers: followers, isOwner })
     } catch (error) {
       console.log("error", error);
