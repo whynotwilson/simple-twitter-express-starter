@@ -1,30 +1,46 @@
 const db = require('../models')
 const User = db.User
 const Tweet = db.Tweet
+const Reply = db.Reply
 const moment = require('moment')
-const helpers = require("../_helpers")
 
 const adminController = {
   getTweets: async (req, res) => {
     try {
       let tweets = await Tweet.findAll({
-        include: [User, { model: User, as: 'LikedUsers' }],
-        limit: 20,
-        // order: [
-        //   ['LikedUsers', 'DESC']
-        // ]
+        include: [User,
+          { model: Reply, include: [User] },
+          { model: User, as: 'LikedUsers' }
+        ],
+        limit: 50
       })
-      // console.log('tweets[0]', tweets[0])
+
+      // 整理 tweets 資料，把 dataValues 都拿掉
+      // ex: tweets.dataValues.User.dataValues => tweets.User
+      // ex: tweets.dataValues.Replies.dataValues.User.dataValues => tweets.Replies.User
       tweets = tweets.map(tweet => ({
         ...tweet.dataValues,
+
+        User: tweet.dataValues.User.dataValues,
+
+        Replies: tweet.dataValues.Replies.map(reply => ({
+          ...reply.dataValues,
+          User: reply.User.dataValues
+        })),
+
+        LikedUsers: tweet.dataValues.LikedUsers.map(user => ({
+          ...user.dataValues
+        })),
+
         description: tweet.description ? tweet.description.substring(0, 50) : null,
         updatedAt: tweet.updatedAt ? moment(tweet.updatedAt).format('YYYY-MM-DD, hh:mm') : '-',
-        // isLiked: tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id),
         likedCount: tweet.LikedUsers.length
       }))
-      console.log('tweets', tweets)
-      // console.log('tweets.isLiked', tweets.isLiked)
-      // console.log('tweets.likedCount', tweets.likedCount)
+
+      tweets = tweets.sort((a, b) =>
+        b.likedCount - a.likedCount
+      )
+
       return res.render('admin/tweets', { tweets })
     } catch (error) {
       console.log(error)
@@ -44,22 +60,37 @@ const adminController = {
   getUsers: async (req, res) => {
     try {
       let users = await User.findAll({
-        // raw: true,
-        // nest: true,
-        limit: 20,
+        // limit: 20,
         include: [
-          { model: User, as: 'Followers' }
+          Tweet,
+          { model: User, as: 'Followers' },
+          { model: User, as: 'Followings' },
+          { model: Tweet, as: 'LikedTweets' }
         ]
       })
 
       users = users.map(user => ({
         ...user.dataValues,
-        FollowerCount: user.Followers.length,
-        createdAt: user.createdAt.toISOString().slice(0, 10)
+        Followers: user.dataValues.Followers.map(follower => ({
+          ...follower.dataValues
+        })),
+
+        Followings: user.dataValues.Followings.map(following => ({
+          ...following.dataValues
+        })),
+
+        LikedTweets: user.dataValues.LikedTweets.map(likedTweet => ({
+          ...likedTweet.dataValues
+        })),
+
+        Tweets: user.dataValues.Tweets.map(tweet => ({
+          ...tweet.dataValues
+        }))
       }))
 
-      // 依追蹤者人數排序清單
-      users = users.sort((a, b) => b.FollowerCount - a.FollowerCount)
+      // 依發文數量排序，由多至少
+      users = users.sort((a, b) => b.Tweets.length - a.Tweets.length)
+
       return res.render('admin/users', { users })
     } catch (error) {
       console.log(error)
