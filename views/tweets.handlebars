@@ -1,6 +1,9 @@
-<div id="textarea" contenteditable="true" placeholder="what's on your mind?" style="position: relative;"></div>
+<div id="text-wrap" style="position: relative;">
+  <div id="textarea" contenteditable="true" placeholder="what's on your mind?"></div>
+  <p id="tweetInput" style="position: absolute; top:1px;"></p>
 
-<p id="tweetInput" style="position: absolute; top: 133px;"></p>
+</div>
+
 
 
 <div class="row justify-content-center my-3">
@@ -209,31 +212,49 @@
 
     let template = ``
 
-    for (const option of options) {
-      if (option.value === mySelect.value) {
-        template = `<a href="/users/${option.dataset.id}/tweets" data-id="${option.dataset.id}">@${option.value}</a>`
-        const tagInput = document.createElement('input')
-        tagInput.setAttribute('name', 'taggedId')
-        tagInput.setAttribute('value', option.dataset.id)
-        tagInput.setAttribute('type', 'hidden')
-        tagInput.setAttribute('id', 'taggedId')
-        document.getElementById('tweetForm').appendChild(tagInput)
+    if (mySelect.value === '') {
+      const textareaTemp = textarea.innerHTML
+
+      let indices = []
+      let idx = textareaTemp.indexOf('@');
+      while (idx != -1) {
+        indices.push(idx);
+        idx = textareaTemp.indexOf('@', idx + 1);
       }
+      const resultTemp = textareaTemp.slice(0, indices[indices.length - 1])
+      //合併輸出
+      textarea.innerHTML = resultTemp + template
+      tweetInput.innerHTML = ''
+    }
+    else {
+      for (const option of options) {
+        if (option.value === mySelect.value) {
+          template = `<a href="/users/${option.dataset.id}/tweets" data-id="${option.dataset.id}">@${option.value}</a>`
+          const tagInput = document.createElement('input')
+          tagInput.setAttribute('name', 'taggedId')
+          tagInput.setAttribute('value', option.dataset.id)
+          tagInput.setAttribute('type', 'hidden')
+          tagInput.setAttribute('id', 'taggedId')
+          document.getElementById('tweetForm').appendChild(tagInput)
+        }
+      }
+
+      //取得@之前字串
+      const textareaTemp = textarea.innerHTML
+
+      let indices = []
+      let idx = textareaTemp.indexOf('@');
+      while (idx != -1) {
+        indices.push(idx);
+        idx = textareaTemp.indexOf('@', idx + 1);
+      }
+      const resultTemp = textareaTemp.slice(0, indices[indices.length - 1])
+      //合併輸出
+      textarea.innerHTML = resultTemp + template
+      tweetInput.innerHTML = ''
     }
 
-    //取得@之前字串
-    const textareaTemp = textarea.innerHTML
 
-    let indices = []
-    let idx = textareaTemp.indexOf('@');
-    while (idx != -1) {
-      indices.push(idx);
-      idx = textareaTemp.indexOf('@', idx + 1);
-    }
-    const resultTemp = textareaTemp.slice(0, indices[indices.length - 1])
-    //合併輸出
-    tweetInput.innerHTML = resultTemp + template
-    textarea.innerHTML = tweetInput.innerHTML
     getTweetsContent()
     textarea.contentEditable = "true";
 
