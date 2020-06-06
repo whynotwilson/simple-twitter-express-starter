@@ -3,10 +3,41 @@ const Tweet = db.Tweet;
 const User = db.User;
 const Like = db.Like;
 const Reply = db.Reply;
+const Blockship = db.Blockship;
 const helpers = require("../_helpers");
+const Op = require('Sequelize').Op;
 
 const tweetController = {
-  getTweets: (req, res) => {
+  getTweets: async (req, res) => {
+
+    let blockships = await Blockship.findAll({
+      where: {
+        [Op.or]: [
+          { blockerId: req.user.id },
+          { blockingId: req.user.id }
+        ]
+      }
+    })
+
+    blockships = blockships.map(blockship => ({
+      ...blockship.dataValues
+    }))
+
+    // blockshipsIdArr = 封鎖我的人 && 我封鎖的人的 ID
+
+    const blockshipsIdArr = []
+
+    blockships.forEach(blockship => {
+      if (blockship.blockerId !== req.user.id) {
+        blockshipsIdArr.push(blockship.blockerId)
+      }
+      if (blockship.blockingId !== req.user.id) {
+        blockshipsIdArr.push(blockship.blockingId)
+      }
+    })
+
+    // console.log('blockshipsIdArr', blockshipsIdArr)
+
     Tweet.findAll({
       limit: 10,
       order: [["createdAt", "DESC"]],
@@ -15,6 +46,11 @@ const tweetController = {
         Reply,
         { model: User, as: 'LikedUsers' }
       ],
+      where: {
+        [Op.not]: [
+          { UserId: blockshipsIdArr }
+        ]
+      },
     }).then((tweets) => {
       tweets = tweets.map((tweet) => ({
         ...tweet.dataValues,
@@ -29,7 +65,13 @@ const tweetController = {
         order: [["createdAt", "DESC"]],
         include: [
           { model: User, as: 'Followers' }
-        ]
+        ],
+        where: {
+          [Op.not]: [
+            { id: blockshipsIdArr }
+          ]
+        }
+
       }).then((users) => {
         users = users.map(user => ({
           ...user.dataValues,
