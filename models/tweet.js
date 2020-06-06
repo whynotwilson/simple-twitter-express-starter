@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     Tweet.hasMany(models.Like)
     Tweet.hasMany(models.Reply)
     Tweet.belongsTo(models.User)
-    Tweet.hasMany(model.Tag)
+    Tweet.hasMany(models.Tag)
     Tweet.belongsToMany(models.User, {
       through: models.Like,
       foreignKey: 'TweetId',

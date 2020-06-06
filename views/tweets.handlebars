@@ -5,7 +5,7 @@
 
 <div class="row justify-content-center my-3">
   <div class="col-md-6">
-    <form action="/tweets" method="POST">
+    <form action="/tweets" method="POST" id="tweetForm">
       <div class="input-group">
         <textarea id="tweets" name="tweets" class="form-control" aria-label="With textarea"
           placeholder="what's on your mind?" rows="3" style="display: none;"></textarea>
@@ -14,8 +14,6 @@
         <small id="tweetsText">characters left:</small>
         <span id="tweetsNumber">140</span>
       </div>
-      <input type="hidden" name="taggedId" id="taggedId" value=''>
-      <input type="hidden" name="taggingId" id="taggingId" value='{{user.id}}'>
       <button id="tweetBtn" class="btn btn-primary float-right" type="submit">Tweet</button>
     </form>
     <br>
@@ -39,7 +37,7 @@
             {{#if this.isLiked }}
             <form action="/tweets/{{this.id}}/unlike" method="POST" style="display: contents;">
               <button type="submit" class="btn btn-danger">
-                <i class="fa fa-heart" aria-hidden="true"></i>
+                <i class="fa fa-heart" aria-hidden="true" onsubmit="clearTagId()"></i>
                 unlike({{ this.likedCount }})
               </button>
             </form>
@@ -168,7 +166,7 @@
           tweetInput.innerHTML = ''
           const { searchedUsers } = users
           let selectTemp = ``
-          selectTemp += `<select id="mySelect" onchange="tagFriend()"><option selected>Tag your friend</option>`
+          selectTemp += `<select id="mySelect" onchange="tagFriend()"><option selected value="0" disabled>Tag your friend</option>`
 
           if (searchedUsers.length === 0) {
             selectTemp += `<option value="">查無用戶</option>`
@@ -210,14 +208,18 @@
     const options = document.querySelectorAll('option')
 
     let template = ``
+
     for (const option of options) {
       if (option.value === mySelect.value) {
         template = `<a href="/users/${option.dataset.id}/tweets" data-id="${option.dataset.id}">@${option.value}</a>`
-        document.getElementById("taggedId").value = option.dataset.id
+        const tagInput = document.createElement('input')
+        tagInput.setAttribute('name', 'taggedId')
+        tagInput.setAttribute('value', option.dataset.id)
+        tagInput.setAttribute('type', 'hidden')
+        tagInput.setAttribute('id', 'taggedId')
+        document.getElementById('tweetForm').appendChild(tagInput)
       }
     }
-
-
 
     //取得@之前字串
     const textareaTemp = textarea.innerHTML

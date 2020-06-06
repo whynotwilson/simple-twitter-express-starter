@@ -3,6 +3,7 @@ const Tweet = db.Tweet;
 const User = db.User;
 const Like = db.Like;
 const Reply = db.Reply;
+const Tag = db.Tag;
 const helpers = require("../_helpers");
 
 const tweetController = {
@@ -47,17 +48,35 @@ const tweetController = {
     });
   },
   postTweets: (req, res) => {
-
-
     const tweetsDesc = req.body.tweets.trim();
 
     if (tweetsDesc !== "" && tweetsDesc.length <= 140) {
-      Tweet.create({
-        description: tweetsDesc,
-        UserId: helpers.getUser(req).id,
-      }).then((tweet) => {
-        return res.redirect('/tweets')
-      });
+      if (req.body.taggedId) {
+        Tweet.create({
+          description: tweetsDesc,
+          UserId: helpers.getUser(req).id,
+        }).then((tweet) => {
+          req.body.taggedId.forEach((id) => {
+            Tag.create({
+              TaggedUserId: Number(id),
+              TweetId: tweet.id
+            })
+          })
+          console.log('twst')
+          return tweet
+        }).then((tweet) => {
+          return res.redirect('/tweets')
+        })
+      } else {
+        Tweet.create({
+          description: tweetsDesc,
+          UserId: helpers.getUser(req).id,
+        }).then((tweet) => {
+          return res.redirect('/tweets')
+        });
+      }
+
+
     } else {
       req.flash('error_messages', { error_messages: '輸入不可為空白！' });
       return res.redirect("/tweets");
