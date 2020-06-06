@@ -74,8 +74,9 @@
               </button>
             </form>
             {{else}}
-            <form class="text-right" action="/followships/{{this.id}}" method="POST">
-              <button type="submit" class="btn btn-info" name="id" value={{this.id}}>
+            <form class="text-right" action="/followships" method="POST">
+              <input type="hidden" name="id" value={{this.id}}>
+              <button type="submit" class="btn btn-info">
                 Follow <i class="fa fa-user-plus" aria-hidden="true"></i>
               </button>
             </form>

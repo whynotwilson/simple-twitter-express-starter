@@ -39,7 +39,7 @@ module.exports = (app) => {
   app.get('/users/:id/edit', authenticated, userController.getEdit)
   app.post('/users/:id/edit', authenticated, upload.single('avatar'), userController.postEdit)
 
-  app.post('/followships/:userId', authenticated, userController.addFollowing)
+  app.post('/followships', authenticated, userController.addFollowing)
   app.delete('/followships/:userId', authenticated, userController.deleteFollowing)
 
   // signin / logout / signup

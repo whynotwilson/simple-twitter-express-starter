@@ -218,7 +218,7 @@ const userController = {
     try {
       const newFollow = await Followship.create({
         followerId: req.user.id,
-        followingId: req.params.userId,
+        followingId: req.body.id,
       });
 
       return res.redirect("back");
