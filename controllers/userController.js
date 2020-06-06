@@ -44,15 +44,15 @@ const userController = {
 
       const tweets = dataValues.Tweets.map(tweet => ({
         ...tweet,
-        description: tweet.description
-          ? tweet.description.substring(0, 50)
-          : null,
+        description: tweet.description,
         updatedAt: tweet.updatedAt
           ? moment(tweet.updatedAt).format(`YYYY-MM-DD, hh:mm`)
           : "-",
         isLiked: tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id),
         likedCount: tweet.LikedUsers.length,
       }));
+
+
 
       return res.render('getTweets', { userData, tweets, isOwner })
     } catch (error) {

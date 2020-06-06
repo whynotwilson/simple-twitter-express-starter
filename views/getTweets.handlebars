@@ -64,7 +64,9 @@
                 <a href="/users/{{ ../userData.id }}/tweets">{{ ../userData.name }}</a> <small
                   class="text-muted">{{this.updatedAt}}</small>
               </h5>
-              <p class="card-text">{{this.description}}</p>
+              <p class="card-text" style="overflow: hidden; text-overflow: ellipsis; white-space:nowrap">
+                {{{this.description}}}
+              </p>
               <a href="/tweets/{{this.dataValues.id}}/replies" class="btn btn-primary">
                 Reply({{this.Replies.length}})
               </a>
