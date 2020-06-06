@@ -47,6 +47,8 @@ const tweetController = {
     });
   },
   postTweets: (req, res) => {
+
+
     const tweetsDesc = req.body.tweets.trim();
 
     if (tweetsDesc !== "" && tweetsDesc.length <= 140) {

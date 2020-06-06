@@ -5,15 +5,17 @@
 
 <div class="row justify-content-center my-3">
   <div class="col-md-6">
-    <form action="/tweets" method="POST" onsubmit="return getTweetsContent()">
+    <form action="/tweets" method="POST">
       <div class="input-group">
         <textarea id="tweets" name="tweets" class="form-control" aria-label="With textarea"
-          placeholder="what's on your mind?" rows="3" oninput="tweetsLeft()" style="display: none;"></textarea>
+          placeholder="what's on your mind?" rows="3" style="display: none;"></textarea>
       </div>
       <div class="text-muted">
         <small id="tweetsText">characters left:</small>
         <span id="tweetsNumber">140</span>
       </div>
+      <input type="hidden" name="taggedId" id="taggedId" value=''>
+      <input type="hidden" name="taggingId" id="taggingId" value='{{user.id}}'>
       <button id="tweetBtn" class="btn btn-primary float-right" type="submit">Tweet</button>
     </form>
     <br>
@@ -132,9 +134,11 @@
   const textarea = document.getElementById('textarea')
   const tweetInput = document.getElementById('tweetInput')
   textarea.addEventListener('input', handleInputDebounce)
+  tweetInput.addEventListener('input', tweetsLeft)
 
   async function markFriend(target) {
     try {
+      getTweetsContent()
       let regExp = /^(.*\s+@\w+|@\w+)/
 
       let keyword = ''
@@ -169,9 +173,11 @@
           if (searchedUsers.length === 0) {
             selectTemp += `<option value="">查無用戶</option>`
           }
+
           for (const user of searchedUsers) {
             selectTemp += `<option value="${user.name}" data-id="${user.id}" data-thumbnail="${user.avatar}">${user.name}</option>`
           }
+
 
           selectTemp += `</select>`
           let textareaTemp = textarea.innerHTML.slice(0, indices[indices.length - 1] + 1) + selectTemp
@@ -194,6 +200,7 @@
 
   function getTweetsContent() {
     document.getElementById('tweets').value = document.getElementById('textarea').innerHTML
+    tweetsLeft()
   }
 
   function tagFriend() {
@@ -205,9 +212,12 @@
     let template = ``
     for (const option of options) {
       if (option.value === mySelect.value) {
-        template = `<a href="/users/${option.dataset.id}/tweets">@${option.value}</a>`
+        template = `<a href="/users/${option.dataset.id}/tweets" data-id="${option.dataset.id}">@${option.value}</a>`
+        document.getElementById("taggedId").value = option.dataset.id
       }
     }
+
+
 
     //取得@之前字串
     const textareaTemp = textarea.innerHTML
@@ -222,12 +232,14 @@
     //合併輸出
     tweetInput.innerHTML = resultTemp + template
     textarea.innerHTML = tweetInput.innerHTML
+    getTweetsContent()
     textarea.contentEditable = "true";
 
   }
 
   function tweetsLeft() {
     const tweets = document.getElementById('tweets').value
+
     let tweetsCount = 140 - tweets.length
     const tweetsRemain = document.getElementById('tweetsNumber')
     const tweetsTitle = document.getElementById('tweetsText')
