@@ -308,7 +308,7 @@ const userController = {
           { model: User, as: 'Followings' },
           Like,
           Tweet,
-          { model: Tweet, as: 'LikedTweets', include: [Like, Reply, User] }
+          Reply
         ]
       }) : null
 
@@ -329,7 +329,11 @@ const userController = {
         isFollowing: req.user.Followings.map(d => d.id).includes(userId)
       }
 
-      const tweets = dataValues.LikedTweets.map(tweet => ({
+      const tweetsData = await Tweet.findAll({ include: [Like, Reply, User] })
+      const likedTweets = tweetsData.filter(tweet =>
+        dataValues.Likes.map(like => like.TweetId).includes(tweet.id)
+      )
+      const tweets = likedTweets.map(tweet => ({
         id: tweet.id,
         description: tweet.description
           ? tweet.description.substring(0, 50)
@@ -681,6 +685,9 @@ const userController = {
   },
 
   signIn: (req, res) => {
+    req.session.username = helpers.getUser(req).name
+    req.session.avatar = helpers.getUser(req).avatar
+    req.session.id = helpers.getUser(req).passport
     req.flash("success_messages", "成功登入！");
     res.redirect("/tweets");
   },
