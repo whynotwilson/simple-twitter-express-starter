@@ -24,7 +24,6 @@ const tweetController = {
     }))
 
     // blockshipsIdArr = 封鎖我的人 && 我封鎖的人的 ID
-
     const blockshipsIdArr = []
 
     blockships.forEach(blockship => {
@@ -36,57 +35,50 @@ const tweetController = {
       }
     })
 
-    // console.log('blockshipsIdArr', blockshipsIdArr)
-
-    Tweet.findAll({
-      limit: 10,
+    let tweets = await Tweet.findAll({
       order: [["createdAt", "DESC"]],
       include: [
         User,
         Reply,
         { model: User, as: 'LikedUsers' }
-      ],
-      where: {
-        [Op.not]: [
-          { UserId: blockshipsIdArr }
-        ]
-      },
-    }).then((tweets) => {
-      tweets = tweets.map((tweet) => ({
-        ...tweet.dataValues,
-        description: tweet.description.substring(0, 100),
-        isLiked: tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id),
-        likedCount: tweet.LikedUsers.length,
-        replyCount: tweet.Replies.length
-      }));
+      ]
+    })
 
-      User.findAll({
-        limit: 10,
-        order: [["createdAt", "DESC"]],
-        include: [
-          { model: User, as: 'Followers' }
-        ],
-        where: {
-          [Op.not]: [
-            { id: blockshipsIdArr }
-          ]
-        }
+    tweets = tweets.map((tweet) => ({
+      ...tweet.dataValues,
+      description: tweet.description.substring(0, 100),
+      isLiked: tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id),
+      likedCount: tweet.LikedUsers.length,
+      replyCount: tweet.Replies.length
+    }))
 
-      }).then((users) => {
-        users = users.map(user => ({
-          ...user.dataValues,
-          followersCount: user.Followers.length,
-          isFollowed: helpers.getUser(req).Followings.map(d => d.id).includes(user.id)
-        }))
+    let count = 0
 
-        users.sort((a, b) => b.followersCount - a.followersCount)
+    tweets = tweets.filter(tweet => {
+      return !(blockshipsIdArr.includes(tweet.User.id)) && count++ < 10
+    })
 
-        return res.render("tweets", {
-          tweets,
-          users,
-        });
-      });
-    });
+    let users = await User.findAll({
+      order: [['createdAt', 'DESC']],
+      include: [
+        { model: User, as: 'Followers' }
+      ]
+    })
+
+    users = users.map(user => ({
+      ...user.dataValues,
+      followersCount: user.Followers.length,
+      isFollowed: helpers.getUser(req).Followings.map(d => d.id).includes(user.id)
+    }))
+
+    count = 0
+    users = users.filter(user => {
+      return !(blockshipsIdArr.includes(user.id)) && count++ < 10
+    })
+
+    users.sort((a, b) => b.followersCount - a.followersCount)
+
+    return res.render('tweets', { tweets, users })
   },
   postTweets: (req, res) => {
     const tweetsDesc = req.body.tweets.trim();

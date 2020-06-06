@@ -10,15 +10,48 @@ const Followship = db.Followship
 const bcrypt = require('bcryptjs')
 const helpers = require("../_helpers")
 const Op = require('Sequelize').Op
-
 const fs = require('fs')
-
 const imgur = require('imgur-node-api')
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 
 const userController = {
   getTweets: async (req, res) => {
     try {
+      let blockships = await Blockship.findAll({
+        where: {
+          [Op.or]: [
+            { blockerId: req.user.id },
+            { blockingId: req.user.id }
+          ]
+        }
+      })
+
+      blockships = blockships.map(blockship => ({
+        ...blockship.dataValues
+      }))
+
+      // blockshipsIdArr = 封鎖我的人 && 我封鎖的人的 ID
+
+      const blockshipsIdArr = []
+
+      blockships.forEach(blockship => {
+        if (blockship.blockerId !== req.user.id) {
+          blockshipsIdArr.push(blockship.blockerId)
+        }
+        if (blockship.blockingId !== req.user.id) {
+          blockshipsIdArr.push(blockship.blockingId)
+        }
+      })
+
+      console.log('')
+      console.log('')
+      console.log('')
+      console.log('blockshipsIdArr', blockshipsIdArr)
+
+      if (blockshipsIdArr.includes(req.user.id)) {
+        return res.render('blockMeaasge')
+      }
+
       const otherUserId = Number(req.params.id)
       let isOwner = false
       if (otherUserId === helpers.getUser(req).id) {
@@ -358,7 +391,6 @@ const userController = {
         include: [
           { model: User, as: 'Followers' },
           { model: User, as: 'Followings' },
-          // { model: User, as: 'Blockings' },
           Like
         ]
       })
@@ -385,6 +417,8 @@ const userController = {
         })),
         isFollowing: otherUser.Followers.map(d => d.id).includes(req.user.id)
       }
+
+      console.log('otherUser[0]', otherUser[0])
 
       let blockings = await User.findByPk(req.user.id, {
         include: [{ model: User, as: 'Blockings' }]
