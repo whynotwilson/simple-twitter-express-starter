@@ -19,6 +19,23 @@ module.exports = {
     }
     queryInterface.bulkInsert('Followships', Followships, {})
 
+    queryInterface.bulkInsert('Blockships', [{
+      blockerId: 25,
+      blockingId: 24,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }, {
+      blockerId: 24,
+      blockingId: 23,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }, {
+      blockerId: 23,
+      blockingId: 25,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }], {})
+
     const Users = []
     Users.push({
       email: 'root@example.com',
