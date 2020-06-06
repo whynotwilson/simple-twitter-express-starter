@@ -31,7 +31,6 @@ const userController = {
       }))
 
       // blockshipsIdArr = 封鎖我的人 && 我封鎖的人的 ID
-
       const blockshipsIdArr = []
 
       blockships.forEach(blockship => {
@@ -43,13 +42,8 @@ const userController = {
         }
       })
 
-      console.log('')
-      console.log('')
-      console.log('')
-      console.log('blockshipsIdArr', blockshipsIdArr)
-
-      if (blockshipsIdArr.includes(req.user.id)) {
-        return res.render('blockMeaasge')
+      if (blockshipsIdArr.includes(Number(req.params.id))) {
+        return res.render('getBlockMessage')
       }
 
       const otherUserId = Number(req.params.id)
@@ -133,6 +127,35 @@ const userController = {
   },
   getFollowings: async (req, res) => {
     try {
+      let blockships = await Blockship.findAll({
+        where: {
+          [Op.or]: [
+            { blockerId: req.user.id },
+            { blockingId: req.user.id }
+          ]
+        }
+      })
+
+      blockships = blockships.map(blockship => ({
+        ...blockship.dataValues
+      }))
+
+      // blockshipsIdArr = 封鎖我的人 && 我封鎖的人的 ID
+      const blockshipsIdArr = []
+
+      blockships.forEach(blockship => {
+        if (blockship.blockerId !== req.user.id) {
+          blockshipsIdArr.push(blockship.blockerId)
+        }
+        if (blockship.blockingId !== req.user.id) {
+          blockshipsIdArr.push(blockship.blockingId)
+        }
+      })
+
+      if (blockshipsIdArr.includes(Number(req.params.id))) {
+        return res.render('getBlockMessage')
+      }
+
       const userId = Number(req.params.id)
       let isOwner = userId === helpers.getUser(req).id ? true : false;
 
@@ -175,7 +198,34 @@ const userController = {
   },
   getFollowers: async (req, res) => {
     try {
+      let blockships = await Blockship.findAll({
+        where: {
+          [Op.or]: [
+            { blockerId: req.user.id },
+            { blockingId: req.user.id }
+          ]
+        }
+      })
 
+      blockships = blockships.map(blockship => ({
+        ...blockship.dataValues
+      }))
+
+      // blockshipsIdArr = 封鎖我的人 && 我封鎖的人的 ID
+      const blockshipsIdArr = []
+
+      blockships.forEach(blockship => {
+        if (blockship.blockerId !== req.user.id) {
+          blockshipsIdArr.push(blockship.blockerId)
+        }
+        if (blockship.blockingId !== req.user.id) {
+          blockshipsIdArr.push(blockship.blockingId)
+        }
+      })
+
+      if (blockshipsIdArr.includes(Number(req.params.id))) {
+        return res.render('getBlockMessage')
+      }
       const userId = Number(req.params.id)
       let isOwner = userId === helpers.getUser(req).id ? true : false;
       const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId, {
@@ -220,6 +270,34 @@ const userController = {
   },
   getLikes: async (req, res) => {
     try {
+      let blockships = await Blockship.findAll({
+        where: {
+          [Op.or]: [
+            { blockerId: req.user.id },
+            { blockingId: req.user.id }
+          ]
+        }
+      })
+
+      blockships = blockships.map(blockship => ({
+        ...blockship.dataValues
+      }))
+
+      // blockshipsIdArr = 封鎖我的人 && 我封鎖的人的 ID
+      const blockshipsIdArr = []
+
+      blockships.forEach(blockship => {
+        if (blockship.blockerId !== req.user.id) {
+          blockshipsIdArr.push(blockship.blockerId)
+        }
+        if (blockship.blockingId !== req.user.id) {
+          blockshipsIdArr.push(blockship.blockingId)
+        }
+      })
+
+      if (blockshipsIdArr.includes(Number(req.params.id))) {
+        return res.render('getBlockMessage')
+      }
 
       const userId = Number(req.params.id)
       let isOwner = userId === helpers.getUser(req).id ? true : false;
@@ -234,11 +312,9 @@ const userController = {
         ]
       }) : null
 
-
       if (!dataValues) {
         throw new Error("user is not found");
       }
-
 
       let userData = {}
       userData = {
