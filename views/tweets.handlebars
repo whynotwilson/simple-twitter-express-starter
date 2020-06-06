@@ -262,8 +262,9 @@
 
   function tweetsLeft() {
     const tweets = document.getElementById('tweets').value
+    const stringInput = tweets.replace(/<[^>]*>?/gm, '');
 
-    let tweetsCount = 140 - tweets.length
+    let tweetsCount = 140 - stringInput.length
     const tweetsRemain = document.getElementById('tweetsNumber')
     const tweetsTitle = document.getElementById('tweetsText')
     const tweetsButton = document.getElementById('tweetBtn')
