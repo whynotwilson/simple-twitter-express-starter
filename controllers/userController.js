@@ -494,8 +494,6 @@ const userController = {
         isFollowing: otherUser.Followers.map(d => d.id).includes(req.user.id)
       }
 
-      console.log('otherUser[0]', otherUser[0])
-
       let blockings = await User.findByPk(req.user.id, {
         include: [{ model: User, as: 'Blockings' }]
       })
@@ -588,7 +586,7 @@ const userController = {
       }
 
       req.flash('success_messages', '已成功封鎖該用戶')
-      return res.redirect('/')
+      return res.redirect(`/users/${req.user.id}/blockings`)
     } catch (error) {
       console.log(error)
       req.flash('error_messages', { error_messages: '資料庫異常，未能成功封鎖該用戶！' })
@@ -668,7 +666,7 @@ const userController = {
       return res.redirect("/signin");
     } catch (error) {
       console.log(error)
-      req.flash('success_messages', { error_messages: '資料庫異常，註冊帳號失敗！' });
+      req.flash('error_messages', { error_messages: '資料庫異常，註冊帳號失敗！' });
       return res.redirect("/signup");
     }
   },
