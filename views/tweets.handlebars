@@ -105,11 +105,12 @@
   function sleep(second) {
     return new Promise(wake => setTimeout(wake, second * 1000))
   }
-  let text = ''
+
   let lastInputTime
   let ifInputChangeBySelected = false
   const timeOut = 0.8 // second
-  async function handleInputDebounce() {
+  async function handleInputDebounce(e) {
+    const target = e.target.innerHTML
     const current = Date.now()
     lastInputTime = current
     await sleep(timeOut)
@@ -120,7 +121,7 @@
       console.log('debounce')
     }
     else {
-      markFriend()
+      markFriend(target)
     }
 
   }
@@ -129,79 +130,63 @@
   const textarea = document.getElementById('textarea')
   textarea.addEventListener('input', handleInputDebounce)
 
-  function markFriend(e) {
+  async function markFriend(target) {
+    try {
+      let regExp = /^(.*\s+@\w+|@\w+)/
 
-    let regExp = /^(.*\s+@\w+|@\w+)/
-    const textTemp = textarea.textContent
-
-    if (regExp.test(textTemp)) {
-
-      textarea.contentEditable = false
-
-      //當資料變多可以用keyword進資料庫先篩選
       let keyword = ''
-
-      let indices = []
-      let idx = textTemp.indexOf('@');
-      while (idx != -1) {
-        indices.push(idx);
-        idx = textTemp.indexOf('@', idx + 1);
+      function getIndices(target) {
+        let indices = []
+        let idx = target.indexOf('@');
+        while (idx != -1) {
+          indices.push(idx);
+          idx = target.indexOf('@', idx + 1);
+        }
+        return indices
       }
+      if (regExp.test(target)) {
+        //當資料變多可以用keyword進資料庫先篩選
+        const indices = await getIndices(target)
+        console.log('2', indices)
+        if (indices.length > 1) {
+          keyword = target.slice(indices[indices.length - 1] + 1, indices[indices.length - 1] + 2)
+        } else {
+          keyword = target.slice(target.indexOf('@') + 1, target.length + 1)
+        }
 
-      if (indices.length > 1) {
-        keyword = textTemp.slice(indices[indices.length - 1] + 1, textTemp.length)
-      } else {
-        keyword = textTemp.slice(indices[0] + 1, textTemp.length)
+
+        //emit
+        socket.emit('test', keyword)
+        socket.on('tag', function (users) {
+
+          const { searchedUsers } = users
+
+          let selectTemp = ``
+          selectTemp += `<select id="mySelect" onchange="tagFriend()"><option selected>Tag your friend</option>`
+          if (searchedUsers.length === 0) {
+            selectTemp += `<option value="">查無用戶</option>`
+          }
+          for (const user of searchedUsers) {
+            selectTemp += `<option value="${user.name}" data-id="${user.id}" data-thumbnail="${user.avatar}">${user.name}</option>`
+          }
+          selectTemp += `</select>`
+
+          let textareaTemp = textarea.innerHTML.slice(0, indices[indices.length - 1] + 2) + selectTemp
+
+          console.log('3', indices[indices.length - 1])
+          console.log('4', textareaTemp)
+          textarea.innerHTML = textareaTemp
+
+          textarea.contentEditable = false
+
+        })
+
+
       }
-      //emit
-      socket.emit('test', keyword)
-      socket.on('tag', function (users) {
-
-        const { searchedUsers } = users
-
-        /*const selector = document.createElement('select')
-        selector.setAttribute('class', 'selectpicker')
-        selector.setAttribute('id', 'mySelect')
-        selector.setAttribute('data-live-serach', 'true')
-        selector.setAttribute('onchange', 'myFunction()')
-        textarea.appendChild(selector)
-        const mySelect = document.getElementById("mySelect");
-        const option = document.createElement('option')
-        option.setAttribute('selected', true)
-        option.text = 'tag your friend'
-        mySelect.appendChild(option)
-        if (searchedUsers.length === 0) {
-          const options = document.createElement('option')
-          options.setAttribute('value', '')
-          options.text = '查無用戶'
-          mySelect.appendChild(options)
-        }
-        for (const user of searchedUsers) {
-          const options = document.createElement('option')
-          options.setAttribute('value', user.name)
-          options.setAttribute('data-id', user.id)
-          options.setAttribute('data-thumbnail', user.avatar)
-          options.text = user.name
-          mySelect.appendChild(options)
-        }*/
-        let selectTemp = ``
-        selectTemp += `<select id="mySelect" onchange="tagFriend()"><option selected>Tag your friend</option>`
-        if (searchedUsers.length === 0) {
-          selectTemp += `<option value="">查無用戶</option>`
-        }
-        for (const user of searchedUsers) {
-          selectTemp += `<option value="${user.name}" data-id="${user.id}" data-thumbnail="${user.avatar}">${user.name}</option>`
-        }
-        selectTemp += `</select>`
-
-        let textareaTemp = textarea.innerHTML.slice(0, indices[indices.length - 1] + keyword.length + 1)
-        console.log(textareaTemp)
-        textarea.innerHTML = textareaTemp + selectTemp
-
-      })
-
-
+    } catch (error) {
+      console.log('error', error)
     }
+
   }
 
 
@@ -219,7 +204,7 @@
     let template = ``
     for (const option of options) {
       if (option.value === mySelect.value) {
-        template = `<a href="/users/${option.dataset.id}/tweets">＠${option.value}</a >`
+        template = `<a href="/users/${option.dataset.id}/tweets">@${option.value}</a>`
       }
     }
 
@@ -233,11 +218,11 @@
     }
     const result = textareaTemp.slice(0, indices[indices.length - 1])
 
-    text += result + template
     //合併輸出
 
     textarea.innerHTML = result + template
     textarea.contentEditable = "true";
+
   }
 
   function tweetsLeft() {
