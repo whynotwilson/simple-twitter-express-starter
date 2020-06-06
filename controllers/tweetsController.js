@@ -52,19 +52,28 @@ const tweetController = {
     const tweetsDesc = req.body.tweets.trim();
 
     if (tweetsDesc !== "" && tweetsDesc.length <= 140) {
+
       if (req.body.taggedId) {
         Tweet.create({
           description: tweetsDesc,
           UserId: helpers.getUser(req).id,
         }).then((tweet) => {
-          req.body.taggedId.forEach((id) => {
+          if (typeof (req.body.taggedId) === 'string') {
             Tag.create({
-              TaggedUserId: Number(id),
+              TaggedUserId: Number(req.body.taggedId),
               TweetId: tweet.id
             })
-          })
-          console.log('twst')
+          } else {
+            req.body.taggedId.forEach((id) => {
+              Tag.create({
+                TaggedUserId: Number(id),
+                TweetId: tweet.id
+              })
+            })
+
+          }
           return tweet
+
         }).then((tweet) => {
           return res.redirect('/tweets')
         })
