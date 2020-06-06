@@ -179,7 +179,7 @@ const userController = {
         isOwnFollower: follower.id === helpers.getUser(req).id ? true : false,
         isFollowed: helpers.getUser(req).Followings.map(d => d.id).includes(follower.id)
       }))
-      console.log(followers)
+
       return res.render('getFollowers', { userData, followers: followers, isOwner })
     } catch (error) {
       console.log("error", error);
@@ -241,7 +241,6 @@ const userController = {
     }
   },
   addFollowing: async (req, res) => {
-    // console.log('req.body.id', req.body.id)
     try {
       const findOne = await Followship.findOne({
         where: {
@@ -394,8 +393,6 @@ const userController = {
       blockings = blockings.dataValues.Blockings.map(blocking => ({
         ...blocking.dataValues
       }))
-
-      console.log('blockings', blockings)
 
       let tweets = await Tweet.findAll({
         where: {
