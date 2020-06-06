@@ -11,14 +11,13 @@ const adminController = {
         include: [User,
           { model: Reply, include: [User] },
           { model: User, as: 'LikedUsers' }
-        ]
-        // limit: 20
+        ],
+        limit: 50
       })
 
       // 整理 tweets 資料，把 dataValues 都拿掉
-      // 原本 tweets.dataValues.User.dataValues
-      // 變成 tweets.User
-      // 例子 tweets.Replies.User
+      // ex: tweets.dataValues.User.dataValues => tweets.User
+      // ex: tweets.dataValues.Replies.dataValues.User.dataValues => tweets.Replies.User
       tweets = tweets.map(tweet => ({
         ...tweet.dataValues,
 

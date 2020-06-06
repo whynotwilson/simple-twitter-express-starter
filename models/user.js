@@ -20,11 +20,25 @@ module.exports = (sequelize, DataTypes) => {
       as: 'Followers'
     })
 
-    // 根據追隨的人找出被他追隨的人
+    // 根據「追隨的人」找出「被他追隨的人」
     User.belongsToMany(User, {
       through: models.Followship,
       foreignKey: 'followerId',
       as: 'Followings'
+    })
+
+    // 根據「封鎖他的人」找出「被他封鎖的人」
+    User.belongsToMany(User, {
+      through: models.Blockship,
+      foreignKey: 'blockingId',
+      as: 'Blockers'
+    })
+
+    // 根據「被他封鎖的人」找出「封鎖他的人」
+    User.belongsToMany(User, {
+      through: models.Blockship,
+      foreignKey: 'blockerId',
+      as: 'Blockings'
     })
 
     User.belongsToMany(models.Tweet, {

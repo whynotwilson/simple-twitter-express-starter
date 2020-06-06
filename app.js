@@ -12,10 +12,10 @@ const app = express()
 const http = require('http').createServer(app)
 const io = require('socket.io')(http)
 
-const sessionMiddleware = session({ 
-  secret: 'secret', 
-  resave: false, 
-  saveUninitialized: false 
+const sessionMiddleware = session({
+  secret: 'secret',
+  resave: false,
+  saveUninitialized: false
 })
 
 io.use((socket, next) => {
@@ -51,8 +51,6 @@ app.use(flash())
 app.use(passport.initialize())
 app.use(passport.session())
 
-let user = {}
-
 app.use((req, res, next) => {
   res.locals.success_messages = req.flash('success_messages')
   res.locals.error_messages = req.flash('error_messages')
@@ -63,14 +61,19 @@ app.use((req, res, next) => {
 
 io.on('connection', (socket) => {
   console.log('a user connected')
-  
+
   const currentUser = socket.request.session
 
-  socket.on('send message', (msg) => {
-    io.emit('chat message', {
-      msg,
+  socket.on('send message', (chat) => {
+    let chatRoomNum = `${chat.senderId ^ chat.receiverId}`
+
+    socket.join(chatRoomNum)
+
+    io.sockets.in(chatRoomNum).emit('chat message', {
+      msg: chat.message,
       avatar: currentUser.avatar,
       name: currentUser.username,
+      id: currentUser.passport.user,
       sendTime: helpers.fromNow(new Date())
     })
   })
