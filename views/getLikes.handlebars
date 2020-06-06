@@ -35,6 +35,7 @@
         </ul>
         {{#if isOwner}}
         <a href="/users/{{userData.id}}/edit" class="btn btn-primary mt-5"> Edit Profile</a>
+        <a href="/users/{{userData.id}}/blockings" class="btn btn-primary mt-5"> Blocking List</a>
         {{else}}
 
         {{#if userData.isFollowing}}
@@ -42,7 +43,8 @@
           <button type="submit" class="btn btn-danger">Unfollow</button>
         </form>
         {{else}}
-        <form action="/followships/{{userData.id}}" method="POST">
+        <form action="/followships" method="POST">
+          <input type="hidden" name="id" value={{userData.id}}>
           <button type="submit" class="btn btn-primary">Follow </button>
         </form>
         {{/if}}
