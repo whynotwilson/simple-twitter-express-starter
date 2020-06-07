@@ -3,6 +3,7 @@ const Tweet = db.Tweet;
 const User = db.User;
 const Like = db.Like;
 const Reply = db.Reply;
+const Tag = db.Tag;
 const Blockship = db.Blockship;
 const helpers = require("../_helpers");
 const Op = require('Sequelize').Op;
@@ -85,12 +86,41 @@ const tweetController = {
     const tweetsDesc = req.body.tweets.trim();
 
     if (tweetsDesc !== "" && tweetsDesc.length <= 140) {
-      Tweet.create({
-        description: tweetsDesc,
-        UserId: helpers.getUser(req).id,
-      }).then((tweet) => {
-        return res.redirect('/tweets')
-      });
+
+      if (req.body.taggedId) {
+        Tweet.create({
+          description: tweetsDesc,
+          UserId: helpers.getUser(req).id,
+        }).then((tweet) => {
+          if (typeof (req.body.taggedId) === 'string') {
+            Tag.create({
+              TaggedUserId: Number(req.body.taggedId),
+              TweetId: tweet.id
+            })
+          } else {
+            req.body.taggedId.forEach((id) => {
+              Tag.create({
+                TaggedUserId: Number(id),
+                TweetId: tweet.id
+              })
+            })
+
+          }
+          return tweet
+
+        }).then((tweet) => {
+          return res.redirect('/tweets')
+        })
+      } else {
+        Tweet.create({
+          description: tweetsDesc,
+          UserId: helpers.getUser(req).id,
+        }).then((tweet) => {
+          return res.redirect('/tweets')
+        });
+      }
+
+
     } else {
       req.flash('error_messages', { error_messages: '輸入不可為空白！' });
       return res.redirect("/tweets");

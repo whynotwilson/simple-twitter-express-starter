@@ -14,7 +14,9 @@ const fs = require('fs')
 const imgur = require('imgur-node-api')
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 
+
 const userController = {
+
   getTweets: async (req, res) => {
     try {
       let blockships = await Blockship.findAll({
@@ -89,6 +91,7 @@ const userController = {
       }
 
       let tweets = await Tweet.findAll({
+        order: [["createdAt", "DESC"]],
         where: {
           UserId: otherUserId
         },
@@ -162,11 +165,11 @@ const userController = {
       const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId, {
         include: [
           { model: User, as: 'Followers' },
-          { model: User, as: 'Followings' },
+          { model: User, as: 'Followings', },
           Like,
           Tweet,
           Reply
-        ]
+        ],
       }) : null
 
       if (!dataValues) {
@@ -185,12 +188,13 @@ const userController = {
         isFollowed: helpers.getUser(req).Followings.map(d => d.id).includes(userId)
       }
 
-      const followings = dataValues.Followings.map(following => ({
+      const followings = dataValues.Followings.reverse().map(following => ({
         id: following.id,
         avatar: following.avatar,
         name: following.name,
         introduction: following.introduction ? following.introduction.substring(0, 20) : null,
       }))
+
       return res.render('getFollowings', { userData, followings: followings, isOwner })
     } catch (error) {
       console.log("error", error);
@@ -254,7 +258,7 @@ const userController = {
         isFollowing: helpers.getUser(req).Followings.map(d => d.id).includes(userId)
       }
 
-      const followers = dataValues.Followers.map(follower => ({
+      const followers = dataValues.Followers.reverse().map(follower => ({
         id: follower.id,
         avatar: follower.avatar,
         name: follower.name,
@@ -312,6 +316,8 @@ const userController = {
         ]
       }) : null
 
+      const tweetsData = await Tweet.findAll({ include: [Like, Reply, User] })
+
       if (!dataValues) {
         throw new Error("user is not found");
       }
@@ -329,11 +335,12 @@ const userController = {
         isFollowing: req.user.Followings.map(d => d.id).includes(userId)
       }
 
-      const tweetsData = await Tweet.findAll({ include: [Like, Reply, User] })
+
       const likedTweets = tweetsData.filter(tweet =>
         dataValues.Likes.map(like => like.TweetId).includes(tweet.id)
       )
-      const tweets = likedTweets.map(tweet => ({
+
+      const tweets = likedTweets.reverse().map(tweet => ({
         id: tweet.id,
         description: tweet.description
           ? tweet.description.substring(0, 50)
@@ -697,6 +704,7 @@ const userController = {
     req.logout()
     res.redirect('/signin')
   }
+
 }
 
 module.exports = userController;

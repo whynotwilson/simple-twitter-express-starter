@@ -69,6 +69,6 @@ module.exports = (app) => {
 
   // chat
   app.get('/chat/:id', authenticated, (req, res) => {
-    res.sendFile(process.cwd() + '/public/index.html')
+    res.sendFile(process.cwd() + '/public/chatroom.html')
   })
 }
