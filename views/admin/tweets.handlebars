@@ -14,13 +14,22 @@
       {{#each tweets}}
       <div class="col-md-12  border rounded mb-5" style="background-color: #eeeeee;">
         {{!-- 使用者資訊 --}}
-        <div class="row col-md-12 mb-3 mt-3">
-          <div class="mr-3" style="max-height: 70px;">
-            <img style="max-height: 70px;" src="{{this.User.avatar}}" alt="avatar" class="rounded-circle">
+        <div class="row col-md-12 mb-3 mt-3  d-flex justify-content-between">
+          <div class="row ml-4">
+            <div class="mr-3" style="max-height: 70px;">
+              <img style="max-height: 70px;" src="{{this.User.avatar}}" alt="avatar" class="rounded-circle">
+            </div>
+            <div class="" style="max-height: 70px;">
+              <strong class="" style="font-size: large;">{{this.User.name}}</strong>
+              <p class="card-text"><small class="text-muted">{{ fromNow this.createdAt }}</small></p>
+            </div>
           </div>
-          <div class="" style="max-height: 70px;">
-            <strong class="" style="font-size: large;">{{this.User.name}}</strong>
-            <p class="card-text"><small class="text-muted">{{ fromNow this.createdAt }}</small></p>
+          <div>
+            <form action="/admin/tweets/{{this.id}}?_method=DELETE" method="POST">
+              <div>
+                <button class="btn btn-danger">刪除</button>
+              </div>
+            </form>
           </div>
         </div>
 
