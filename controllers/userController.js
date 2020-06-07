@@ -390,11 +390,23 @@ const userController = {
         [Op.and]: [{ followerId: helpers.getUser(req).id }, { followingId: req.params.userId }]
       }
     }).then(followship => {
-      console.log(followship)
-      followship.destroy()
-        .then(followship => {
-          return res.redirect('back')
-        })
+
+      if (!followship) {
+        req.flash('error_messages', { error_messages: "資料庫錯誤" })
+        return res.redirect('back')
+      }
+
+      Followship.destroy({
+        where: {
+          [Op.and]: [{ followerId: helpers.getUser(req).id }, { followingId: req.params.userId }]
+        }
+      }).then(followship => {
+        return res.redirect('back')
+      })
+
+    }).catch((error) => {
+      console.log('error', error)
+      return res.redirect('back')
     })
 
   },
