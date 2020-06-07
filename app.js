@@ -84,7 +84,8 @@ io.on('connection', (socket) => {
 
     User.findAll({
       raw: true, nest: true, order: [['name', 'ASC']], where: {
-        name: { [Op.like]: '%' + keyword + '%' }
+        email: { [Op.like]: '%' + keyword + '%' }
+        // name: { [Op.like]: '%' + keyword + '%' }
       }
     }).then((users) => {
 
