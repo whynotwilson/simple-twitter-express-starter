@@ -90,7 +90,7 @@ const userController = {
         isFollowed: helpers.getUser(req).Followings.map(d => d.id).includes(otherUser.id)
       }
 
-      console.log(otherUser.isFollowed)
+      console.log(otherUser.id)
 
       let tweets = await Tweet.findAll({
         order: [["createdAt", "DESC"]],
