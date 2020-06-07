@@ -123,6 +123,8 @@
     try {
       getTweetsContent()
       let regExp = /^(.*\s+@\w+|@\w+)/
+      const textDivdedHtml = target.replace(/&nbsp;/g, " ");
+
       let keyword = ''
       function getIndices(target) {
         let indices = []
@@ -133,7 +135,7 @@
         }
         return indices
       }
-      if (regExp.test(target)) {
+      if (regExp.test(textDivdedHtml)) {
         //當資料變多可以用keyword進資料庫先篩選
         const indices = await getIndices(target)
         if (indices.length > 1) {
@@ -237,7 +239,7 @@
 
   function tweetsLeft() {
     const tweets = document.getElementById('tweets').value
-    const stringInput = tweets.replace(/<[^>]*>?/gm, '');
+    const stringInput = tweets.replace(/<[^>]*>?/gm, '')
 
     let tweetsCount = 140 - stringInput.length
     const tweetsRemain = document.getElementById('tweetsNumber')
