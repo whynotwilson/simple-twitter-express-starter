@@ -1,17 +1,14 @@
  #textarea {
-
  width:300px;
-
-border:1px solid #ccc;
-
+ border:1px solid #ccc;
  min-height:150px;
-
  max-height:300px;
-
-overflow: auto;
-
+ overflow: auto;
  font-size: 14px;      
+ outline: none; 
+}
 
-outline: none; 
-
+ #textarea:empty:before{
+content: attr(placeholder);
+color:#bbb;
 }
