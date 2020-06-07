@@ -48,7 +48,7 @@ const tweetController = {
     tweets = tweets.map((tweet) => ({
       ...tweet.dataValues,
       User: tweet.User.dataValues,
-      description: tweet.description.substring(0, 100),
+      description: tweet.description,
       isLiked: tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id),
       likedCount: tweet.LikedUsers.length,
       replyCount: tweet.Replies.length
