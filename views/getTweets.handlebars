@@ -38,7 +38,7 @@
         <a href="/users/{{otherUser.id}}/blockings" class="btn btn-primary mt-5"> Blocking List</a>
         {{else}}
 
-        {{#if otherUser.isFollowing}}
+        {{#if otherUser.isFollowed}}
         <form style="display: inline-block;" action="/followships/{{otherUser.id}}?_method=DELETE" method="POST">
           <button type="submit" class="btn btn-danger">Unfollow</button>
         </form>

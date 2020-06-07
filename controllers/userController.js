@@ -87,8 +87,9 @@ const userController = {
         Likes: otherUser.Likes.map(like => ({
           ...like.dataValues
         })),
-        isFollowing: otherUser.Followers.map(d => d.id).includes(req.user.id)
+        isFollowed: otherUser.Followers.map(d => d.id).includes(req.user.id)
       }
+
 
       let tweets = await Tweet.findAll({
         order: [["createdAt", "DESC"]],
@@ -382,18 +383,32 @@ const userController = {
       console.log("error", error);
     }
   },
-  deleteFollowing: async (req, res) => {
-    try {
-      const followship = await Followship.findOne({
+  deleteFollowing: (req, res) => {
+
+    Followship.findOne({
+      where: {
+        [Op.and]: [{ followerId: helpers.getUser(req).id }, { followingId: req.params.userId }]
+      }
+    }).then(followship => {
+
+      if (!followship) {
+        req.flash('error_messages', { error_messages: "資料庫錯誤" })
+        return res.redirect('back')
+      }
+
+      Followship.destroy({
         where: {
-          [Op.and]: [{ followerId: req.user.id }, { followingId: req.params.userId }]
+          [Op.and]: [{ followerId: helpers.getUser(req).id }, { followingId: req.params.userId }]
         }
+      }).then(followship => {
+        return res.redirect('back')
       })
-      await followship.destroy()
+
+    }).catch((error) => {
+      console.log('error', error)
       return res.redirect('back')
-    } catch (error) {
-      console.log("error", error);
-    }
+    })
+
   },
   getEdit: async (req, res) => {
     try {
