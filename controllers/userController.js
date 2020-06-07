@@ -87,10 +87,9 @@ const userController = {
         Likes: otherUser.Likes.map(like => ({
           ...like.dataValues
         })),
-        isFollowed: helpers.getUser(req).Followings.map(d => d.id).includes(otherUser.id)
+        isFollowed: otherUser.Followers.map(d => d.id).includes(req.user.id)
       }
 
-      console.log(otherUser.id)
 
       let tweets = await Tweet.findAll({
         order: [["createdAt", "DESC"]],
@@ -384,19 +383,20 @@ const userController = {
       console.log("error", error);
     }
   },
-  deleteFollowing: async (req, res) => {
-    try {
-      const followship = await Followship.findOne({
-        where: {
-          [Op.and]: [{ followerId: req.user.id }, { followingId: req.params.userId }]
-        }
-      }).then((followship) => {
-        followship.destroy()
-      })
-      return res.redirect('back')
-    } catch (error) {
-      console.log("error", error);
-    }
+  deleteFollowing: (req, res) => {
+
+    Followship.findOne({
+      where: {
+        [Op.and]: [{ followerId: helpers.getUser(req).id }, { followingId: req.params.userId }]
+      }
+    }).then(followship => {
+      console.log(followship)
+      followship.destroy()
+        .then(followship => {
+          return res.redirect('back')
+        })
+    })
+
   },
   getEdit: async (req, res) => {
     try {
