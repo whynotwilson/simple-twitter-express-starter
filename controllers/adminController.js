@@ -12,7 +12,7 @@ const adminController = {
           { model: Reply, include: [User] },
           { model: User, as: 'LikedUsers' }
         ],
-        limit: 50
+        // limit: 50
       })
 
       // 整理 tweets 資料，把 dataValues 都拿掉
