@@ -133,6 +133,7 @@
         return indices
       }
       if (regExp.test(textDivdedHtml)) {
+
         //當資料變多可以用keyword進資料庫先篩選
         const indices = await getIndices(target)
         if (indices.length > 1) {
@@ -202,7 +203,7 @@
       const resultTemp = textareaTemp.slice(0, indices[indices.length - 1])
       //合併輸出
       textarea.innerHTML = resultTemp + template
-      tweetInput.innerHTML = ''
+      tweetInput.innerHTML = resultTemp + template
     }
     else {
       for (const option of options) {
@@ -225,7 +226,8 @@
       const resultTemp = textareaTemp.slice(0, indices[indices.length - 1])
       //合併輸出
       textarea.innerHTML = resultTemp + template
-      tweetInput.innerHTML = ''
+      tweetInput.innerHTML = resultTemp + template
+
     }
 
 

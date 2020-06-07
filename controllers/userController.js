@@ -87,8 +87,10 @@ const userController = {
         Likes: otherUser.Likes.map(like => ({
           ...like.dataValues
         })),
-        isFollowing: otherUser.Followers.map(d => d.id).includes(req.user.id)
+        isFollowed: helpers.getUser(req).Followings.map(d => d.id).includes(otherUser.id)
       }
+
+      console.log(otherUser.isFollowed)
 
       let tweets = await Tweet.findAll({
         order: [["createdAt", "DESC"]],
@@ -388,8 +390,9 @@ const userController = {
         where: {
           [Op.and]: [{ followerId: req.user.id }, { followingId: req.params.userId }]
         }
+      }).then((followship) => {
+        followship.destroy()
       })
-      await followship.destroy()
       return res.redirect('back')
     } catch (error) {
       console.log("error", error);
