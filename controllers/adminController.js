@@ -32,7 +32,7 @@ const adminController = {
           ...user.dataValues
         })),
 
-        description: tweet.description ? tweet.description.substring(0, 50) : null,
+        description: tweet.description ? tweet.description : '',
         updatedAt: tweet.updatedAt ? moment(tweet.updatedAt).format('YYYY-MM-DD, hh:mm') : '-',
         likedCount: tweet.LikedUsers.length
       }))
