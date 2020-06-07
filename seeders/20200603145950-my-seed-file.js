@@ -72,6 +72,15 @@ module.exports = {
         })
       ), {})
 
+    queryInterface.bulkInsert('Tags',
+      [{
+        TaggedUserId: 1,
+        TweetId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }]
+      , {})
+
     const Likes = []
     for (let i = 2; i < 15; i++) {
       let j = i
@@ -93,7 +102,7 @@ module.exports = {
           description: faker.lorem.text(),
           userId: Math.floor(Math.random() * 22) + 2,
           createdAt: new Date(),
-          updatedAt: new Date()
+          updatedAt: new Date(),
         })
       ), {})
   },
