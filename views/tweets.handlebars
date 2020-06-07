@@ -1,24 +1,21 @@
-<form action="/tweets" method="POST" id="tweetForm" onsubmit="addTagId()">
-
-  <div id="text-wrap" style="position: relative;">
-    <div id="textarea" contenteditable="true" placeholder="what's on your mind?"></div>
-    <p id="tweetInput" style="position: absolute; top:0px;"></p>
-  </div>
-
-  <div class="input-group">
-    <textarea id="tweets" name="tweets" class="form-control" aria-label="With textarea"
-      placeholder="what's on your mind?" rows="3" style="display: none;"></textarea>
-  </div>
-  <div class="text-muted mt-1">
-    <small id="tweetsText">characters left:</small>
-    <span id="tweetsNumber">140</span>
-    <button id="tweetBtn" class="btn btn-primary" type="submit" style="margin-left: 10%">Tweet</button>
-
-  </div>
-</form>
-
 <div class="row justify-content-center my-3">
   <div class="col-md-6">
+    <form action="/tweets" method="POST" id="tweetForm" onsubmit="addTagId()">
+      <div id="text-wrap" style="position: relative;">
+        <div id="textarea" contenteditable="true" placeholder="what's on your mind?"></div>
+        <p id="tweetInput" style="position: absolute; top:0px;"></p>
+      </div>
+
+      <div class="input-group">
+        <textarea id="tweets" name="tweets" class="form-control" aria-label="With textarea"
+          placeholder="what's on your mind?" rows="3" style="display: none;"></textarea>
+      </div>
+      <div class="text-muted mt-1">
+        <small id="tweetsText" class="mr-1">characters left:</small>
+        <span id="tweetsNumber" class="align-middle">140</span>
+        <button id="tweetBtn" class="btn btn-primary float-right" type="submit">Tweet</button>
+      </div>
+    </form>
 
     <br>
     <br>
