@@ -4,8 +4,9 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "NODE_ENV=development node app.js",
+    "start": "node app.js",
     "dev": "NODE_ENV=development nodemon app.js",
+    "seeder": "node models/seeders/20200603145950-my-seed-file.js",
     "test": "set \"NODE_ENV=test\" && mocha test/*/*.js --exit --recursive --timeout 5000"
   },
   "author": "",

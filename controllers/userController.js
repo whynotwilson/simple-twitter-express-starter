@@ -679,6 +679,8 @@ const userController = {
           bcrypt.genSaltSync(10),
           null
         ),
+        introduction: '',
+        role: 'user'
       })
 
       req.flash("success_messages", "成功註冊帳號！");
