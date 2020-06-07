@@ -6,7 +6,7 @@ const Reply = db.Reply;
 const Tag = db.Tag;
 const Blockship = db.Blockship;
 const helpers = require("../_helpers");
-const Op = require('Sequelize').Op;
+const Op = require('sequelize').Op;
 
 const tweetController = {
   getTweets: async (req, res) => {
