@@ -16,8 +16,8 @@ const tweetController = {
       nest: true,
       where: {
         [Op.or]: [
-          { blockerId: req.user.id },
-          { blockingId: req.user.id }
+          { blockerId: helpers.getUser(req).id },
+          { blockingId: helpers.getUser(req).id }
         ]
       }
     })
@@ -30,10 +30,10 @@ const tweetController = {
     const blockshipsIdArr = []
 
     blockships.forEach(blockship => {
-      if (blockship.blockerId !== req.user.id) {
+      if (blockship.blockerId !== helpers.getUser(req).id) {
         blockshipsIdArr.push(blockship.blockerId)
       }
-      if (blockship.blockingId !== req.user.id) {
+      if (blockship.blockingId !== helpers.getUser(req).id) {
         blockshipsIdArr.push(blockship.blockingId)
       }
     })
@@ -51,8 +51,8 @@ const tweetController = {
         ...tweet,
         User: tweet.User,
         description: tweet.description,
-        isLiked: tweet.likedUsers ? tweet.likedUsers.map(d => d.id).includes(helpers.getUser(req).id) : false,
-        likedCount: tweet.likedUsers ? tweet.likedUsers.length : 0,
+        isLiked: tweet.LikedUsers ? tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id) : false,
+        likedCount: tweet.LikedUsers ? tweet.LikedUsers.length : 0,
         replyCount: tweet.Replies ? tweet.Replies.length : 0
       }))
 
