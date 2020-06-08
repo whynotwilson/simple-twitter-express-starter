@@ -61,7 +61,7 @@ const tweetController = {
           model: User,
           where: {
             id: {
-              [Op.eq]: Tweet.UserId
+              [Op.eq]: 22
             }
           }
         }
