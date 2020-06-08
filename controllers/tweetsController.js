@@ -51,7 +51,7 @@ const tweetController = {
 
     tweets = JSON.parse(JSON.stringify(tweets)).map((tweet) => ({
       ...tweet,
-      User: tweet.User,
+      // User: tweet.User,
       description: tweet.description,
       isLiked: tweet.LikedUsers ? tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id) : false,
       likedCount: tweet.LikedUsers ? tweet.LikedUsers.length : 0,
