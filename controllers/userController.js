@@ -198,8 +198,8 @@ const userController = {
         }
       })
 
-      blockships = blockships.map(blockship => ({
-        ...blockship.dataValues
+      blockships = JSON.parse(JSON.stringify(blockships)).map(blockship => ({
+        ...blockship
       }))
 
       // blockshipsIdArr = 封鎖我的人 && 我封鎖的人的 ID
@@ -219,7 +219,7 @@ const userController = {
       }
       const userId = Number(req.params.id)
       let isOwner = userId === helpers.getUser(req).id ? true : false;
-      const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId, {
+      let userData = await User.findByPk(userId) ? await User.findByPk(userId, {
         include: [
           { model: User, as: 'Followers' },
           { model: User, as: 'Followings' },
@@ -229,23 +229,21 @@ const userController = {
         ]
       }) : null
 
-      if (!dataValues) {
+      if (!userData) {
         throw new Error("user is not found");
       }
-      let userData = {}
+
       userData = {
-        id: dataValues.id,
-        avatar: dataValues.avatar,
-        name: dataValues.name,
-        introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null,
-        TweetsNumber: dataValues.Tweets.length,
-        FollowersNumber: dataValues.Followers.length,
-        FollowingsNumber: dataValues.Followings.length,
-        LikesNumber: dataValues.Likes.length,
+        ...userData.toJSON(),
+        introduction: userData.introduction,
+        TweetsNumber: userData.Tweets.length,
+        FollowersNumber: userData.Followers.length,
+        FollowingsNumber: userData.Followings.length,
+        LikesNumber: userData.Likes.length,
         isFollowing: helpers.getUser(req).Followings.map(d => d.id).includes(userId)
       }
 
-      const followers = dataValues.Followers.reverse().map(follower => ({
+      const followers = userData.Followers.map(follower => ({
         id: follower.id,
         avatar: follower.avatar,
         name: follower.name,
