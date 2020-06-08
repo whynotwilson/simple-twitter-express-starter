@@ -12,6 +12,8 @@ const tweetController = {
   getTweets: async (req, res) => {
 
     let blockships = await Blockship.findAll({
+      raw: true,
+      nest: true,
       where: {
         [Op.or]: [
           { blockerId: req.user.id },
@@ -45,14 +47,14 @@ const tweetController = {
       ]
     })
 
-    tweets = tweets.map((tweet) => ({
-      ...tweet.dataValues,
-      User: tweet.User.dataValues,
-      description: tweet.description,
-      isLiked: tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id),
-      likedCount: tweet.LikedUsers.length,
-      replyCount: tweet.Replies.length
-    }))
+    tweets = JSON.parse(JSON.stringify(tweets)).map((tweet) => ({
+        ...tweet,
+        User: tweet.User,
+        description: tweet.description,
+        isLiked: tweet.likedUsers ? tweet.likedUsers.map(d => d.id).includes(helpers.getUser(req).id) : false,
+        likedCount: tweet.likedUsers ? tweet.likedUsers.length : 0,
+        replyCount: tweet.Replies ? tweet.Replies.length : 0
+      }))
 
     let count = 0
 
@@ -61,6 +63,8 @@ const tweetController = {
     })
 
     let users = await User.findAll({
+      raw: true,
+      nest: true,
       order: [['createdAt', 'DESC']],
       include: [
         { model: User, as: 'Followers' }
@@ -68,7 +72,7 @@ const tweetController = {
     })
 
     users = users.map(user => ({
-      ...user.dataValues,
+      ...user,
       followersCount: user.Followers.length,
       isFollowed: helpers.getUser(req).Followings.map(d => d.id).includes(user.id)
     }))
