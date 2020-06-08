@@ -28,8 +28,8 @@ const userController = {
         }
       })
 
-      blockships = blockships.map(blockship => ({
-        ...blockship.dataValues
+      blockships = JSON.parse(JSON.stringify(blockships)).map(blockship => ({
+        ...blockship
       }))
 
       // blockshipsIdArr = 封鎖我的人 && 我封鎖的人的 ID
@@ -67,25 +67,18 @@ const userController = {
       if (!otherUser) {
         throw new Error('otherUser is not found')
       }
-
       // ------------------ otherUser 資料整理 -------------------
       otherUser = {
-        ...otherUser.dataValues,
+        ...otherUser.toJSON(),
         introduction: otherUser.introduction.substring(0, 30),
         Followers: otherUser.Followers.map(follower => ({
-          ...follower.dataValues
-        })),
-        Followings: otherUser.Followings.map(following => ({
-          ...following.dataValues
+          ...follower
         })),
         Blockers: otherUser.Blockers.map(blocker => ({
-          ...blocker.dataValues
+          ...blocker
         })),
         Blockings: otherUser.Blockings.map(blocking => ({
-          ...blocking.dataValues
-        })),
-        Likes: otherUser.Likes.map(like => ({
-          ...like.dataValues
+          ...blocking
         })),
         isFollowed: otherUser.Followers.map(d => d.id).includes(req.user.id)
       }
@@ -104,24 +97,19 @@ const userController = {
         ]
       })
 
+
+
       // ------------------ Tweets 資料整理 -------------------
-      tweets = tweets.map(tweet => ({
-        ...tweet.dataValues,
+      tweets = JSON.parse(JSON.stringify(tweets)).map(tweet => ({
+        ...tweet,
 
-        User: tweet.User.dataValues,
-
-        Replies: tweet.dataValues.Replies.map(reply => ({
-          ...reply.dataValues,
-          User: reply.User.dataValues
-        })),
-
-        LikedUsers: tweet.dataValues.LikedUsers.map(user => ({
-          ...user.dataValues
-        })),
-        isLiked: tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id),
+        User: tweet.User,
+        Replies: tweet.Replies,
+        LikedUsers: tweet.LikedUsers,
+        isLiked: tweet.LikedUsers ? tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id) : false,
         description: tweet.description ? tweet.description.substring(0, 50) : null,
         updatedAt: tweet.updatedAt ? moment(tweet.updatedAt).format('YYYY-MM-DD, hh:mm') : '-',
-        likedCount: tweet.LikedUsers.length
+        likedCount: tweet.LikedUsers ? tweet.LikedUsers.length : 0
       }))
 
       return res.render('getTweets', { otherUser, tweets, isOwner })
@@ -140,8 +128,8 @@ const userController = {
         }
       })
 
-      blockships = blockships.map(blockship => ({
-        ...blockship.dataValues
+      blockships = JSON.parse(JSON.stringify(blockships)).map(blockship => ({
+        ...blockship
       }))
 
       // blockshipsIdArr = 封鎖我的人 && 我封鎖的人的 ID
