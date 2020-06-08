@@ -39,8 +39,8 @@ const tweetController = {
     //   }
     // })
 
-    // let usersTest = await User.findAll({
-    //   limit: 3,
+    // let userTest = await User.findAll({
+    //   limit: 1,
     //   include: [
     //     Tweet
     //   ]
@@ -49,22 +49,23 @@ const tweetController = {
     // console.log('')
     // console.log('')
     // console.log('')
-    // console.log('usersTest', usersTest)
+    // console.log('userTest', userTest)
 
     let tweets = await Tweet.findAll({
       limit: 10,
       order: [["createdAt", "DESC"]],
       include: [
+        User,
         Reply,
-        { model: User, as: 'LikedUsers' },
-        {
-          model: User,
-          where: {
-            id: {
-              [Op.eq]: 22
-            }
-          }
-        }
+        { model: User, as: 'LikedUsers' }
+        // {
+        //   model: User,
+        //   where: {
+        //     id: {
+        //       [Op.eq]: 22
+        //     }
+        //   }
+        // }
       ]
     })
 

@@ -2,7 +2,13 @@
 module.exports = (sequelize, DataTypes) => {
   const Tweet = sequelize.define('Tweet', {
     description: DataTypes.TEXT,
-    UserId: DataTypes.INTEGER
+    UserId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'users',
+        key: 'id'
+      }
+    }
   }, {});
   Tweet.associate = function (models) {
     Tweet.hasMany(models.Like)
