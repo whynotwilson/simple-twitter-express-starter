@@ -47,15 +47,16 @@ const tweetController = {
 
     tweets = tweets.map((tweet) => ({
       ...tweet.dataValues,
-      User: tweet.User.dataValues,
+      // User: tweet.User.dataValues,
       description: tweet.description,
-      isLiked: tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id),
+      isLiked: req.user.LikedTweets.map(d => d.id).includes(tweet.id),
+      // isLiked: tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id),
       likedCount: tweet.LikedUsers.length,
       replyCount: tweet.Replies.length
     }))
 
+    // 擋掉封鎖的人的動態
     let count = 0
-
     tweets = tweets.filter(tweet => {
       return !(blockshipsIdArr.includes(tweet.User.id)) && count++ < 10
     })
@@ -73,6 +74,7 @@ const tweetController = {
       isFollowed: helpers.getUser(req).Followings.map(d => d.id).includes(user.id)
     }))
 
+    // 擋掉封鎖的人的動態
     count = 0
     users = users.filter(user => {
       return !(blockshipsIdArr.includes(user.id)) && count++ < 10
