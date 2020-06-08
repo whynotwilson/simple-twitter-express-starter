@@ -6,7 +6,10 @@ const Reply = db.Reply;
 const Tag = db.Tag;
 const Blockship = db.Blockship;
 const helpers = require("../_helpers");
+const sequelize = require('sequelize');
 const Op = require('sequelize').Op;
+
+
 
 const tweetController = {
   getTweets: async (req, res) => {
@@ -55,19 +58,54 @@ const tweetController = {
       limit: 10,
       order: [["createdAt", "DESC"]],
       include: [
-        // User,
         Reply,
         { model: User, as: 'LikedUsers' },
         {
           model: User,
-          where: {
-            id: {
-              [Op.eq]: 22
-            }
-          }
+          where: { id: sequelize.col('tweet.UserId') }
         }
+        // {
+        //   model: User,
+        //   where: {
+        //     id: {
+        //       [Op.eq]: 22
+        //     }
+        //   }
+        // }
       ]
     })
+
+    // 由 user 找所有 tweets，再按照 tweets createdAt 排序，並且 include Reply & LikedUsers
+    // let tweetsUsers = await User.findAll({
+    //   include: [
+    //     {
+    //       model: Tweet,
+    //       order: [['createdAt', 'DESC']],
+    //       limit: 10,
+    //       include: [Reply, { model: User, as: 'LikedUsers' }]
+    //     }
+    //   ]
+    // })
+
+    // tweetsUsers = tweetsUsers.map(user => ({
+    //   ...user.dataValues
+    // Tweet: user.Tweet.dataValues
+    // }))
+
+    // console.log('')
+    // console.log('')
+    // console.log('')
+    // console.log('')
+    // console.log('tweetsUsers[0]', tweetsUsers[0])
+
+    // tweetsUsers = tweetsUsers.map(user => ({
+    //   ...user.dataValues,
+    //   Tweet: user.Tweet.dataValues
+
+    // followersCount: user.Followers.length,
+    // isFollowed: helpers.getUser(req).Followings.map(d => d.id).includes(user.id)
+    // }))
+
 
     // test
     // let tweets = await Tweet.findAll({
@@ -81,8 +119,9 @@ const tweetController = {
     // })
 
     tweets = JSON.parse(JSON.stringify(tweets)).map((tweet) => ({
+      // tweets = tweets.map((tweet) => ({
       ...tweet,
-      // User: JSON.parse(JSON.stringify(tweet.User)),
+      // User: (tweet.User),
       description: tweet.description,
       isLiked: tweet.LikedUsers ? tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id) : false,
       likedCount: tweet.LikedUsers ? tweet.LikedUsers.length : 0,
