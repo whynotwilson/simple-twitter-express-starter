@@ -151,7 +151,7 @@ const userController = {
       const userId = Number(req.params.id)
       let isOwner = userId === helpers.getUser(req).id ? true : false;
 
-      const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId, {
+      let userData = await User.findByPk(userId) ? await User.findByPk(userId, {
         include: [
           { model: User, as: 'Followers' },
           { model: User, as: 'Followings', },
@@ -161,23 +161,21 @@ const userController = {
         ],
       }) : null
 
-      if (!dataValues) {
+      if (!userData) {
         throw new Error("user is not found");
       }
-      let userData = {}
+
       userData = {
-        id: dataValues.id,
-        avatar: dataValues.avatar,
-        name: dataValues.name,
-        introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null,
-        TweetsNumber: dataValues.Tweets.length,
-        FollowersNumber: dataValues.Followers.length,
-        FollowingsNumber: dataValues.Followings.length,
-        LikesNumber: dataValues.Likes.length,
+        ...userData.toJSON(),
+        introduction: userData.introduction,
+        TweetsNumber: userData.Tweets.length,
+        FollowersNumber: userData.Followers.length,
+        FollowingsNumber: userData.Followings.length,
+        LikesNumber: userData.Likes.length,
         isFollowed: helpers.getUser(req).Followings.map(d => d.id).includes(userId)
       }
 
-      const followings = dataValues.Followings.reverse().map(following => ({
+      const followings = userData.Followings.map(following => ({
         id: following.id,
         avatar: following.avatar,
         name: following.name,
