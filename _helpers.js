@@ -12,8 +12,14 @@ function fromNow(dateTime) {
   return moment(dateTime).fromNow()
 }
 
+function getKeywordData(keyword) {
+  console.log('helper', keyword)
+  console.log('keyword!')
+}
+
 module.exports = {
   ensureAuthenticated,
   getUser,
-  fromNow
+  fromNow,
+  getKeywordData
 };

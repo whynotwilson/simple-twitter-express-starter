@@ -1,0 +1,13 @@
+#textarea {
+  width: 100%;
+  border: 1px solid #ccc;
+  min-height: 150px;
+  max-height: 300px;
+  overflow: auto;
+  outline: none;
+}
+
+#textarea:empty:before {
+  content: attr(placeholder);
+  color: #bbb;
+}

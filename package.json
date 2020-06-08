@@ -4,8 +4,9 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "NODE_ENV=development node app.js",
+    "start": "node app.js",
     "dev": "NODE_ENV=development nodemon app.js",
+    "seeder": "node models/seeders/20200603145950-my-seed-file.js",
     "test": "set \"NODE_ENV=test\" && mocha test/*/*.js --exit --recursive --timeout 5000"
   },
   "author": "",
@@ -14,6 +15,7 @@
     "bcrypt-nodejs": "0.0.3",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
+    "bootstrap-select": "^1.13.17",
     "chai": "^4.2.0",
     "connect-flash": "^0.1.1",
     "dotenv": "^8.2.0",
@@ -25,6 +27,7 @@
     "jquery": "^3.5.1",
     "jsdom": "^16.2.2",
     "jsonwebtoken": "^8.5.1",
+    "loadsh": "0.0.4",
     "method-override": "^3.0.0",
     "mocha": "^6.0.2",
     "moment": "^2.26.0",
