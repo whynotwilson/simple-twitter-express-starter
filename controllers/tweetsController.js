@@ -9,54 +9,12 @@ const helpers = require("../_helpers");
 const sequelize = require('sequelize');
 const Op = require('sequelize').Op;
 
-
-
 const tweetController = {
   getTweets: async (req, res) => {
 
-    /* Henry 做法 */
-    // let blockships = await Blockship.findAll({
-    //   raw: true,
-    //   nest: true,
-    //   where: {
-    //     [Op.or]: [
-    //       { blockerId: helpers.getUser(req).id },
-    //       { blockingId: helpers.getUser(req).id }
-    //     ]
-    //   }
-    // })
-
-    // blockships = blockships.map(blockship => ({
-    //   ...blockship.dataValues
-    // }))
-
-    // blockshipsIdArr = 封鎖我的人&& 我封鎖的人的ID
-    // const blockshipsIdArr = []
-
-    // blockships.forEach(blockship => {
-    //   if (blockship.blockerId !== helpers.getUser(req).id) {
-    //     blockshipsIdArr.push(blockship.blockerId)
-    //   }
-    //   if (blockship.blockingId !== helpers.getUser(req).id) {
-    //     blockshipsIdArr.push(blockship.blockingId)
-    //   }
-    // })
-
-    // let userTest = await User.findAll({
-    //   limit: 1,
-    //   include: [
-    //     Tweet
-    //   ]
-    // })
-
-    // console.log('')
-    // console.log('')
-    // console.log('')
-    // console.log('userTest', userTest)
-
     let tweets = await Tweet.findAll({
-      limit: 10,
-      order: [["createdAt", "DESC"]],
+      limit: 50,
+      order: [['createdAt', 'DESC']],
       include: [
         Reply,
         { model: User, as: 'LikedUsers' },
@@ -64,85 +22,25 @@ const tweetController = {
           model: User,
           where: { id: sequelize.col('tweet.UserId') }
         }
-        // {
-        //   model: User,
-        //   where: {
-        //     id: {
-        //       [Op.eq]: 22
-        //     }
-        //   }
-        // }
       ]
     })
 
-    // 由 user 找所有 tweets，再按照 tweets createdAt 排序，並且 include Reply & LikedUsers
-    // let tweetsUsers = await User.findAll({
-    //   include: [
-    //     {
-    //       model: Tweet,
-    //       order: [['createdAt', 'DESC']],
-    //       limit: 10,
-    //       include: [Reply, { model: User, as: 'LikedUsers' }]
-    //     }
-    //   ]
-    // })
-
-    // tweetsUsers = tweetsUsers.map(user => ({
-    //   ...user.dataValues
-    // Tweet: user.Tweet.dataValues
-    // }))
-
-    // console.log('')
-    // console.log('')
-    // console.log('')
-    // console.log('')
-    // console.log('tweetsUsers[0]', tweetsUsers[0])
-
-    // tweetsUsers = tweetsUsers.map(user => ({
-    //   ...user.dataValues,
-    //   Tweet: user.Tweet.dataValues
-
-    // followersCount: user.Followers.length,
-    // isFollowed: helpers.getUser(req).Followings.map(d => d.id).includes(user.id)
-    // }))
-
-
-    // test
-    // let tweets = await Tweet.findAll({
-    //   limit: 10,
-    //   order: [["createdAt", "DESC"]],
-    //   include: [
-    //     Reply,
-    //     { model: User, as: 'LikedUsers' },
-    //     { model: User, required: false }
-    //   ]
-    // })
-
-    tweets = JSON.parse(JSON.stringify(tweets)).map((tweet) => ({
-      // tweets = tweets.map((tweet) => ({
-      ...tweet,
-      // User: (tweet.User),
+    tweets = tweets.map((tweet) => ({
+      ...tweet.dataValues,
+      User: tweet.User.dataValues,
       description: tweet.description,
-      isLiked: tweet.LikedUsers ? tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id) : false,
-      likedCount: tweet.LikedUsers ? tweet.LikedUsers.length : 0,
-      replyCount: tweet.Replies ? tweet.Replies.length : 0
+      isLiked: tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id),
+      likedCount: tweet.LikedUsers.length,
+      replyCount: tweet.Replies.length
     }))
 
-    console.log('')
-    console.log('')
-    console.log('')
-    console.log('tweets[0]', tweets[0])
-
-    // 擋掉封鎖的人的動態
-    // let count = 0
-    // tweets = tweets.filter(tweet => {
-    //   return (!(req.user.Blockings.map(b => b.id).includes(tweet.User.id)) ||
-    //     !(req.user.Blockers.map(b => b.id).includes(tweet.User.id))) &&
-    //     count++ < 10
-    // })
-
-    // console.log('req.user.Blockings', req.user.Blockings.map(b => b.id))
-    // console.log('req.user.Blockers', req.user.Blockers.map(b => b.id))
+    // 擋掉封鎖的人的 tweets
+    let count = 0
+    tweets = tweets.filter(tweet => {
+      return !req.user.Blockings.map(b => b.id).includes(tweet.User.id) &&
+        !req.user.Blockers.map(b => b.id).includes(tweet.User.id) &&
+        count++ < 10
+    })
 
     let users = await User.findAll({
       raw: true,
@@ -159,92 +57,19 @@ const tweetController = {
       isFollowed: helpers.getUser(req).Followings.map(d => d.id).includes(user.id)
     }))
 
-    // 擋掉封鎖的人的動態
-    // count = 0
-    // users = users.filter(user => {
-    //   return !(req.user.Blockings.includes(user.id)) && !(req.user.Blockers.includes(user.id)) && count++ < 10
-    // })
-
-    users.sort((a, b) => b.followersCount - a.followersCount)
-
-    return res.render('tweets', { tweets, users })
-
-    /* 取不到 tweets[0].User User 會是 null
-
-    // let blockships = await Blockship.findAll({
-    //   where: {
-    //     [Op.or]: [
-    //       { blockerId: req.user.id },
-    //       { blockingId: req.user.id }
-    //     ]
-    //   }
-    // })
-
-    // blockships = blockships.map(blockship => ({
-    //   ...blockship.dataValues
-    // }))
-
-    // blockshipsIdArr = 封鎖我的人 && 我封鎖的人的 ID
-    // const blockshipsIdArr = []
-
-    // blockships.forEach(blockship => {
-    //   if (blockship.blockerId !== req.user.id) {
-    //     blockshipsIdArr.push(blockship.blockerId)
-    //   }
-    //   if (blockship.blockingId !== req.user.id) {
-    //     blockshipsIdArr.push(blockship.blockingId)
-    //   }
-    // })
-
-    let tweets = await Tweet.findAll({
-      order: [["createdAt", "DESC"]],
-      include: [
-        User,
-        Reply,
-        { model: User, as: 'LikedUsers' }
-      ]
-    })
-
-    tweets = tweets.map((tweet) => ({
-      ...tweet.dataValues,
-      // User: tweet.User.dataValues,
-      description: tweet.description,
-      isLiked: req.user.LikedTweets.map(d => d.id).includes(tweet.id),
-      // isLiked: tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id),
-      likedCount: tweet.LikedUsers.length,
-      replyCount: tweet.Replies.length
-    }))
-
-    // 擋掉封鎖的人的動態
-    let count = 0
-    tweets = tweets.filter(tweet => {
-      return !(blockshipsIdArr.includes(tweet.User.dataValues.id)) && count++ < 10
-    })
-
-    let users = await User.findAll({
-      order: [['createdAt', 'DESC']],
-      include: [
-        { model: User, as: 'Followers' }
-      ]
-    })
-
-    users = users.map(user => ({
-      ...user.dataValues,
-      followersCount: user.Followers.length,
-      isFollowed: helpers.getUser(req).Followings.map(d => d.id).includes(user.id)
-    }))
-
-    // 擋掉封鎖的人的動態
+    // 擋掉封鎖的人的 Popular User 頁面
     count = 0
     users = users.filter(user => {
-      return !(req.user.Blockings.includes(user.id)) && !(req.user.Blockers.includes(user.id)) && count++ < 10
+      return !req.user.Blockings.map(b => b.id).includes(user.id) &&
+        !req.user.Blockers.map(b => b.id).includes(user.id) &&
+        count++ < 10
     })
 
     users.sort((a, b) => b.followersCount - a.followersCount)
 
     return res.render('tweets', { tweets, users })
-  */
   },
+
   postTweets: (req, res) => {
     const tweetsDesc = req.body.tweets.trim();
 
