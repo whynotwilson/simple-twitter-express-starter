@@ -43,9 +43,9 @@ const tweetController = {
       limit: 10,
       order: [["createdAt", "DESC"]],
       include: [
-        { model: User },
         Reply,
-        { model: User, as: 'LikedUsers' }
+        { model: User, as: 'LikedUsers' },
+        { model: User, required: false }
       ]
     })
 
