@@ -104,7 +104,7 @@
             <h5 class='card-title'>
               <a href="/users/{{targetUser.id}}/tweets" style="text-decoration: none;">@{{targetUser.name}}</a>
             </h5>
-            <p class="card-text">{{targetUser.introduction}}</p>
+            <p class="card-text">{{{tweet.description}}}</p>
             <p class="card-text"><small class="text-muted">{{fromNow this.createdAt}}</small></p>
             <div class='text-right inline-block mt-1'>
               <a href="/tweets/{{tweet.id}}/replies" class='btn btn-primary mr-2'>Reply ({{tweet.replies.length}})</a>
