@@ -268,8 +268,8 @@ const userController = {
         }
       })
 
-      blockships = blockships.map(blockship => ({
-        ...blockship.dataValues
+      blockships = JSON.parse(JSON.stringify(blockships)).map(blockship => ({
+        ...blockship
       }))
 
       // blockshipsIdArr = 封鎖我的人 && 我封鎖的人的 ID
@@ -291,7 +291,7 @@ const userController = {
       const userId = Number(req.params.id)
       let isOwner = userId === helpers.getUser(req).id ? true : false;
 
-      const { dataValues } = await User.findByPk(userId) ? await User.findByPk(userId, {
+      let userData = await User.findByPk(userId) ? await User.findByPk(userId, {
         include: [
           { model: User, as: 'Followers' },
           { model: User, as: 'Followings' },
@@ -301,31 +301,28 @@ const userController = {
         ]
       }) : null
 
-      const tweetsData = await Tweet.findAll({ include: [Like, Reply, User] })
-
-      if (!dataValues) {
+      if (!userData) {
         throw new Error("user is not found");
       }
 
-      let userData = {}
+
       userData = {
-        id: dataValues.id,
-        name: dataValues.name,
-        avatar: dataValues.avatar,
-        introduction: dataValues.introduction ? dataValues.introduction.substring(0, 30) : null,
-        TweetsNumber: dataValues.Tweets.length,
-        FollowersNumber: dataValues.Followers.length,
-        FollowingsNumber: dataValues.Followings.length,
-        LikesNumber: dataValues.Likes.length,
+        ...userData.toJSON(),
+        introduction: userData.introduction,
+        TweetsNumber: userData.Tweets.length,
+        FollowersNumber: userData.Followers.length,
+        FollowingsNumber: userData.Followings.length,
+        LikesNumber: userData.Likes.length,
         isFollowing: req.user.Followings.map(d => d.id).includes(userId)
       }
 
+      const tweetsData = await Tweet.findAll({ include: [Like, Reply, User] })
 
-      const likedTweets = tweetsData.filter(tweet =>
-        dataValues.Likes.map(like => like.TweetId).includes(tweet.id)
+      const likedTweets = JSON.parse(JSON.stringify(tweetsData)).filter(tweet =>
+        userData.Likes.map(like => like.TweetId).includes(tweet.id)
       )
 
-      const tweets = likedTweets.reverse().map(tweet => ({
+      const tweets = likedTweets.map(tweet => ({
         id: tweet.id,
         description: tweet.description
           ? tweet.description.substring(0, 50)
