@@ -60,8 +60,8 @@ const tweetController = {
         {
           model: User,
           where: {
-            UserId: {
-              [Op.eq]: User.id
+            id: {
+              [Op.eq]: Tweet.UserId
             }
           }
         }
