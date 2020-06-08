@@ -9,7 +9,8 @@ const moment = require('moment')
 const Followship = db.Followship
 const bcrypt = require('bcryptjs')
 const helpers = require("../_helpers")
-const Op = require('Sequelize').Op
+const Op = require('sequelize').Op
+const sequelize = require('sequelize')
 const fs = require('fs')
 const imgur = require('imgur-node-api')
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
@@ -91,18 +92,19 @@ const userController = {
         },
         include: [
           Like,
-          User,
           { model: Reply, include: [User] },
-          { model: User, as: 'LikedUsers' }
+          { model: User, as: 'LikedUsers' },
+          {
+            model: User,
+            where: { id: sequelize.col('tweet.UserId') }
+          },
         ]
       })
-
 
 
       // ------------------ Tweets 資料整理 -------------------
       tweets = JSON.parse(JSON.stringify(tweets)).map(tweet => ({
         ...tweet,
-
         User: tweet.User,
         Replies: tweet.Replies,
         LikedUsers: tweet.LikedUsers,
@@ -111,6 +113,8 @@ const userController = {
         updatedAt: tweet.updatedAt ? moment(tweet.updatedAt).format('YYYY-MM-DD, hh:mm') : '-',
         likedCount: tweet.LikedUsers ? tweet.LikedUsers.length : 0
       }))
+
+
 
       return res.render('getTweets', { otherUser, tweets, isOwner })
     } catch (error) {
@@ -316,7 +320,12 @@ const userController = {
         isFollowing: req.user.Followings.map(d => d.id).includes(userId)
       }
 
-      const tweetsData = await Tweet.findAll({ include: [Like, Reply, User] })
+      const tweetsData = await Tweet.findAll({
+        include: [{
+          model: User,
+          where: { id: sequelize.col('tweet.UserId') }
+        }, Like, Reply]
+      })
 
       const likedTweets = JSON.parse(JSON.stringify(tweetsData)).filter(tweet =>
         userData.Likes.map(like => like.TweetId).includes(tweet.id)
