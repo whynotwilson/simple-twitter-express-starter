@@ -14,8 +14,8 @@ const tweetController = {
     let blockships = await Blockship.findAll({
       where: {
         [Op.or]: [
-          { blockerId: req.user.id },
-          { blockingId: req.user.id }
+          { blockerId: helpers.getUser(req).id },
+          { blockingId: helpers.getUser(req).id }
         ]
       }
     })
@@ -28,10 +28,10 @@ const tweetController = {
     const blockshipsIdArr = []
 
     blockships.forEach(blockship => {
-      if (blockship.blockerId !== req.user.id) {
+      if (blockship.blockerId !== helpers.getUser(req).id) {
         blockshipsIdArr.push(blockship.blockerId)
       }
-      if (blockship.blockingId !== req.user.id) {
+      if (blockship.blockingId !== helpers.getUser(req).id) {
         blockshipsIdArr.push(blockship.blockingId)
       }
     })
@@ -87,7 +87,7 @@ const tweetController = {
 
     if (tweetsDesc !== "" && tweetsDesc.length <= 140) {
 
-      if (req.body.taggedId) {
+      /*if (req.body.taggedId !== undefined) {
         Tweet.create({
           description: tweetsDesc,
           UserId: helpers.getUser(req).id,
@@ -96,20 +96,21 @@ const tweetController = {
             Tag.create({
               TaggedUserId: Number(req.body.taggedId),
               TweetId: tweet.id
+            }).then((tag) => {
+              return res.redirect('/tweets')
             })
           } else {
             req.body.taggedId.forEach((id) => {
               Tag.create({
                 TaggedUserId: Number(id),
                 TweetId: tweet.id
+              }).then((tag) => {
+                return res.redirect('/tweets')
               })
             })
 
           }
-          return tweet
 
-        }).then((tweet) => {
-          return res.redirect('/tweets')
         })
       } else {
         Tweet.create({
@@ -118,8 +119,13 @@ const tweetController = {
         }).then((tweet) => {
           return res.redirect('/tweets')
         });
-      }
-
+      }*/
+      Tweet.create({
+        description: tweetsDesc,
+        UserId: helpers.getUser(req).id,
+      }).then((tweet) => {
+        return res.redirect('/tweets')
+      });
 
     } else {
       req.flash('error_messages', { error_messages: '輸入不可為空白！' });

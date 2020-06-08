@@ -22,8 +22,8 @@ const userController = {
       let blockships = await Blockship.findAll({
         where: {
           [Op.or]: [
-            { blockerId: req.user.id },
-            { blockingId: req.user.id }
+            { blockerId: helpers.getUser(req).id },
+            { blockingId: helpers.getUser(req).id }
           ]
         }
       })
@@ -36,10 +36,10 @@ const userController = {
       const blockshipsIdArr = []
 
       blockships.forEach(blockship => {
-        if (blockship.blockerId !== req.user.id) {
+        if (blockship.blockerId !== helpers.getUser(req).id) {
           blockshipsIdArr.push(blockship.blockerId)
         }
-        if (blockship.blockingId !== req.user.id) {
+        if (blockship.blockingId !== helpers.getUser(req).id) {
           blockshipsIdArr.push(blockship.blockingId)
         }
       })
@@ -71,7 +71,7 @@ const userController = {
       // ------------------ otherUser 資料整理 -------------------
       otherUser = {
         ...otherUser.dataValues,
-        introduction: otherUser.introduction.substring(0, 30),
+        introduction: otherUser.introduction,
         Followers: otherUser.Followers.map(follower => ({
           ...follower.dataValues
         })),
@@ -87,7 +87,7 @@ const userController = {
         Likes: otherUser.Likes.map(like => ({
           ...like.dataValues
         })),
-        isFollowed: otherUser.Followers.map(d => d.id).includes(req.user.id)
+        isFollowed: otherUser.Followers.map(d => d.id).includes(helpers.getUser(req).id)
       }
 
 
@@ -134,8 +134,8 @@ const userController = {
       let blockships = await Blockship.findAll({
         where: {
           [Op.or]: [
-            { blockerId: req.user.id },
-            { blockingId: req.user.id }
+            { blockerId: helpers.getUser(req).id },
+            { blockingId: helpers.getUser(req).id }
           ]
         }
       })
@@ -148,10 +148,10 @@ const userController = {
       const blockshipsIdArr = []
 
       blockships.forEach(blockship => {
-        if (blockship.blockerId !== req.user.id) {
+        if (blockship.blockerId !== helpers.getUser(req).id) {
           blockshipsIdArr.push(blockship.blockerId)
         }
-        if (blockship.blockingId !== req.user.id) {
+        if (blockship.blockingId !== helpers.getUser(req).id) {
           blockshipsIdArr.push(blockship.blockingId)
         }
       })
@@ -189,7 +189,7 @@ const userController = {
         isFollowed: helpers.getUser(req).Followings.map(d => d.id).includes(userId)
       }
 
-      const followings = dataValues.Followings.reverse().map(following => ({
+      const followings = dataValues.Followings.map(following => ({
         id: following.id,
         avatar: following.avatar,
         name: following.name,
@@ -206,8 +206,8 @@ const userController = {
       let blockships = await Blockship.findAll({
         where: {
           [Op.or]: [
-            { blockerId: req.user.id },
-            { blockingId: req.user.id }
+            { blockerId: helpers.getUser(req).id },
+            { blockingId: helpers.getUser(req).id }
           ]
         }
       })
@@ -220,10 +220,10 @@ const userController = {
       const blockshipsIdArr = []
 
       blockships.forEach(blockship => {
-        if (blockship.blockerId !== req.user.id) {
+        if (blockship.blockerId !== helpers.getUser(req).id) {
           blockshipsIdArr.push(blockship.blockerId)
         }
-        if (blockship.blockingId !== req.user.id) {
+        if (blockship.blockingId !== helpers.getUser(req).id) {
           blockshipsIdArr.push(blockship.blockingId)
         }
       })
@@ -259,7 +259,7 @@ const userController = {
         isFollowing: helpers.getUser(req).Followings.map(d => d.id).includes(userId)
       }
 
-      const followers = dataValues.Followers.reverse().map(follower => ({
+      const followers = dataValues.Followers.map(follower => ({
         id: follower.id,
         avatar: follower.avatar,
         name: follower.name,
@@ -278,8 +278,8 @@ const userController = {
       let blockships = await Blockship.findAll({
         where: {
           [Op.or]: [
-            { blockerId: req.user.id },
-            { blockingId: req.user.id }
+            { blockerId: helpers.getUser(req).id },
+            { blockingId: helpers.getUser(req).id }
           ]
         }
       })
@@ -292,10 +292,10 @@ const userController = {
       const blockshipsIdArr = []
 
       blockships.forEach(blockship => {
-        if (blockship.blockerId !== req.user.id) {
+        if (blockship.blockerId !== helpers.getUser(req).id) {
           blockshipsIdArr.push(blockship.blockerId)
         }
-        if (blockship.blockingId !== req.user.id) {
+        if (blockship.blockingId !== helpers.getUser(req).id) {
           blockshipsIdArr.push(blockship.blockingId)
         }
       })
@@ -333,7 +333,7 @@ const userController = {
         FollowersNumber: dataValues.Followers.length,
         FollowingsNumber: dataValues.Followings.length,
         LikesNumber: dataValues.Likes.length,
-        isFollowing: req.user.Followings.map(d => d.id).includes(userId)
+        isFollowing: helpers.getUser(req).Followings.map(d => d.id).includes(userId)
       }
 
 
@@ -361,33 +361,43 @@ const userController = {
       console.log("error", error);
     }
   },
-  addFollowing: async (req, res) => {
+  addFollowing: (req, res) => {
+
     try {
-      const findOne = await Followship.findOne({
-        where: {
-          [Op.and]: [
-            { followerId: req.user.id },
-            { followingId: req.body.id }
-          ]
-        }
-      })
-      if (!findOne) {
-        await Followship.create({
-          followerId: req.user.id,
-          followingId: req.body.id
+      if (helpers.getUser(req).id === Number(req.body.id)) {
+        return res.redirect("back");
+
+      } else {
+        const findOne = await Followship.findOne({
+          where: {
+            [Op.and]: [
+              { followerId: helpers.getUser(req).id },
+              { followingId: req.body.id }
+            ]
+          }
         })
+        if (!findOne) {
+          await Followship.create({
+            followerId: helpers.getUser(req).id,
+            followingId: req.body.id
+          })
+          return res.redirect("back");
+
+        }
+
+        return res.redirect("back");
       }
 
-      return res.redirect("back");
     } catch (error) {
       console.log("error", error);
     }
+
   },
   deleteFollowing: (req, res) => {
 
     Followship.findOne({
       where: {
-        [Op.and]: [{ followerId: helpers.getUser(req).id }, { followingId: req.params.userId }]
+        [Op.and]: [{ followerId: helpers.getUser(req).id }, { followingId: req.params.id }]
       }
     }).then(followship => {
 
@@ -398,7 +408,7 @@ const userController = {
 
       Followship.destroy({
         where: {
-          [Op.and]: [{ followerId: helpers.getUser(req).id }, { followingId: req.params.userId }]
+          [Op.and]: [{ followerId: helpers.getUser(req).id }, { followingId: req.params.id }]
         }
       }).then(followship => {
         return res.redirect('back')
@@ -414,7 +424,7 @@ const userController = {
     try {
       const userId = Number(req.params.id)
       //判斷是否為owner 不然退出
-      if (userId === req.user.id) {
+      if (userId === helpers.getUser(req).id) {
         const { dataValues } = (await User.findByPk(userId))
           ? await User.findByPk(userId)
           : null;
@@ -485,7 +495,7 @@ const userController = {
     try {
       const otherUserId = Number(req.params.id)
       let isOwner = false
-      if (otherUserId === req.user.id) {
+      if (otherUserId === helpers.getUser(req).id) {
         isOwner = true
       }
 
@@ -517,10 +527,10 @@ const userController = {
         Likes: otherUser.Likes.map(like => ({
           ...like.dataValues
         })),
-        isFollowing: otherUser.Followers.map(d => d.id).includes(req.user.id)
+        isFollowing: otherUser.Followers.map(d => d.id).includes(helpers.getUser(req).id)
       }
 
-      let blockings = await User.findByPk(req.user.id, {
+      let blockings = await User.findByPk(helpers.getUser(req).id, {
         include: [{ model: User, as: 'Blockings' }]
       })
 
@@ -579,7 +589,7 @@ const userController = {
       const follower = await Followship.findOne({
         where: {
           [Op.and]: [
-            { followerId: req.user.id },
+            { followerId: helpers.getUser(req).id },
             { followingId: req.params.userId }
           ]
         }
@@ -592,7 +602,7 @@ const userController = {
         where: {
           [Op.and]: [
             { followerId: req.params.userId },
-            { followingId: req.user.id }
+            { followingId: helpers.getUser(req).id }
           ]
         }
       })
@@ -603,7 +613,7 @@ const userController = {
       const blockships = await Blockship.findOne({
         where: {
           [Op.and]: [
-            { blockerId: req.user.id },
+            { blockerId: helpers.getUser(req).id },
             { blockingId: req.body.userId }
           ]
         }
@@ -611,13 +621,13 @@ const userController = {
 
       if (!blockships) {
         await Blockship.create({
-          blockerId: req.user.id,
+          blockerId: helpers.getUser(req).id,
           blockingId: req.body.userId
         })
       }
 
       req.flash('success_messages', '已成功封鎖該用戶')
-      return res.redirect(`/users/${req.user.id}/blockings`)
+      return res.redirect(`/users/${helpers.getUser(req).id}/blockings`)
     } catch (error) {
       console.log(error)
       req.flash('error_messages', { error_messages: '資料庫異常，未能成功封鎖該用戶！' })
@@ -630,7 +640,7 @@ const userController = {
       const destroyBlock = await Blockship.findOne({
         where: {
           [Op.and]: [
-            { blockerId: req.user.id },
+            { blockerId: helpers.getUser(req).id },
             { blockingId: req.params.id }
           ]
         }

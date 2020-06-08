@@ -3,6 +3,7 @@ const tweetsController = require('../controllers/tweetsController')
 const adminController = require('../controllers/adminController')
 const replyController = require('../controllers/replyController')
 const passport = require('../config/passport')
+const helpers = require("../_helpers")
 
 // 上傳圖片
 const multer = require('multer')
@@ -11,15 +12,15 @@ const upload = multer({
 })
 
 const authenticated = (req, res, next) => {
-  if (req.isAuthenticated()) {
+  if (helpers.ensureAuthenticated(req)) {
     return next()
   }
   res.redirect('/signin')
 }
 
 const authenticatedAdmin = (req, res, next) => {
-  if (req.isAuthenticated()) {
-    if (req.user.role) { return next() }
+  if (helpers.ensureAuthenticated(req)) {
+    if (helpers.getUser(req).role) { return next() }
     return next()
     // return res.redirect('/admin/tweets')
   }
@@ -40,7 +41,7 @@ module.exports = (app) => {
   app.post('/users/:id/edit', authenticated, upload.single('avatar'), userController.postEdit)
 
   app.post('/followships', authenticated, userController.addFollowing)
-  app.delete('/followships/:userId', authenticated, userController.deleteFollowing)
+  app.delete('/followships/:id', authenticated, userController.deleteFollowing)
 
   app.get('/users/:id/blockings', authenticated, userController.getBlockings)
   app.post('/blockships', authenticated, userController.postBlock)

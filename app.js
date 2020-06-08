@@ -32,7 +32,7 @@ const db = require('./models')
 const User = db.User
 const { Op } = require('sequelize')
 
-// use helpers.getUser(req) to replace req.user
+// use helpers.getUser(req) to replace helpers.getUser(req)
 // use helpers.ensureAuthenticated(req) to replace req.isAuthenticated()
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
@@ -56,8 +56,8 @@ app.use(passport.session())
 app.use((req, res, next) => {
   res.locals.success_messages = req.flash('success_messages')
   res.locals.error_messages = req.flash('error_messages')
-  res.locals.user = req.user
-  user = req.user
+  res.locals.user = helpers.getUser(req)
+  user = helpers.getUser(req)
   next()
 })
 
