@@ -55,17 +55,17 @@ const tweetController = {
       limit: 10,
       order: [["createdAt", "DESC"]],
       include: [
-        User,
+        // User,
         Reply,
-        { model: User, as: 'LikedUsers' }
-        // {
-        //   model: User,
-        //   where: {
-        //     id: {
-        //       [Op.eq]: 22
-        //     }
-        //   }
-        // }
+        { model: User, as: 'LikedUsers' },
+        {
+          model: User,
+          where: {
+            id: {
+              [Op.eq]: 22
+            }
+          }
+        }
       ]
     })
 
