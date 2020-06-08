@@ -58,7 +58,7 @@ const tweetController = {
     // 擋掉封鎖的人的動態
     let count = 0
     tweets = tweets.filter(tweet => {
-      return !(blockshipsIdArr.includes(tweet.User.id)) && count++ < 10
+      return !(blockshipsIdArr.includes(tweet.User.dataValues.id)) && count++ < 10
     })
 
     let users = await User.findAll({
