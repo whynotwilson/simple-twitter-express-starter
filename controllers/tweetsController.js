@@ -39,6 +39,20 @@ const tweetController = {
     //   }
     // })
 
+    let usersTest = await User.findAll({
+      limit: 3,
+      include: [
+        Tweet
+      ]
+    })
+
+    console.log('')
+    console.log('')
+    console.log('')
+    console.log('usersTest', usersTest)
+
+
+
     let tweets = await Tweet.findAll({
       limit: 10,
       order: [["createdAt", "DESC"]],
@@ -58,10 +72,10 @@ const tweetController = {
       replyCount: tweet.Replies ? tweet.Replies.length : 0
     }))
 
-    console.log('')
-    console.log('')
-    console.log('')
-    console.log('tweets[0]', tweets[0])
+    // console.log('')
+    // console.log('')
+    // console.log('')
+    // console.log('tweets[0]', tweets[0])
 
     // 擋掉封鎖的人的動態
     // let count = 0
