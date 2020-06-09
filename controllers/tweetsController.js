@@ -6,42 +6,22 @@ const Reply = db.Reply;
 const Tag = db.Tag;
 const Blockship = db.Blockship;
 const helpers = require("../_helpers");
-const Op = require('Sequelize').Op;
+const sequelize = require('sequelize');
+const Op = require('sequelize').Op;
 
 const tweetController = {
   getTweets: async (req, res) => {
 
-    let blockships = await Blockship.findAll({
-      where: {
-        [Op.or]: [
-          { blockerId: req.user.id },
-          { blockingId: req.user.id }
-        ]
-      }
-    })
-
-    blockships = blockships.map(blockship => ({
-      ...blockship.dataValues
-    }))
-
-    // blockshipsIdArr = 封鎖我的人 && 我封鎖的人的 ID
-    const blockshipsIdArr = []
-
-    blockships.forEach(blockship => {
-      if (blockship.blockerId !== req.user.id) {
-        blockshipsIdArr.push(blockship.blockerId)
-      }
-      if (blockship.blockingId !== req.user.id) {
-        blockshipsIdArr.push(blockship.blockingId)
-      }
-    })
-
     let tweets = await Tweet.findAll({
-      order: [["createdAt", "DESC"]],
+      limit: 50,
+      order: [['createdAt', 'DESC']],
       include: [
-        User,
         Reply,
-        { model: User, as: 'LikedUsers' }
+        { model: User, as: 'LikedUsers' },
+        {
+          model: User,
+          where: { id: sequelize.col('tweet.UserId') }
+        }
       ]
     })
 
@@ -54,13 +34,17 @@ const tweetController = {
       replyCount: tweet.Replies.length
     }))
 
+    // 擋掉封鎖的人的 tweets
     let count = 0
-
     tweets = tweets.filter(tweet => {
-      return !(blockshipsIdArr.includes(tweet.User.id)) && count++ < 10
+      return !req.user.Blockings.map(b => b.id).includes(tweet.User.id) &&
+        !req.user.Blockers.map(b => b.id).includes(tweet.User.id) &&
+        count++ < 10
     })
 
     let users = await User.findAll({
+      raw: true,
+      nest: true,
       order: [['createdAt', 'DESC']],
       include: [
         { model: User, as: 'Followers' }
@@ -68,14 +52,17 @@ const tweetController = {
     })
 
     users = users.map(user => ({
-      ...user.dataValues,
+      ...user,
       followersCount: user.Followers.length,
       isFollowed: helpers.getUser(req).Followings.map(d => d.id).includes(user.id)
     }))
 
+    // 擋掉封鎖的人的 Popular User 頁面
     count = 0
     users = users.filter(user => {
-      return !(blockshipsIdArr.includes(user.id)) && count++ < 10
+      return !req.user.Blockings.map(b => b.id).includes(user.id) &&
+        !req.user.Blockers.map(b => b.id).includes(user.id) &&
+        count++ < 10
     })
 
     users.sort((a, b) => b.followersCount - a.followersCount)
