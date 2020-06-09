@@ -23,9 +23,7 @@ const adminController = {
             required: false,
             include: [
               {
-                model: User,
-                where: { id: sequelize.col('replies.UserId') },
-                required: false
+                model: User
               }
             ]
           },
@@ -33,10 +31,7 @@ const adminController = {
             model: User,
             as: 'LikedUsers'
           },
-          {
-            model: User,
-            where: { id: sequelize.col('tweet.UserId') }
-          }
+          User
         ],
         order: [['id', 'ASC']],
         offset: offset,
