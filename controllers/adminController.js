@@ -41,7 +41,7 @@ const adminController = {
         order: [['id', 'ASC']],
         offset: offset,
         limit: pageLimit,
-        distinct: true // 這行是為了 result.count 正確，沒加會不正確
+        // distinct: true // 這行是為了 result.count 正確，沒加會不正確
 
         /*
           Tweet.findAndCountAll 資料內容格式
