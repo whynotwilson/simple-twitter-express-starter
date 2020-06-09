@@ -20,7 +20,7 @@ const userController = {
 
   getTweets: async (req, res) => {
     try {
-      let blockships = await Blockship.findAll({
+      /*let blockships = await Blockship.findAll({
         where: {
           [Op.or]: [
             { blockerId: helpers.getUser(req).id },
@@ -47,7 +47,7 @@ const userController = {
 
       if (blockshipsIdArr.includes(Number(req.params.id))) {
         return res.render('getBlockMessage')
-      }
+      }*/
 
       const otherUserId = Number(req.params.id)
       let isOwner = false
@@ -443,16 +443,14 @@ const userController = {
         return res.redirect('back')
       }
 
-      const userId = Number(req.params.id);
 
       const { file } = req;
       if (file) {
         imgur.setClientID(IMGUR_CLIENT_ID)
-        // const data = fs.readFileSync(file.path);
-        // const writeFile = fs.writeFileSync(`upload/${file.originalname}`, data);
+
         const uploadImage = await imgur.upload(file.path, async (err, image) => {
           try {
-            const updateUser = await User.findByPk(userId).then((user) => {
+            const updateUser = await User.findByPk(helpers.getUser(req).id).then((user) => {
               user.update({
                 name: req.body.name,
                 introduction: req.body.introduction,
@@ -460,30 +458,24 @@ const userController = {
               });
             });
             req.flash('success_messages', "個人資料已成功修改")
-            return res.redirect(`/users/${userId}/tweets`);
+            return res.redirect(`/users/${helpers.getUser(req).id}/tweets`);
           } catch (error) {
             console.log('error', error)
           }
 
         })
       } else {
-        User.findByPk(userId).then((user) => {
+        return User.findByPk(helpers.getUser(req).id).then((user) => {
           user.update({
+            ...user,
             name: req.body.name,
             introduction: req.body.introduction,
+            avatar: user.avatar
+          }).then(user => {
+            req.flash('success_messages', "個人資料已成功修改")
+            res.redirect(`/users/${helpers.getUser(req).id}/tweets`);
           })
-
-          req.flash('success_messages', "個人資料已成功修改")
-          return res.redirect(`/users/${userId}/tweets`);
         })
-
-        /*let updateUser = await User.findByPk(userId).then((user) => {
-          user.update({
-            name: req.body.name,
-            introduction: req.body.introduction,
-            avatar: this.avatar,
-          });
-        });*/
 
       }
     } catch (error) {
