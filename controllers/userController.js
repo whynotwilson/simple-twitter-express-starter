@@ -317,7 +317,7 @@ const userController = {
         FollowersNumber: userData.Followers.length,
         FollowingsNumber: userData.Followings.length,
         LikesNumber: userData.Likes.length,
-        isFollowing: req.user.Followings.map(d => d.id).includes(userId)
+        isFollowing: helpers.getUser(req).Followings.map(d => d.id).includes(userId)
       }
 
       const tweetsData = await Tweet.findAll({
@@ -355,7 +355,7 @@ const userController = {
 
     try {
       if (helpers.getUser(req).id === Number(req.body.id)) {
-        return res.redirect("back");
+        return res.render('tweets')
 
       } else {
         const findOne = await Followship.findOne({
@@ -380,6 +380,8 @@ const userController = {
 
     } catch (error) {
       console.log("error", error);
+      return res.redirect("back");
+
     }
 
   },
