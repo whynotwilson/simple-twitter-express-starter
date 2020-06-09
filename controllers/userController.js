@@ -96,7 +96,7 @@ const userController = {
           { model: User, as: 'LikedUsers' },
           {
             model: User,
-            where: { id: sequelize.col('tweet.UserId') }
+            // where: { id: sequelize.col('tweet.UserId') }
           },
         ]
       })
@@ -323,7 +323,7 @@ const userController = {
       const tweetsData = await Tweet.findAll({
         include: [{
           model: User,
-          where: { id: sequelize.col('tweet.UserId') }
+          // where: { id: sequelize.col('tweet.UserId') }
         }, Like, Reply]
       })
 
