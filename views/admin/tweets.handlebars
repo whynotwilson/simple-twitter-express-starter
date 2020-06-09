@@ -10,6 +10,32 @@
       <br />
     </div>
 
+    {{!-- 分頁欄 --}}
+    <div class="col-md-12 mb-3">
+      <nav aria-label="Page navigation example">
+        <ul class="pagination">
+          <li class="page-item">
+            <a class="page-link" href="/admin/tweets?page={{prev}}" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          {{#each totalPage}}
+            {{#ifCond this ../page}}
+              <li class="page-item active"><a class="page-link" href="#">{{this}}</a></li>
+            {{else}}
+              <li class="page-item"><a class="page-link"
+                  href="/admin/tweets?page={{this}}">{{this}}</a></li>
+            {{/ifCond}}
+          {{/each}}
+          <a class="page-link" href="/admin/tweets?page={{next}}" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+    
+    {{!-- 主體 --}}
     <div class="col-md-12">
       {{#each tweets}}
       <div class="col-md-12  border rounded mb-5" style="background-color: #eeeeee;">
@@ -59,7 +85,7 @@
                 <img class="rounded-circle" style="max-height: 30px;" src="{{this.User.avatar}}" alt="avatar">
               </div>
               <div class="col-md-10" style="background-color: #dfdfdf;  border-radius: 10px;">
-                <strong>{{this.User.name}}</strong>
+                <strong><a href="/users/{{this.User.id}}/tweets">{{this.User.name}}</a></strong>
                 <p>{{this.comment}}</p>
               </div>
               <div class="pl-1"></div>

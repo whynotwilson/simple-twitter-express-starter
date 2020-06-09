@@ -1,6 +1,11 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   const Tweet = sequelize.define('Tweet', {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true
+    },
     description: DataTypes.TEXT,
     UserId: {
       type: DataTypes.INTEGER,
