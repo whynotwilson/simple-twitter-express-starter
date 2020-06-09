@@ -443,7 +443,7 @@ const userController = {
         return res.redirect('back')
       }
 
-      const userId = req.params.id;
+      const userId = Number(req.params.id);
 
       const { file } = req;
       if (file) {
@@ -467,16 +467,24 @@ const userController = {
 
         })
       } else {
-        const updateUser = await User.findByPk(userId).then((user) => {
+        User.findByPk(userId).then((user) => {
+          user.update({
+            name: req.body.name,
+            introduction: req.body.introduction,
+          })
+
+          req.flash('success_messages', "個人資料已成功修改")
+          return res.redirect(`/users/${userId}/tweets`);
+        })
+
+        /*let updateUser = await User.findByPk(userId).then((user) => {
           user.update({
             name: req.body.name,
             introduction: req.body.introduction,
             avatar: this.avatar,
           });
-        });
+        });*/
 
-        req.flash('success_messages', "個人資料已成功修改")
-        return res.redirect(`/users/${userId}/tweets`);
       }
     } catch (error) {
       console.log("error", error);
