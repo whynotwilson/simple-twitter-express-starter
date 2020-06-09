@@ -18,10 +18,7 @@ const tweetController = {
       include: [
         Reply,
         { model: User, as: 'LikedUsers' },
-        {
-          model: User,
-          where: { id: sequelize.col('tweet.UserId') }
-        }
+        User
       ]
     })
 

@@ -94,10 +94,7 @@ const userController = {
           Like,
           { model: Reply, include: [User] },
           { model: User, as: 'LikedUsers' },
-          {
-            model: User,
-            // where: { id: sequelize.col('tweet.UserId') }
-          },
+          User
         ]
       })
 
@@ -321,15 +318,17 @@ const userController = {
       }
 
       const tweetsData = await Tweet.findAll({
-        include: [{
-          model: User,
-          // where: { id: sequelize.col('tweet.UserId') }
-        }, Like, Reply]
+        include: [User, Like, Reply]
       })
 
       const likedTweets = JSON.parse(JSON.stringify(tweetsData)).filter(tweet =>
         userData.Likes.map(like => like.TweetId).includes(tweet.id)
       )
+
+      console.log('')
+      console.log('')
+      console.log('')
+      console.log('likedTweets', likedTweets)
 
       const tweets = likedTweets.map(tweet => ({
         id: tweet.id,
