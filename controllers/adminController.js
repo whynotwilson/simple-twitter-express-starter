@@ -66,6 +66,7 @@ const adminController = {
       console.log('')
       console.log('')
       console.log('')
+      console.log('total Count', result.count)
       console.log('pageLimit', pageLimit)
       console.log('offset', offset)
       console.log('page', page)
@@ -73,7 +74,7 @@ const adminController = {
       console.log('totalPage', totalPage)
       console.log('prev', prev)
       console.log('next', next)
-      console.log('tweets Id Array', result.rows.map(r => r.id))
+      console.log('tweets ID Array', result.rows.map(r => r.id))
 
       let tweets = result.rows.map(r => ({
         ...r.dataValues,
