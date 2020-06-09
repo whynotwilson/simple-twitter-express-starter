@@ -69,6 +69,7 @@ const tweetController = {
 
     return res.render('tweets', { tweets, users })
   },
+
   postTweets: (req, res) => {
     const tweetsDesc = req.body.tweets.trim();
 

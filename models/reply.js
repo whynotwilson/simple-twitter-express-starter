@@ -2,8 +2,20 @@
 module.exports = (sequelize, DataTypes) => {
   const Reply = sequelize.define('Reply', {
     comment: DataTypes.STRING,
-    UserId: DataTypes.INTEGER,
-    TweetId: DataTypes.INTEGER
+    UserId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'users',
+        key: 'id'
+      }
+    },
+    TweetId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'tweets',
+        key: 'id'
+      }
+    }
   }, {});
   Reply.associate = function (models) {
     Reply.belongsTo(models.User)

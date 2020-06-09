@@ -2,48 +2,103 @@ const db = require('../models')
 const User = db.User
 const Tweet = db.Tweet
 const Reply = db.Reply
+const sequelize = require('sequelize')
 const moment = require('moment')
+const pageLimit = 20
 
 const adminController = {
   getTweets: async (req, res) => {
     try {
-      let tweets = await Tweet.findAll({
-        include: [User,
-          { model: Reply, include: [User] },
-          { model: User, as: 'LikedUsers' }
+      let offset = 0
+
+      // 計算目前頁數
+      if (req.query.page - 1) {
+        offset = (req.query.page - 1) * pageLimit
+      }
+
+      const result = await Tweet.findAndCountAll({
+        include: [
+          {
+            model: Reply,
+            required: false,
+            include: [
+              {
+                model: User,
+                where: { id: sequelize.col('replies.UserId') },
+                required: false
+              }
+            ]
+          },
+          {
+            model: User,
+            as: 'LikedUsers'
+          },
+          {
+            model: User,
+            where: { id: sequelize.col('tweet.UserId') }
+          }
         ],
-        //limit: 50
+        order: [['id', 'ASC']],
+        offset: offset,
+        limit: pageLimit,
+        // distinct: true // 這行是為了 result.count 正確，沒加會不正確
+
+        /*
+          Tweet.findAndCountAll 資料內容格式
+          result: {
+            count : 總筆數
+            rows: [
+              { tweet },
+              { tweet },
+              ...
+            ]
+          }
+        */
       })
 
-      // 整理 tweets 資料，把 dataValues 都拿掉
-      // ex: tweets.dataValues.User.dataValues => tweets.User
-      // ex: tweets.dataValues.Replies.dataValues.User.dataValues => tweets.Replies.User
-      tweets = tweets.map(tweet => ({
-        ...tweet.dataValues,
+      // 分頁資料
+      const page = Number(req.query.page || 1)
+      const pages = Math.ceil(result.count / pageLimit)
+      const totalPage = Array.from({ length: pages }).map((item, index) => index + 1)
+      const prev = page - 1 < 1 ? 1 : page - 1
+      const next = page + 1 > pages ? pages : page + 1
 
-        User: tweet.dataValues.User.dataValues,
+      console.log('')
+      console.log('')
+      console.log('')
+      console.log('')
+      console.log('total Count', result.count)
+      console.log('pageLimit', pageLimit)
+      console.log('offset', offset)
+      console.log('page', page)
+      console.log('pages', pages)
+      console.log('totalPage', totalPage)
+      console.log('prev', prev)
+      console.log('next', next)
+      console.log('tweets ID Array', result.rows.map(r => r.id))
 
-        Replies: tweet.dataValues.Replies.map(reply => ({
+      let tweets = result.rows.map(r => ({
+        ...r.dataValues,
+        User: r.User.dataValues,
+        Replies: r.Replies.map(reply => ({
           ...reply.dataValues,
           User: reply.User.dataValues
         })),
-
-        LikedUsers: tweet.dataValues.LikedUsers.map(user => ({
+        LikedUsers: r.LikedUsers.map(user => ({
           ...user.dataValues
         })),
-
-        description: tweet.description ? tweet.description : '',
-        updatedAt: tweet.updatedAt ? moment(tweet.updatedAt).format('YYYY-MM-DD, hh:mm') : '-',
-        likedCount: tweet.LikedUsers.length
+        likedCount: r.LikedUsers.length
       }))
 
       tweets = tweets.sort((a, b) =>
         b.likedCount - a.likedCount
       )
 
-      return res.render('admin/tweets', { tweets })
+      return res.render('admin/tweets', { tweets, page, totalPage, prev, next })
     } catch (error) {
       console.log(error)
+      req.flash('error_messages', { error_messages: '資料庫異常，返回首頁' })
+      return res.redirect('back')
     }
   },
 
