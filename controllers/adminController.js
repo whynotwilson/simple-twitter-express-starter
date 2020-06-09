@@ -20,6 +20,7 @@ const adminController = {
         include: [
           {
             model: Reply,
+            required: false,
             include: [
               {
                 model: User,
@@ -62,6 +63,12 @@ const adminController = {
       const totalPage = Array.from({ length: pages }).map((item, index) => index + 1)
       const prev = page - 1 < 1 ? 1 : page - 1
       const next = page + 1 > pages ? pages : page + 1
+
+      console.log('')
+      console.log('')
+      console.log('')
+      console.log('page', page)
+      console.log('tweets Id Array', result.rows.map(r => r.id))
 
       let tweets = result.rows.map(r => ({
         ...r.dataValues,
