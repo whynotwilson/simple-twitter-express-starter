@@ -15,13 +15,17 @@
   },
   "production": {
     "use_env_variable": "CLEARDB_DATABASE_URL",
-    "dialect": "postgres",
     "protocol": "postgres",
     "dialectOptions": {
       "ssl": {
         "require": true,
         "rejectUnauthorized": false
       }
-    }
+    },
+    "username": "b824b244894187",
+    "password": "f766a860",
+    "database": "heroku_13e671b97fcbfa0",
+    "host": "us-cdbr-east-05.cleardb.net",
+    "dialect": "mysql"
   }
 }
