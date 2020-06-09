@@ -20,6 +20,7 @@ const adminController = {
         include: [
           {
             model: Reply,
+            required: false,
             include: [
               {
                 model: User,
