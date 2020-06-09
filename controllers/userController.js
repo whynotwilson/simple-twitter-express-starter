@@ -351,7 +351,7 @@ const userController = {
       console.log("error", error);
     }
   },
-  addFollowing: (req, res) => {
+  addFollowing: async (req, res) => {
 
     try {
       if (helpers.getUser(req).id === Number(req.body.id)) {
