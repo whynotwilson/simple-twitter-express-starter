@@ -100,7 +100,7 @@ module.exports = {
       Array.from({ length: 200 }).map(d =>
         ({
           description: faker.lorem.text(),
-          userId: Math.floor(Math.random() * 22) + 2,
+          UserId: Math.floor(Math.random() * 22) + 2,
           createdAt: new Date(),
           updatedAt: new Date(),
         })
