@@ -70,55 +70,39 @@ const tweetController = {
     return res.render('tweets', { tweets, users })
   },
 
-  postTweets: (req, res) => {
-    const tweetsDesc = req.body.tweets.trim();
+  postTweets: async (req, res) => {
 
-    if (tweetsDesc !== "" && tweetsDesc.length <= 140) {
-
-      /*if (req.body.taggedId !== undefined) {
-        Tweet.create({
-          description: tweetsDesc,
-          UserId: helpers.getUser(req).id,
-        }).then((tweet) => {
-          if (typeof (req.body.taggedId) === 'string') {
-            Tag.create({
-              TaggedUserId: Number(req.body.taggedId),
-              TweetId: tweet.id
-            }).then((tag) => {
-              return res.redirect('/tweets')
-            })
-          } else {
-            req.body.taggedId.forEach((id) => {
-              Tag.create({
-                TaggedUserId: Number(id),
-                TweetId: tweet.id
-              }).then((tag) => {
-                return res.redirect('/tweets')
-              })
-            })
-
-          }
-
-        })
-      } else {
-        Tweet.create({
-          description: tweetsDesc,
-          UserId: helpers.getUser(req).id,
-        }).then((tweet) => {
-          return res.redirect('/tweets')
-        });
-      }*/
-      Tweet.create({
-        description: tweetsDesc,
-        UserId: helpers.getUser(req).id,
-      }).then((tweet) => {
-        return res.redirect('/tweets')
-      });
-
-    } else {
-      req.flash('error_messages', { error_messages: '輸入不可為空白！' });
-      return res.redirect("/tweets");
+    const description = req.body.description
+    if (!req.body.description) {
+      req.flash('error_messages', '輸入不可為空白！')
+      return res.redirect('back')
+    } else if (description.length > 140) {
+      req.flash('error_messages', '最多 140 字！')
+      return res.redirect('back')
     }
+    try {
+      await Tweet.create({
+        description,
+        UserId: helpers.getUser(req).id
+      })
+      return res.redirect('/tweets')
+    } catch (error) {
+      console.error(error)
+      req.flash('error_messages', { messages: '新增 Tweets 失敗，請稍後嘗試！' })
+      return res.redirect('back')
+    }
+    // if (tweetsDesc !== "" && tweetsDesc.length <= 140) {
+    //   Tweet.create({
+    //     description: tweetsDesc,
+    //     UserId: helpers.getUser(req).id,
+    //   }).then((tweet) => {
+    //     return res.redirect('/')
+    //   });
+
+    // } else {
+    //   req.flash('error_messages', { error_messages: '輸入不可為空白！' });
+    //   return res.redirect("/tweets");
+    // }
   },
   addLike: (req, res) => {
     return Like.create({
