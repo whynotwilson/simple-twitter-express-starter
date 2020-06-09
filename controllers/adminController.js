@@ -20,7 +20,6 @@ const adminController = {
         include: [
           {
             model: Reply,
-            required: false,
             include: [
               {
                 model: User,
@@ -31,8 +30,7 @@ const adminController = {
           },
           {
             model: User,
-            as: 'LikedUsers',
-            required: false
+            as: 'LikedUsers'
           },
           {
             model: User,
