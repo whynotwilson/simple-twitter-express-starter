@@ -24,7 +24,7 @@ const adminController = {
             include: [
               {
                 model: User,
-                where: { id: sequelize.col('replies.UserId') },
+                where: { id: sequelize.col('Replies.UserId') },
                 required: false
               }
             ]
