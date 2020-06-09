@@ -9,6 +9,8 @@ const session = require('express-session')
 const methodOverride = require('method-override')
 
 const app = express()
+const port = process.env.PORT || 3000
+
 const http = require('http').createServer(app)
 const io = require('socket.io')(http)
 
@@ -22,7 +24,6 @@ io.use((socket, next) => {
   sessionMiddleware(socket.request, socket.request.res || {}, next)
 })
 
-const port = process.env.PORT || 3000
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }

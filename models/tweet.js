@@ -1,8 +1,19 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   const Tweet = sequelize.define('Tweet', {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true
+    },
     description: DataTypes.TEXT,
-    UserId: DataTypes.INTEGER
+    UserId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'users',
+        key: 'id'
+      }
+    }
   }, {});
   Tweet.associate = function (models) {
     Tweet.hasMany(models.Like)

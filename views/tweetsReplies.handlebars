@@ -84,9 +84,10 @@
       {{/ifNotCond}}
 
       {{#ifNotCond currentUserId targetUser.id}}
-        <a class="btn btn-primary" href="/tweets/{{tweet.id}}/replies" role="button" onclick="window.open('http://localhost:3000/chat/{{targetUser.id}}?cid={{currentUserId}}', '_blank', 'Chatroom, height=592, width=500')">
-          Chat With {{targetUser.name}}
-        </a>
+      <a class="btn btn-primary" href="/tweets/{{tweet.id}}/replies" role="button"
+        onclick="window.open('https://ac-simple-twitter-starter.herokuapp.com/chat/{{targetUser.id}}?cid={{currentUserId}}', '_blank', 'Chatroom, height=592, width=500')">
+        Chat With {{targetUser.name}}
+      </a>
       {{/ifNotCond}}
     </div>
   </div>

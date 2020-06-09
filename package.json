@@ -1,6 +1,9 @@
 {
   "name": "test",
   "version": "1.0.0",
+  "engines": {
+    "node": "10.15.x"
+  },
   "description": "",
   "main": "app.js",
   "scripts": {
@@ -36,6 +39,7 @@
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
+    "pg": "^8.2.1",
     "sequelize": "^4.42.0",
     "sequelize-cli": "^5.5.0",
     "sinon": "^7.2.3",
