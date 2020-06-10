@@ -24,7 +24,7 @@
             <h5 class="card-title">
               <a href="/users/{{ this.User.id }}/tweets">{{ this.User.name }}</a>
             </h5>
-            <p class="card-text">{{ this.description }}</p>
+            <p class="card-text">{{{ this.description }}}</p>
             <p class="card-text"><small class="text-muted">{{ fromNow this.createdAt }}</small></p>
           </div>
           <div class="card-body text-right inline-block mt-1">
