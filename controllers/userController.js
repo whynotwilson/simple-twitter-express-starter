@@ -119,72 +119,54 @@ const userController = {
   },
   getFollowings: async (req, res) => {
     try {
-      let blockships = await Blockship.findAll({
-        where: {
-          [Op.or]: [
-            { blockerId: req.user.id },
-            { blockingId: req.user.id }
-          ]
-        }
-      })
+      const otherUserId = Number(req.params.id)
 
-      blockships = JSON.parse(JSON.stringify(blockships)).map(blockship => ({
-        ...blockship
-      }))
+      let isOwner = false
+      if (otherUserId === helpers.getUser(req).id) {
+        isOwner = true
+      }
 
-      // blockshipsIdArr = 封鎖我的人 && 我封鎖的人的 ID
-      const blockshipsIdArr = []
-
-      blockships.forEach(blockship => {
-        if (blockship.blockerId !== req.user.id) {
-          blockshipsIdArr.push(blockship.blockerId)
-        }
-        if (blockship.blockingId !== req.user.id) {
-          blockshipsIdArr.push(blockship.blockingId)
-        }
-      })
-
-      if (blockshipsIdArr.includes(Number(req.params.id))) {
+      // 判斷是否 我有封鎖他 or 他有封鎖我
+      if (req.user.Blockings.map(b => b.id).includes(otherUserId) ||
+          req.user.Blockings.map(b => b.id).includes(otherUserId)) {
         return res.render('getBlockMessage')
       }
 
-      const userId = Number(req.params.id)
-      let isOwner = userId === helpers.getUser(req).id ? true : false;
-
-      let userData = await User.findByPk(userId) ? await User.findByPk(userId, {
+      let otherUser = await User.findByPk(otherUserId, {
         include: [
           { model: User, as: 'Followers' },
-          { model: User, as: 'Followings', },
+          { model: User, as: 'Followings' },
           Like,
-          Tweet,
-          Reply
-        ],
-      }) : null
+          Tweet
+        ]
+      })
 
-      if (!userData) {
-        throw new Error("user is not found");
+      if (!otherUser) {
+        throw new Error('otherUser is not found')
+      }
+      // ------------------ otherUser 資料整理 -------------------
+      otherUser = {
+        ...otherUser.dataValues,
+        introduction: otherUser.introduction.substring(0, 30),
+        Followers: otherUser.Followers.map(follower => ({
+          ...follower.dataValues
+        })),
+        Followings: otherUser.Followings.map(following => ({
+          ...following.dataValues,
+          introduction: following.introduction.substring(0, 30),
+          isFollowing: req.user.Followings.map(f => f.id).includes(following.id)
+        })),
+        Tweet: otherUser.Tweets.map(tweet => ({
+          ...tweet.dataValues
+        })),
+        isFollowing: otherUser.Followers.map(d => d.id).includes(req.user.id)
       }
 
-      userData = {
-        ...userData.toJSON(),
-        introduction: userData.introduction,
-        TweetsNumber: userData.Tweets.length,
-        FollowersNumber: userData.Followers.length,
-        FollowingsNumber: userData.Followings.length,
-        LikesNumber: userData.Likes.length,
-        isFollowed: helpers.getUser(req).Followings.map(d => d.id).includes(userId)
-      }
-
-      const followings = userData.Followings.map(following => ({
-        id: following.id,
-        avatar: following.avatar,
-        name: following.name,
-        introduction: following.introduction ? following.introduction.substring(0, 20) : null,
-      }))
-
-      return res.render('getFollowings', { userData, followings: followings, isOwner })
+      return res.render('getFollowings', { otherUser, followings: otherUser.Followings, isOwner })
     } catch (error) {
-      console.log("error", error);
+      console.log('error', error)
+      req.flash('error_messages', { error_messages: '資料庫異常，請重新操作' })
+      return res.redirect('back')
     }
   },
   getFollowers: async (req, res) => {
@@ -219,7 +201,9 @@ const userController = {
         ...otherUser.dataValues,
         introduction: otherUser.introduction.substring(0, 30),
         Followers: otherUser.Followers.map(follower => ({
-          ...follower.dataValues
+          ...follower.dataValues,
+          introduction: follower.introduction.substring(0, 30),
+          isFollowing: req.user.Followings.map(f => f.id).includes(follower.id)
         })),
         Followings: otherUser.Followings.map(following => ({
           ...following.dataValues
@@ -230,22 +214,7 @@ const userController = {
         isFollowing: otherUser.Followers.map(d => d.id).includes(req.user.id)
       }
 
-      // ------------------ followers 資料整理 -------------------
-      let followers = await User.findByPk(otherUserId, {
-        include: [{ model: User, as: 'Followers' }]
-      })
-
-      followers = followers.dataValues.Followers.map(follower => ({
-        ...follower.dataValues
-      }))
-
-      followers = followers.map(follower => ({
-        ...follower,
-        introduction: follower.introduction.substring(0, 30),
-        isFollowing: req.user.Followings.map(f => f.id).includes(follower.id)
-      }))
-
-      return res.render('getFollowers', { otherUser, followers, isOwner })
+      return res.render('getFollowers', { otherUser, followers: otherUser.Followers, isOwner })
     } catch (error) {
       console.log('error', error)
       req.flash('error_messages', { error_messages: '資料庫異常，請重新操作' })
