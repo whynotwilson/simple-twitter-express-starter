@@ -3,60 +3,112 @@ const Tweet = db.Tweet;
 const User = db.User;
 const Like = db.Like;
 const Reply = db.Reply;
+const Tag = db.Tag;
+const Blockship = db.Blockship;
 const helpers = require("../_helpers");
+const sequelize = require('sequelize');
+const Op = require('sequelize').Op;
 
 const tweetController = {
-  getTweets: (req, res) => {
-    Tweet.findAll({
-      limit: 10,
-      order: [["createdAt", "DESC"]],
+  getTweets: async (req, res) => {
+
+    let tweets = await Tweet.findAll({
+      limit: 50,
+      order: [['createdAt', 'DESC']],
       include: [
-        User,
         Reply,
-        { model: User, as: 'LikedUsers' }
-      ],
-    }).then((tweets) => {
-      tweets = tweets.map((tweet) => ({
-        ...tweet.dataValues,
-        User: tweet.User.dataValues,
-        description: tweet.description.substring(0, 100),
-        isLiked: tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id),
-        likedCount: tweet.LikedUsers.length,
-        replyCount: tweet.Replies.length
-      }));
+        { model: User, as: 'LikedUsers' },
+        {
+          model: User,
+          where: { id: sequelize.col('tweet.UserId') }
+        }
+      ]
+    })
 
-      User.findAll({
-        limit: 10,
-        order: [["createdAt", "DESC"]],
-        include: [
-          { model: User, as: 'Followers' }
-        ]
-      }).then((users) => {
-        users = users.map(user => ({
-          ...user.dataValues,
-          followersCount: user.Followers.length,
-          isFollowed: helpers.getUser(req).Followings.map(d => d.id).includes(user.id)
-        }))
+    tweets = tweets.map((tweet) => ({
+      ...tweet.dataValues,
+      User: tweet.User.dataValues,
+      description: tweet.description,
+      isLiked: tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id),
+      likedCount: tweet.LikedUsers.length,
+      replyCount: tweet.Replies.length
+    }))
 
-        users.sort((a, b) => b.followersCount - a.followersCount)
+    // 擋掉封鎖的人的 tweets
+    let count = 0
+    tweets = tweets.filter(tweet => {
+      return !req.user.Blockings.map(b => b.id).includes(tweet.User.id) &&
+        !req.user.Blockers.map(b => b.id).includes(tweet.User.id) &&
+        count++ < 10
+    })
 
-        return res.render("tweets", {
-          tweets,
-          users,
-        });
-      });
-    });
+    let users = await User.findAll({
+      raw: true,
+      nest: true,
+      order: [['createdAt', 'DESC']],
+      include: [
+        { model: User, as: 'Followers' }
+      ]
+    })
+
+    users = users.map(user => ({
+      ...user,
+      followersCount: user.Followers.length,
+      isFollowed: helpers.getUser(req).Followings.map(d => d.id).includes(user.id)
+    }))
+
+    // 擋掉封鎖的人的 Popular User 頁面
+    count = 0
+    users = users.filter(user => {
+      return !req.user.Blockings.map(b => b.id).includes(user.id) &&
+        !req.user.Blockers.map(b => b.id).includes(user.id) &&
+        count++ < 10
+    })
+
+    users.sort((a, b) => b.followersCount - a.followersCount)
+
+    return res.render('tweets', { tweets, users })
   },
+
   postTweets: (req, res) => {
     const tweetsDesc = req.body.tweets.trim();
 
     if (tweetsDesc !== "" && tweetsDesc.length <= 140) {
-      Tweet.create({
-        description: tweetsDesc,
-        UserId: helpers.getUser(req).id,
-      }).then((tweet) => {
-        return res.redirect('/tweets')
-      });
+
+      if (req.body.taggedId) {
+        Tweet.create({
+          description: tweetsDesc,
+          UserId: helpers.getUser(req).id,
+        }).then((tweet) => {
+          if (typeof (req.body.taggedId) === 'string') {
+            Tag.create({
+              TaggedUserId: Number(req.body.taggedId),
+              TweetId: tweet.id
+            })
+          } else {
+            req.body.taggedId.forEach((id) => {
+              Tag.create({
+                TaggedUserId: Number(id),
+                TweetId: tweet.id
+              })
+            })
+
+          }
+          return tweet
+
+        }).then((tweet) => {
+          return res.redirect('/tweets')
+        })
+      } else {
+        Tweet.create({
+          description: tweetsDesc,
+          UserId: helpers.getUser(req).id,
+        }).then((tweet) => {
+          return res.redirect('/tweets')
+        });
+      }
+
+
     } else {
       req.flash('error_messages', { error_messages: '輸入不可為空白！' });
       return res.redirect("/tweets");

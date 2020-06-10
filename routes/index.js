@@ -42,6 +42,10 @@ module.exports = (app) => {
   app.post('/followships', authenticated, userController.addFollowing)
   app.delete('/followships/:userId', authenticated, userController.deleteFollowing)
 
+  app.get('/users/:id/blockings', authenticated, userController.getBlockings)
+  app.post('/blockships', authenticated, userController.postBlock)
+  app.delete('/blockships/:id', authenticated, userController.deleteBlock)
+
   // signin / logout / signup
   app.get('/signup', userController.signUpPage)
   app.post('/signup', userController.signUp)
@@ -65,6 +69,6 @@ module.exports = (app) => {
 
   // chat
   app.get('/chat/:id', authenticated, (req, res) => {
-    res.sendFile(process.cwd() + '/public/index.html')
+    res.sendFile(process.cwd() + '/public/chatroom.html')
   })
 }

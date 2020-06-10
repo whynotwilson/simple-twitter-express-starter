@@ -67,20 +67,20 @@
     </div>
     <div class='text-right d-flex justify-content-between'>
       {{#ifNotCond currentUserId targetUser.id}}
-        {{#if targetUser.isFollowed}}
-        <form action="/followships/{{targetUser.id}}?_method=DELETE" method='POST'>
-          <button type='submit' class='btn btn-danger'>
-            Unfollow <i class='fa fa-user px-2' aria-hidden='true'></i>
-          </button>
-        </form>
-        {{else}}
-        <form action='/followships/{{targetUser.id}}' method='POST'>
-          <input type='hidden' name='id' value="{{targetUser.id}}" />
-          <button type='submit' class='btn btn-info'>
-            Follow <i class='fa fa-user-plus px-2' aria-hidden='true'></i>
-          </button>
-        </form>
-        {{/if}}
+      {{#if targetUser.isFollowed}}
+      <form action="/followships/{{targetUser.id}}?_method=DELETE" method='POST'>
+        <button type='submit' class='btn btn-danger'>
+          Unfollow <i class='fa fa-user px-2' aria-hidden='true'></i>
+        </button>
+      </form>
+      {{else}}
+      <form action='/followships' method='POST'>
+        <input type='hidden' name='id' value="{{targetUser.id}}" />
+        <button type='submit' class='btn btn-info'>
+          Follow <i class='fa fa-user-plus px-2' aria-hidden='true'></i>
+        </button>
+      </form>
+      {{/if}}
       {{/ifNotCond}}
 
       {{#ifNotCond currentUserId targetUser.id}}
@@ -104,7 +104,7 @@
             <h5 class='card-title'>
               <a href="/users/{{targetUser.id}}/tweets" style="text-decoration: none;">@{{targetUser.name}}</a>
             </h5>
-            <p class="card-text">{{targetUser.introduction}}</p>
+            <p class="card-text">{{{tweet.description}}}</p>
             <p class="card-text"><small class="text-muted">{{fromNow this.createdAt}}</small></p>
             <div class='text-right inline-block mt-1'>
               <a href="/tweets/{{tweet.id}}/replies" class='btn btn-primary mr-2'>Reply ({{tweet.replies.length}})</a>

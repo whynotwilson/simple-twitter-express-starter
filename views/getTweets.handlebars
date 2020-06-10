@@ -3,7 +3,7 @@
     <div col="col-md-4">
       <img src="{{otherUser.avatar}}" alt="avatar" style="width: 250px;margin-bottom: 25px;" />
       <div class="userDataProfile">
-        <ul class="list-group" style="list-style-type:none">
+        <ul class="list-group mb-2" style="list-style-type:none">
           <li>
             <h3>{{otherUser.name}}</h3>
           </li>
@@ -35,26 +35,24 @@
         </ul>
         {{#if isOwner}}
         <a href="/users/{{otherUser.id}}/edit" class="btn btn-primary mt-5"> Edit Profile</a>
+        <a href="/users/{{otherUser.id}}/blockings" class="btn btn-primary mt-5"> Blocking List</a>
         {{else}}
 
-        {{#if otherUser.isFollowing}}
-        <form action="/followships/{{otherUser.id}}?_method=DELETE" method="POST">
+        {{#if otherUser.isFollowed}}
+        <form style="display: inline-block;" action="/followships/{{otherUser.id}}?_method=DELETE" method="POST">
           <button type="submit" class="btn btn-danger">Unfollow</button>
         </form>
         {{else}}
-        <form action="/followships/{{otherUser.id}}" method="POST">
+        <form style="display: inline-block;" action="/followships" method="POST">
+          <input type="hidden" name="id" value={{otherUser.id}}>
           <button type="submit" class="btn btn-primary">Follow </button>
         </form>
         {{/if}}
-        {{!-- {{#if otherUser.isBlocking}}
-        <form action="/blockships/{{otherUser.id}}?_method=DELETE" method="POST">
-          <button type="submit" class="btn btn-danger">解除封鎖</button>
+        {{!-- 封鎖按鈕 --}}
+        <form style="display: inline-block;" action="/blockships" method="POST">
+          <input type="hidden" name="userId" value="{{otherUser.id}}">
+          <button type="submit" class="btn btn-danger">封鎖</button>
         </form>
-        {{else}}
-        <form action="/blockships/{{otherUser.id}}" method="POST">
-          <button type="submit" class="btn btn-primary">封鎖</button>
-        </form>
-        {{/if}} --}}
         {{/if}}
       </div>
     </div>
@@ -73,7 +71,9 @@
                 <a href="/users/{{ this.User.id }}/tweets">{{ this.User.name }}</a> <small
                   class="text-muted">{{this.updatedAt}}</small>
               </h5>
-              <p class="card-text">{{this.description}}</p>
+              <p class="card-text" style="overflow: hidden; text-overflow: ellipsis; white-space:nowrap">
+                {{{this.description}}}
+              </p>
               <a href="/tweets/{{this.id}}/replies" class="btn btn-primary">
                 Reply({{this.Replies.length}})
               </a>
