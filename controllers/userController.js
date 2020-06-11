@@ -267,7 +267,11 @@ const userController = {
         isFollowing: otherUser.Followers.map(d => d.id).includes(req.user.id)
       }
 
-      const likedTweetsIdArr = req.user.LikedTweets.map(t => t.id)
+      const likedTweetsIdArr = otherUser.Likes.map(t => t.TweetId)
+      console.log('')
+      console.log('')
+      console.log('')
+      console.log('likedTweetsIdArr', likedTweetsIdArr)
 
       let likedTweets = await Tweet.findAll({
         where: {
@@ -290,8 +294,11 @@ const userController = {
           ? moment(tweet.updatedAt).format('YYYY-MM-DD, hh:mm')
           : '-',
         repliesCount: tweet.Replies.length,
-        likedCount: tweet.Likes.length
+        likedCount: tweet.Likes.length,
+        isLiked: req.user.LikedTweets.map(t => t.id).includes(tweet.id)
       }))
+
+      console.log('likedTweets', likedTweets)
 
       return res.render('getLikes', { otherUser, likedTweets, isOwner })
     } catch (error) {
@@ -303,6 +310,9 @@ const userController = {
 
   addFollowing: async (req, res) => {
     try {
+      if (Number(req.user.id) === Number(req.body.id)) {
+        throw new Error('自己無法 follow 自己')
+      }
       const findOne = await Followship.findOne({
         where: {
           [Op.and]: [
@@ -317,10 +327,11 @@ const userController = {
           followingId: req.body.id
         })
       }
-
-      return res.redirect("back");
+      return res.redirect('back')
     } catch (error) {
-      console.log("error", error);
+      console.log('error', error)
+      req.flash('error_messages', { error_messages: '自己無法 Follow 自己' })
+      return res.redirect('back')
     }
   },
 

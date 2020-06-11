@@ -20,11 +20,10 @@ const adminController = {
         include: [
           {
             model: Reply,
-            required: false,
+            // required: false,
             include: [
               {
                 model: User,
-                where: { id: sequelize.col('replies.UserId') },
                 required: false
               }
             ]
@@ -41,7 +40,7 @@ const adminController = {
         order: [['id', 'ASC']],
         offset: offset,
         limit: pageLimit,
-        // distinct: true // 這行是為了 result.count 正確，沒加會不正確
+        distinct: true // 這行是為了 result.count 正確，沒加會不正確
 
         /*
           Tweet.findAndCountAll 資料內容格式
@@ -94,10 +93,12 @@ const adminController = {
         b.likedCount - a.likedCount
       )
 
+      // console.log('tweets[0]', tweets[0])
+
       return res.render('admin/tweets', { tweets, page, totalPage, prev, next })
     } catch (error) {
       console.log(error)
-      req.flash('error_messages', { error_messages: '資料庫異常，返回首頁' })
+      req.flash('error_messages', { error_messages: '資料庫異常，請重新操作' })
       return res.redirect('back')
     }
   },
@@ -109,6 +110,8 @@ const adminController = {
       return res.redirect('/admin')
     } catch (error) {
       console.log(error)
+      req.flash('error_messages', { error_messages: '資料庫異常，請重新操作' })
+      return res.redirect('back')
     }
   },
 
@@ -149,6 +152,8 @@ const adminController = {
       return res.render('admin/users', { users })
     } catch (error) {
       console.log(error)
+      req.flash('error_messages', { error_messages: '資料庫異常，請重新操作' })
+      return res.redirect('back')
     }
   }
 }
