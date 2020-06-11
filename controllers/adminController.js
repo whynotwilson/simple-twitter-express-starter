@@ -98,7 +98,7 @@ const adminController = {
       return res.render('admin/tweets', { tweets, page, totalPage, prev, next })
     } catch (error) {
       console.log(error)
-      req.flash('error_messages', { error_messages: '資料庫異常，返回首頁' })
+      req.flash('error_messages', { error_messages: '資料庫異常，請重新操作' })
       return res.redirect('back')
     }
   },
@@ -110,6 +110,8 @@ const adminController = {
       return res.redirect('/admin')
     } catch (error) {
       console.log(error)
+      req.flash('error_messages', { error_messages: '資料庫異常，請重新操作' })
+      return res.redirect('back')
     }
   },
 
@@ -150,6 +152,8 @@ const adminController = {
       return res.render('admin/users', { users })
     } catch (error) {
       console.log(error)
+      req.flash('error_messages', { error_messages: '資料庫異常，請重新操作' })
+      return res.redirect('back')
     }
   }
 }
