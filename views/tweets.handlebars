@@ -72,7 +72,8 @@
             <h5 class="card-title">
               <a href="/users/{{this.id}}/tweets">{{ this.name }}</a>
             </h5>
-            <p class="card-text">{{ this.introduction}}</p>
+            <p style="overflow: hidden; text-overflow: ellipsis; white-space:nowrap" class="card-text">
+              {{ this.introduction}}</p>
             {{#ifNotCond this.id ../user.id}}
             {{#if this.isFollowed }}
             <form class="text-right" action="/followships/{{this.id}}?_method=DELETE" method="POST">

@@ -84,7 +84,7 @@ const userController = {
         Replies: tweet.Replies,
         LikedUsers: tweet.LikedUsers,
         isLiked: tweet.LikedUsers ? tweet.LikedUsers.map(d => d.id).includes(helpers.getUser(req).id) : false,
-        description: tweet.description ? tweet.description.substring(0, 50) : null,
+        description: tweet.description ? tweet.description : null,
         updatedAt: tweet.updatedAt ? moment(tweet.updatedAt).format('YYYY-MM-DD, hh:mm') : '-',
         likedCount: tweet.LikedUsers ? tweet.LikedUsers.length : 0
       }))

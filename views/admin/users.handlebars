@@ -1,17 +1,15 @@
-<h1>Twitter 後台</h1>
-
-<a href='/admin/tweets'>
-  <button type="button" class="btn btn-primary">All Tweets</button>
-</a>
-<a href='/admin/users'>
-  <button type="button" class="btn btn-primary">All Users</button>
-</a>
-
-<br />
-<br />
+<div class="col-md-12 mt-5 mb-3">
+  <a href='/admin/tweets'>
+    <button type="button" class="btn btn-primary">All Tweets</button>
+  </a>
+  <a href='/admin/users'>
+    <button type="button" class="btn btn-primary">All Users</button>
+  </a>
+  <br />
+</div>
 
 {{!-- 分頁欄 --}}
-<div class="col-md-12 mb-3">
+<div class="col-md-12 mt-4">
   <nav aria-label="Page navigation example">
     <ul class="pagination">
       <li class="page-item">
@@ -35,29 +33,31 @@
 </div>
 
 {{!-- User 表格 --}}
-<table class="table">
-  <thead class="thead-dark">
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">Name</th>
-      <th scope="col">Email</th>
-      <th scope="col">Tweets</th>
-      <th scope="col">Followings</th>
-      <th scope="col">Followers</th>
-      <th scope="col">LikeTweets</th>
-    </tr>
-  </thead>
-  <tbody>
-    {{#each users}}
-    <tr>
-      <th scope="row">{{this.id}}</th>
-      <td><a href="/users/{{this.id}}/tweets">{{this.name}}</a></td>
-      <td>{{this.email}}</td>
-      <td><a href="/users/{{this.id}}/tweets">Tweets ({{this.Tweets.length}})</a></td>
-      <td><a href="/users/{{this.id}}/followings">Followings ({{this.Followings.length}})</a></td>
-      <td><a href="/users/{{this.id}}/followers">Followers ({{this.Followers.length}})</a></td>
-      <td><a href="/users/{{this.id}}/likes">LikedTweets ({{this.LikedTweets.length}})</a></td>
-    </tr>
-    {{/each}}
-  </tbody>
-</table>
+<div class="col-md-12">
+  <table class="table">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Name</th>
+        <th scope="col">Email</th>
+        <th scope="col">Tweets</th>
+        <th scope="col">Followings</th>
+        <th scope="col">Followers</th>
+        <th scope="col">LikeTweets</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each users}}
+      <tr>
+        <th scope="row">{{this.id}}</th>
+        <td><a href="/users/{{this.id}}/tweets">{{this.name}}</a></td>
+        <td>{{this.email}}</td>
+        <td><a href="/users/{{this.id}}/tweets">Tweets ({{this.Tweets.length}})</a></td>
+        <td><a href="/users/{{this.id}}/followings">Followings ({{this.Followings.length}})</a></td>
+        <td><a href="/users/{{this.id}}/followers">Followers ({{this.Followers.length}})</a></td>
+        <td><a href="/users/{{this.id}}/likes">LikedTweets ({{this.LikedTweets.length}})</a></td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</div>
