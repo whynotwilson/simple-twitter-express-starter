@@ -268,6 +268,10 @@ const userController = {
       }
 
       const likedTweetsIdArr = otherUser.Likes.map(t => t.TweetId)
+      console.log('')
+      console.log('')
+      console.log('')
+      console.log('likedTweetsIdArr', likedTweetsIdArr)
 
       let likedTweets = await Tweet.findAll({
         where: {
@@ -293,6 +297,8 @@ const userController = {
         likedCount: tweet.Likes.length,
         isLiked: req.user.LikedTweets.map(t => t.id).includes(tweet.id)
       }))
+
+      console.log('likedTweets', likedTweets)
 
       return res.render('getLikes', { otherUser, likedTweets, isOwner })
     } catch (error) {
