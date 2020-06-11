@@ -27,7 +27,7 @@ const userController = {
 
       // 判斷是否 我有封鎖他 or 他有封鎖我
       if (req.user.Blockings.map(b => b.id).includes(otherUserId) ||
-        req.user.Blockings.map(b => b.id).includes(otherUserId)) {
+        req.user.Blockers.map(b => b.id).includes(otherUserId)) {
         return res.render('getBlockMessage')
       }
 
@@ -106,7 +106,7 @@ const userController = {
 
       // 判斷是否 我有封鎖他 or 他有封鎖我
       if (req.user.Blockings.map(b => b.id).includes(otherUserId) ||
-        req.user.Blockings.map(b => b.id).includes(otherUserId)) {
+        req.user.Blockers.map(b => b.id).includes(otherUserId)) {
         return res.render('getBlockMessage')
       }
 
@@ -159,7 +159,7 @@ const userController = {
 
       // 判斷是否 我有封鎖他 or 他有封鎖我
       if (req.user.Blockings.map(b => b.id).includes(otherUserId) ||
-        req.user.Blockings.map(b => b.id).includes(otherUserId)) {
+        req.user.Blockers.map(b => b.id).includes(otherUserId)) {
         return res.render('getBlockMessage')
       }
 
@@ -212,7 +212,7 @@ const userController = {
 
       // 判斷是否 我有封鎖他 or 他有封鎖我
       if (req.user.Blockings.map(b => b.id).includes(otherUserId) ||
-        req.user.Blockings.map(b => b.id).includes(otherUserId)) {
+        req.user.Blockers.map(b => b.id).includes(otherUserId)) {
         return res.render('getBlockMessage')
       }
 
@@ -423,7 +423,7 @@ const userController = {
 
       // 判斷是否 我有封鎖他 or 他有封鎖我
       if (req.user.Blockings.map(b => b.id).includes(otherUserId) ||
-        req.user.Blockings.map(b => b.id).includes(otherUserId)) {
+        req.user.Blockers.map(b => b.id).includes(otherUserId)) {
         return res.render('getBlockMessage')
       }
 

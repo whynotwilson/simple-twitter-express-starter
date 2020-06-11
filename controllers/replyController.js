@@ -15,6 +15,13 @@ const replyController = {
         { model: Reply, include: [User] },
       ],
     }).then((tweet) => {
+
+      // 判斷是否 我有封鎖他 or 他有封鎖我
+      if (req.user.Blockings.map(b => b.id).includes(tweet.UserId) ||
+        req.user.Blockers.map(b => b.id).includes(tweet.UserId)) {
+        return res.render('getBlockMessage')
+      }
+
       tweet.dataValues.likesCount = tweet.Likes.length;
       tweet.dataValues.isLiked = tweet.LikedUsers.map((d) => d.id).includes(
         helpers.getUser(req).id
