@@ -1,6 +1,9 @@
 <div class="row col-md-12 mt-5">
   <div class="col-md-1"></div>
+
+  {{!-- 人物欄位 --}}
   <div class="col-md-4">
+    <h1><strong>User Data</strong></h1>
     <div col="col-md-4">
       <img src="{{otherUser.avatar}}" alt="avatar" style="width: 250px;" />
       <div>
@@ -12,7 +15,7 @@
           <li>
             <a href="/users/{{otherUser.id}}/tweets">
               Tweet &nbsp
-              <span class="badge badge-primary badge-pill">{{tweets.length}}</span>
+              <span class="badge badge-primary badge-pill">{{otherUser.Tweets.length}}</span>
             </a>
           </li>
           <li>
@@ -44,21 +47,24 @@
           <button type="submit" class="btn btn-danger">Unfollow</button>
         </form>
         {{else}}
-        <form style="display: inline-block;" action="/followships/{{otherUser.id}}" method="POST">
+        <form style="display: inline-block;" action="/followships" method="POST">
+          <input type="hidden" name="id" value={{otherUser.id}}>
           <button type="submit" class="btn btn-primary">Follow </button>
         </form>
         {{/if}}
         <form style="display: inline-block;" action="/blockships" method="POST">
           <input type="hidden" name="userId" value="{{otherUser.id}}">
-          <button type="submit" class="btn btn-danger">封鎖</button>
+          <button type="submit" class="btn btn-danger">Block</button>
         </form>
         {{/if}}
       </div>
     </div>
   </div>
   <div class="col-md-1"></div>
+
+  {{!-- Followers 欄位 --}}
   <div class="col-md-6">
-    <h1><strong>封鎖清單</strong></h1>
+    <h1><strong>Blocking List</strong></h1>
     {{#each blockings}}
     <div class="col-md-12 mb-3 border bg-white">
       <div class="row no-gutters">
