@@ -267,7 +267,7 @@ const userController = {
         isFollowing: otherUser.Followers.map(d => d.id).includes(req.user.id)
       }
 
-      const likedTweetsIdArr = req.user.LikedTweets.map(t => t.id)
+      const likedTweetsIdArr = otherUser.Likes.map(t => t.TweetId)
 
       let likedTweets = await Tweet.findAll({
         where: {
@@ -290,7 +290,8 @@ const userController = {
           ? moment(tweet.updatedAt).format('YYYY-MM-DD, hh:mm')
           : '-',
         repliesCount: tweet.Replies.length,
-        likedCount: tweet.Likes.length
+        likedCount: tweet.Likes.length,
+        isLiked: req.user.LikedTweets.map(t => t.id).includes(tweet.id)
       }))
 
       return res.render('getLikes', { otherUser, likedTweets, isOwner })
