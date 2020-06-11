@@ -4,7 +4,8 @@ const Tweet = db.Tweet
 const Reply = db.Reply
 const sequelize = require('sequelize')
 const moment = require('moment')
-const pageLimit = 20
+const allTweetsPageLimit = 20
+const allUsersPageLimit = 5
 
 const adminController = {
   getTweets: async (req, res) => {
@@ -13,7 +14,7 @@ const adminController = {
 
       // 計算目前頁數
       if (req.query.page - 1) {
-        offset = (req.query.page - 1) * pageLimit
+        offset = (req.query.page - 1) * allTweetsPageLimit
       }
 
       const result = await Tweet.findAndCountAll({
@@ -39,7 +40,7 @@ const adminController = {
         ],
         order: [['id', 'ASC']],
         offset: offset,
-        limit: pageLimit,
+        limit: allTweetsPageLimit,
         distinct: true // 這行是為了 result.count 正確，沒加會不正確
 
         /*
@@ -57,24 +58,24 @@ const adminController = {
 
       // 分頁資料
       const page = Number(req.query.page || 1)
-      const pages = Math.ceil(result.count / pageLimit)
+      const pages = Math.ceil(result.count / allTweetsPageLimit)
       const totalPage = Array.from({ length: pages }).map((item, index) => index + 1)
       const prev = page - 1 < 1 ? 1 : page - 1
       const next = page + 1 > pages ? pages : page + 1
 
-      console.log('')
-      console.log('')
-      console.log('')
-      console.log('')
-      console.log('total Count', result.count)
-      console.log('pageLimit', pageLimit)
-      console.log('offset', offset)
-      console.log('page', page)
-      console.log('pages', pages)
-      console.log('totalPage', totalPage)
-      console.log('prev', prev)
-      console.log('next', next)
-      console.log('tweets ID Array', result.rows.map(r => r.id))
+      // console.log('')
+      // console.log('')
+      // console.log('')
+      // console.log('')
+      // console.log('total Count', result.count)
+      // console.log('allTweetsPageLimit ', allTweetsPageLimit)
+      // console.log('offset', offset)
+      // console.log('page', page)
+      // console.log('pages', pages)
+      // console.log('totalPage', totalPage)
+      // console.log('prev', prev)
+      // console.log('next', next)
+      // console.log('tweets ID Array', result.rows.map(r => r.id))
 
       let tweets = result.rows.map(r => ({
         ...r.dataValues,
@@ -117,39 +118,45 @@ const adminController = {
 
   getUsers: async (req, res) => {
     try {
-      let users = await User.findAll({
-        // limit: 20,
+      let offset = 0
+
+      // 計算目前頁數
+      if (req.query.page - 1) {
+        offset = (req.query.page - 1) * allUsersPageLimit
+      }
+
+      const result = await User.findAndCountAll({
         include: [
           Tweet,
           { model: User, as: 'Followers' },
           { model: User, as: 'Followings' },
           { model: Tweet, as: 'LikedTweets' }
-        ]
+        ],
+        // order: [['id', 'ASC']],
+        offset: offset,
+        limit: allUsersPageLimit,
+        distinct: true // 這行是為了 result.count 正確，沒加會不正確
       })
 
-      users = users.map(user => ({
-        ...user.dataValues,
-        Followers: user.dataValues.Followers.map(follower => ({
-          ...follower.dataValues
-        })),
-
-        Followings: user.dataValues.Followings.map(following => ({
-          ...following.dataValues
-        })),
-
-        LikedTweets: user.dataValues.LikedTweets.map(likedTweet => ({
-          ...likedTweet.dataValues
-        })),
-
-        Tweets: user.dataValues.Tweets.map(tweet => ({
-          ...tweet.dataValues
-        }))
+      let users = result.rows.map(r => ({
+        ...r.dataValues
       }))
+
+      console.log('')
+      console.log('')
+      console.log('users', users)
+
+      // 分頁資料
+      const page = Number(req.query.page || 1)
+      const pages = Math.ceil(result.count / allUsersPageLimit)
+      const totalPage = Array.from({ length: pages }).map((item, index) => index + 1)
+      const prev = page - 1 < 1 ? 1 : page - 1
+      const next = page + 1 > pages ? pages : page + 1
 
       // 依發文數量排序，由多至少
       users = users.sort((a, b) => b.Tweets.length - a.Tweets.length)
 
-      return res.render('admin/users', { users })
+      return res.render('admin/users', { users, page, totalPage, prev, next })
     } catch (error) {
       console.log(error)
       req.flash('error_messages', { error_messages: '資料庫異常，請重新操作' })
