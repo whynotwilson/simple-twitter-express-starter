@@ -20,7 +20,7 @@ const adminController = {
         include: [
           {
             model: Reply,
-            required: false,
+            // required: false,
             include: [
               {
                 model: User,
@@ -41,7 +41,7 @@ const adminController = {
         order: [['id', 'ASC']],
         offset: offset,
         limit: pageLimit,
-        // distinct: true // 這行是為了 result.count 正確，沒加會不正確
+        distinct: true // 這行是為了 result.count 正確，沒加會不正確
 
         /*
           Tweet.findAndCountAll 資料內容格式
@@ -93,6 +93,8 @@ const adminController = {
       tweets = tweets.sort((a, b) =>
         b.likedCount - a.likedCount
       )
+
+      console.log('tweets[0]', tweets[0])
 
       return res.render('admin/tweets', { tweets, page, totalPage, prev, next })
     } catch (error) {
