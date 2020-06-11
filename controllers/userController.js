@@ -304,6 +304,9 @@ const userController = {
 
   addFollowing: async (req, res) => {
     try {
+      if (Number(req.user.id) === Number(req.body.id)) {
+        throw new Error('自己無法 follow 自己')
+      }
       const findOne = await Followship.findOne({
         where: {
           [Op.and]: [
@@ -318,10 +321,11 @@ const userController = {
           followingId: req.body.id
         })
       }
-
-      return res.redirect("back");
+      return res.redirect('back')
     } catch (error) {
-      console.log("error", error);
+      console.log('error', error)
+      req.flash('error_messages', { error_messages: '自己無法 Follow 自己' })
+      return res.redirect('back')
     }
   },
 
