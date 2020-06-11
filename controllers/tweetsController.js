@@ -35,12 +35,12 @@ const tweetController = {
     }))
 
     // 擋掉封鎖的人的 tweets
-    let count = 0
-    tweets = tweets.filter(tweet => {
-      return !req.user.Blockings.map(b => b.id).includes(tweet.User.id) &&
-        !req.user.Blockers.map(b => b.id).includes(tweet.User.id) &&
-        count++ < 10
-    })
+    // let count = 0
+    // tweets = tweets.filter(tweet => {
+    //   return !req.user.Blockings.map(b => b.id).includes(tweet.User.id) &&
+    //     !req.user.Blockers.map(b => b.id).includes(tweet.User.id) &&
+    //     count++ < 10
+    // })
 
     let users = await User.findAll({
       raw: true,
@@ -58,12 +58,12 @@ const tweetController = {
     }))
 
     // 擋掉封鎖的人的 Popular User 頁面
-    count = 0
-    users = users.filter(user => {
-      return !req.user.Blockings.map(b => b.id).includes(user.id) &&
-        !req.user.Blockers.map(b => b.id).includes(user.id) &&
-        count++ < 10
-    })
+    // count = 0
+    // users = users.filter(user => {
+    //   return !req.user.Blockings.map(b => b.id).includes(user.id) &&
+    //     !req.user.Blockers.map(b => b.id).includes(user.id) &&
+    //     count++ < 10
+    // })
 
     users.sort((a, b) => b.followersCount - a.followersCount)
 
