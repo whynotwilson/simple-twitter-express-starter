@@ -49,6 +49,7 @@ module.exports = {
     })
     for (let i = 1; i < 25; i++) {
       Users.push({
+        id: i + 1,
         email: `user${i}@example.com`,
         password: bcrypt.hashSync('12345678', bcrypt.genSaltSync(10), null),
         name: `user${i}`,
@@ -97,8 +98,17 @@ module.exports = {
     queryInterface.bulkInsert('Likes', Likes, {})
 
     return queryInterface.bulkInsert('Tweets',
-      Array.from({ length: 200 }).map(d =>
+      // Array.from({ length: 200 }).map(d =>
+      //   ({
+      //     description: faker.lorem.text(),
+      //     UserId: Math.floor(Math.random() * 22) + 2,
+      //     createdAt: new Date(),
+      //     updatedAt: new Date(),
+      //   })
+      // ), {})
+      Array.from({ length: 200 }).map((item, index) =>
         ({
+          id: index + 1,
           description: faker.lorem.text(),
           UserId: Math.floor(Math.random() * 22) + 2,
           createdAt: new Date(),
