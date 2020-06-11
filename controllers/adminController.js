@@ -25,7 +25,7 @@ const adminController = {
               {
                 model: User,
                 where: {
-                  id: sequelize.col('reply.UserId')
+                  id: sequelize.col('replies.UserId')
                 },
                 required: false
               }
@@ -96,7 +96,7 @@ const adminController = {
         b.likedCount - a.likedCount
       )
 
-      console.log('tweets[0]', tweets[0])
+      // console.log('tweets[0]', tweets[0])
 
       return res.render('admin/tweets', { tweets, page, totalPage, prev, next })
     } catch (error) {
