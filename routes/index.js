@@ -26,23 +26,31 @@ const authenticatedAdmin = (req, res, next) => {
   res.redirect('/signin')
 }
 
+const isBlocking = (req, res, next) => {
+  if (req.user.Blockings.map(b => b.id).includes(Number(req.params.id)) ||
+    req.user.Blockers.map(b => b.id).includes(Number(req.params.id))) {
+    return res.render('getBlockMessage')
+  }
+  return next()
+}
+
 module.exports = (app) => {
 
   // 首頁
   app.get('/', authenticated, (req, res) => res.redirect('/tweets'))
 
   // users
-  app.get('/users/:id/tweets', authenticated, userController.getTweets)
-  app.get('/users/:id/followings', authenticated, userController.getFollowings)
-  app.get('/users/:id/followers', authenticated, userController.getFollowers)
-  app.get('/users/:id/likes', authenticated, userController.getLikes)
+  app.get('/users/:id/tweets', authenticated, isBlocking, userController.getTweets)
+  app.get('/users/:id/followings', authenticated, isBlocking, userController.getFollowings)
+  app.get('/users/:id/followers', authenticated, isBlocking, userController.getFollowers)
+  app.get('/users/:id/likes', authenticated, isBlocking, userController.getLikes)
   app.get('/users/:id/edit', authenticated, userController.getEdit)
   app.post('/users/:id/edit', authenticated, upload.single('avatar'), userController.postEdit)
 
   app.post('/followships', authenticated, userController.addFollowing)
   app.delete('/followships/:userId', authenticated, userController.deleteFollowing)
 
-  app.get('/users/:id/blockings', authenticated, userController.getBlockings)
+  app.get('/users/:id/blockings', authenticated, isBlocking, userController.getBlockings)
   app.post('/blockships', authenticated, userController.postBlock)
   app.delete('/blockships/:id', authenticated, userController.deleteBlock)
 
