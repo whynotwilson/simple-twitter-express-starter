@@ -438,7 +438,14 @@ const userController = {
         introduction: blocking.introduction.substring(0, 30)
       }))
 
-      return res.render('getBlockings', { otherUser, isOwner, blockings })
+      blockings = blockings.sort((a, b) => b.Blockship.dataValues.createdAt - a.Blockship.dataValues.createdAt)
+
+      // tab 是用來給前端顯示畫面用的，{ tab: 'blocking' } 顯示全白，沒有 tab 的話第一筆(現在被封鎖的對象)顯示黃色
+      if (req.query.tab) {
+        return res.render('getBlockings', { otherUser, isOwner, blockings, tab: 'blocking' })
+      } else {
+        return res.render('getBlockings', { otherUser, isOwner, blockings })
+      }
     } catch (error) {
       console.log('error', error)
       req.flash('error_messages', { error_messages: '資料庫異常，請重新操作' })
@@ -509,7 +516,7 @@ const userController = {
 
       req.flash('success_messages', '成功解除封鎖該用戶')
       await destroyBlock.destroy()
-      return res.redirect('back')
+      return res.redirect(`/users/${req.user.id}/blockings?tab=blocking`)
     } catch (error) {
       console.log(error)
       req.flash('error_messages', { error_messages: '資料庫異常，未能成功解除封鎖該用戶！' })

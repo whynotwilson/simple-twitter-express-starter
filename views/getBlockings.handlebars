@@ -39,7 +39,7 @@
         </ul>
         {{#if isOwner}}
         <a href="/users/{{otherUser.id}}/edit" class="btn btn-primary mt-5"> Edit Profile</a>
-        <a href="/users/{{otherUser.id}}/blockings" class="btn btn-primary mt-5"> Blocking List</a>
+        <a href="/users/{{otherUser.id}}/blockings?tab=blocking" class="btn btn-primary mt-5"> Blocking List</a>
         {{else}}
 
         {{#if otherUser.isFollowing}}
@@ -62,9 +62,11 @@
   </div>
   <div class="col-md-1"></div>
 
-  {{!-- Followers 欄位 --}}
+  {{!-- Blockings 欄位 --}}
   <div class="col-md-6">
     <h1><strong>Blocking List</strong></h1>
+    {{!-- 判斷是從哪邊進入這個頁面，post 的話要調整新增的被封鎖人背景為黃色，只是要看自己的封鎖清單的話不用 --}}
+    {{#ifCond tab 'blocking'}}
     {{#each blockings}}
     <div class="col-md-12 mb-3 border bg-white">
       <div class="row no-gutters">
@@ -86,4 +88,33 @@
     </div>
     {{/each}}
   </div>
+  {{else}}
+  {{#each blockings}}
+  {{#if @first}}
+  <div class="col-md-12 mb-3 border" style="background-color: yellow;">
+    {{else}}
+    <div class="col-md-12 mb-3 border bg-white">
+      {{/if}}
+      <div class="row no-gutters">
+        <div class="col-md-4">
+          <img src="{{this.avatar}}" style="max-height: 150px;" class="rounded-circle" alt="avatar">
+        </div>
+        <div class="col-md-7">
+          <div class="">
+            <h5>
+              <a href="/users/{{ this.id }}/tweets">{{ this.name }}</a>
+            </h5>
+            <p class="card-text">{{this.introduction}}</p>
+            <form action="/blockships/{{ this.id }}?_method=DELETE" method="POST">
+              <button type="submit" class="btn btn-danger">UnBlock</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+  {{/ifCond}}
+
+
 </div>

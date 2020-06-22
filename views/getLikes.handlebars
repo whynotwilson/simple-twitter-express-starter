@@ -38,7 +38,7 @@
       {{!--  (編輯 and 封鎖列表) or (follow and 封鎖) 按鈕 --}}
       {{#if isOwner}}
       <a href="/users/{{otherUser.id}}/edit" class="btn btn-primary mt-5"> Edit Profile</a>
-      <a href="/users/{{otherUser.id}}/blockings" class="btn btn-primary mt-5"> Blocking List</a>
+      <a href="/users/{{otherUser.id}}/blockings?tab=blocking" class="btn btn-primary mt-5"> Blocking List</a>
       {{else}}
 
       {{#if otherUser.isFollowing}}
