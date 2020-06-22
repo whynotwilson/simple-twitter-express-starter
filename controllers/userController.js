@@ -567,6 +567,11 @@ const userController = {
         error_messages.push({ error_messages: '密碼至少 8 位數！' })
       }
 
+      const reg = /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/
+      if (req.body.email.search(reg) === -1) {
+        error_messages.push({ error_messages: 'Email 格式不符！' })
+      }
+
       // confirm unique name
       let user = await User.findOne({ where: { name: req.body.name } })
       if (user) {
