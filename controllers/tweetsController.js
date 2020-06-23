@@ -43,19 +43,18 @@ const tweetController = {
     })
 
     let users = await User.findAll({
-      raw: true,
-      nest: true,
-      order: [['createdAt', 'DESC']],
       include: [
         { model: User, as: 'Followers' }
       ]
     })
 
     users = users.map(user => ({
-      ...user,
+      ...user.dataValues,
       followersCount: user.Followers.length,
       isFollowed: helpers.getUser(req).Followings.map(d => d.id).includes(user.id)
     }))
+
+    users = users.sort((a, b) => b.followersCount - a.followersCount)
 
     // 擋掉封鎖的人的 Popular User 頁面
     count = 0
@@ -64,8 +63,6 @@ const tweetController = {
         !req.user.Blockers.map(b => b.id).includes(user.id) &&
         count++ < 10
     })
-
-    users.sort((a, b) => b.followersCount - a.followersCount)
 
     return res.render('tweets', { tweets, users })
   },
