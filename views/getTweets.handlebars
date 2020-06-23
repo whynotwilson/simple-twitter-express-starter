@@ -1,103 +1,49 @@
-<div class="container py-5">
-  <div class="row" style="justify-content: space-evenly">
-    <div col="col-md-4">
-      <img src="{{otherUser.avatar}}" alt="avatar" style="width: 250px;margin-bottom: 25px;" />
-      <div class="userDataProfile">
-        <ul class="list-group mb-2" style="list-style-type:none">
-          <li>
-            <h3>{{otherUser.name}}</h3>
-          </li>
-          <li>{{otherUser.introduction}}</li>
-          <li>
-            <a href="/users/{{otherUser.id}}/tweets">
-              Tweet &nbsp
-              <span class="badge badge-primary badge-pill">{{tweets.length}}</span>
-            </a>
-          </li>
-          <li>
-            <a href="/users/{{otherUser.id}}/followings">
-              Followings &nbsp
-              <span class="badge badge-primary badge-pill">{{otherUser.Followings.length}}</span>
-            </a>
-          </li>
-          <li>
-            <a href="/users/{{otherUser.id}}/followers">
-              Followers &nbsp
-              <span class="badge badge-primary badge-pill">{{otherUser.Followers.length}}</span>
-            </a>
-          </li>
-          <li>
-            <a href="/users/{{otherUser.id}}/likes">
-              Like &nbsp
-              <span class="badge badge-primary badge-pill">{{otherUser.Likes.length}}</span>
-            </a>
-          </li>
-        </ul>
-        {{#if isOwner}}
-        <a href="/users/{{otherUser.id}}/edit" class="btn btn-primary mt-5"> Edit Profile</a>
-        <a href="/users/{{otherUser.id}}/blockings?tab=blocking" class="btn btn-primary mt-5"> Blocking List</a>
-        {{else}}
+<div class="row col-md-12 mt-5">
+  <div class="col-md-1"></div>
 
-        {{#if otherUser.isFollowed}}
-        <form style="display: inline-block;" action="/followships/{{otherUser.id}}?_method=DELETE" method="POST">
-          <button type="submit" class="btn btn-danger">Unfollow</button>
-        </form>
-        {{else}}
-        <form style="display: inline-block;" action="/followships" method="POST">
-          <input type="hidden" name="id" value={{otherUser.id}}>
-          <button type="submit" class="btn btn-primary">Follow </button>
-        </form>
-        {{/if}}
-        {{!-- 封鎖按鈕 --}}
-        <form style="display: inline-block;" action="/blockships" method="POST">
-          <input type="hidden" name="userId" value="{{otherUser.id}}">
-          <button type="submit" class="btn btn-danger">封鎖</button>
-        </form>
-        {{/if}}
-      </div>
-    </div>
+  {{!-- 人物欄位 --}}
+  {{>targetUser}}
 
-
-    <div col="col-md-8">
-      {{#each tweets}}
-      <div class="card mb-3" style="max-width: 540px;">
-        <div class="row no-gutters">
-          <div class="col-md-4">
-            <img src="{{this.User.avatar}}" class="card-img" alt="avatar">
-          </div>
-          <div class="col-md-8">
-            <div class="card-body">
-              <h5 class="card-title">
-                <a href="/users/{{ this.User.id }}/tweets">{{ this.User.name }}</a> <small
-                  class="text-muted">{{this.updatedAt}}</small>
-              </h5>
-              <p class="card-text" style="overflow: hidden; text-overflow: ellipsis; white-space:nowrap">
-                {{{this.description}}}
-              </p>
-              <a href="/tweets/{{this.id}}/replies" class="btn btn-primary">
-                Reply({{this.Replies.length}})
-              </a>
-              {{#if this.isLiked }}
-              <form action="/tweets/{{this.id}}/unlike" method="POST" style="display: contents;">
-                <button type="submit" class="btn btn-danger">
-                  <i class="fa fa-heart" aria-hidden="true"></i>
-                  unlike({{ this.likedCount}})
-                </button>
-              </form>
-              {{else}}
-              <form action="/tweets/{{this.id}}/like" method="POST" style="display: contents;">
-                <input type="hidden" name="userId" value="{{this.id}}" />
-                <button type="submit" class="btn btn-primary">
-                  <i class="fa fa-heart" aria-hidden="true"></i>
-                  like({{ this.likedCount }})
-                </button>
-              </form>
-              {{/if}}
-            </div>
+  <div class="col-md-1"></div>
+  {{!-- My Tweets List 欄位 --}}
+  <div class="col-md-6">
+    <h1><strong>My Tweets List</strong></h1>
+    {{#each tweets}}
+    <div class="card mb-3" style="max-width: 540px;">
+      <div class="row no-gutters">
+        <div class="col-md-4">
+          <img src="{{this.User.avatar}}" class="card-img" alt="avatar">
+        </div>
+        <div class="col-md-8">
+          <div class="card-body">
+            <h5 class="card-title">
+              <a href="/users/{{ this.User.id }}/tweets">{{ this.User.name }}</a> <small
+                class="text-muted">{{this.updatedAt}}</small>
+            </h5>
+            <p class="card-text" style="overflow: hidden; text-overflow: ellipsis; white-space:nowrap">
+              {{{this.description}}}</p>
+            <a href="/tweets/{{this.id}}/replies" class="btn btn-primary">
+              Reply({{this.repliesCount}})
+            </a>
+            {{#if this.isLiked}}
+            <form action="/tweets/{{this.id}}/unlike" method="POST" style="display: contents;">
+              <button type="submit" class="btn btn-danger">
+                <i class="fa fa-heart" aria-hidden="true"></i>
+                unlike({{ this.likedCount}})
+              </button>
+            </form>
+            {{else}}
+            <form action="/tweets/{{this.id}}/like" method="POST" style="display: contents;">
+              <button type="submit" class="btn btn-primary">
+                <i class="fa fa-heart" aria-hidden="true"></i>
+                like({{ this.likedCount}})
+              </button>
+            </form>
+            {{/if}}
           </div>
         </div>
       </div>
-      {{/each}}
     </div>
+    {{/each}}
   </div>
 </div>

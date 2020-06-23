@@ -20,6 +20,7 @@ const userController = {
   getTweets: async (req, res) => {
     try {
       const otherUserId = Number(req.params.id)
+
       let isOwner = false
       if (otherUserId === helpers.getUser(req).id) {
         isOwner = true
@@ -29,9 +30,8 @@ const userController = {
         include: [
           { model: User, as: 'Followers' },
           { model: User, as: 'Followings' },
-          { model: User, as: 'Blockers' },
-          { model: User, as: 'Blockings' },
-          Like
+          Like,
+          Tweet
         ]
       })
 
@@ -40,34 +40,30 @@ const userController = {
       }
       // ------------------ otherUser 資料整理 -------------------
       otherUser = {
-        ...otherUser.toJSON(),
+        ...otherUser.dataValues,
         introduction: otherUser.introduction.substring(0, 30),
         Followers: otherUser.Followers.map(follower => ({
-          ...follower
+          ...follower.dataValues
         })),
-        Blockers: otherUser.Blockers.map(blocker => ({
-          ...blocker
+        Followings: otherUser.Followings.map(following => ({
+          ...following.dataValues
         })),
-        Blockings: otherUser.Blockings.map(blocking => ({
-          ...blocking
+        Tweet: otherUser.Tweets.map(tweet => ({
+          ...tweet.dataValues
         })),
-        isFollowed: otherUser.Followers.map(d => d.id).includes(req.user.id)
+        isFollowing: otherUser.Followers.map(d => d.id).includes(req.user.id)
       }
 
-
       let tweets = await Tweet.findAll({
-        order: [["createdAt", "DESC"]],
+        order: [['createdAt', 'DESC']],
         where: {
           UserId: otherUserId
         },
         include: [
           Like,
+          User,
           { model: Reply, include: [User] },
-          { model: User, as: 'LikedUsers' },
-          {
-            model: User,
-            where: { id: sequelize.col('tweet.UserId') }
-          },
+          { model: User, as: 'LikedUsers' }
         ]
       })
 
@@ -86,6 +82,8 @@ const userController = {
       return res.render('getTweets', { otherUser, tweets, isOwner })
     } catch (error) {
       console.log('error', error)
+      req.flash('error_messages', { error_messages: '資料庫異常，請重新操作' })
+      return res.redirect('back')
     }
   },
 
