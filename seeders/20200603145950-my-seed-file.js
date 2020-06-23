@@ -5,17 +5,19 @@ const bcrypt = require('bcryptjs')
 module.exports = {
   up: (queryInterface, Sequelize) => {
     const Followships = []
+    let times = 15
     for (let i = 2; i < 13; i++) {
-      for (let j = 15; j > 4; j--) {
+      for (let j = i + 1; j < i + times; j++) {
         if (i !== j) {
           Followships.push({
-            followerId: i,
-            followingId: j,
+            followerId: j,
+            followingId: i,
             createdAt: new Date(),
             updatedAt: new Date()
           })
         }
       }
+      times--
     }
     queryInterface.bulkInsert('Followships', Followships, {})
 
