@@ -14,50 +14,61 @@ const sequelize = require('sequelize')
 const fs = require('fs')
 const imgur = require('imgur-node-api')
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
+const getTargetUserData = async (req, res, targetUserId) => {
+  let targetUserData = await User.findByPk(targetUserId, {
+    include: [
+      { model: User, as: 'Followers' },
+      { model: User, as: 'Followings' },
+      Like,
+      Tweet
+    ]
+  })
+
+  if (!targetUserData) {
+    return false
+  }
+  // ------------------ targetUserData 資料整理 -------------------
+  targetUserData = {
+    ...targetUserData.dataValues,
+    introduction: targetUserData.introduction.substring(0, 30),
+    Followers: targetUserData.Followers.map(follower => ({
+      ...follower.dataValues,
+      introduction: follower.introduction.substring(0, 30),
+      isFollowing: req.user.Followings.map(f => f.id).includes(follower.id)
+    })),
+    Followings: targetUserData.Followings.map(following => ({
+      ...following.dataValues,
+      introduction: following.introduction.substring(0, 30),
+      isFollowing: req.user.Followings.map(f => f.id).includes(following.id)
+    })),
+    Tweet: targetUserData.Tweets.map(tweet => ({
+      ...tweet.dataValues
+    })),
+    isFollowing: targetUserData.Followers.map(d => d.id).includes(req.user.id)
+  }
+
+  return targetUserData
+}
 
 const userController = {
 
   getTweets: async (req, res) => {
     try {
-      const otherUserId = Number(req.params.id)
+      const targetUserId = Number(req.params.id)
 
       let isOwner = false
-      if (otherUserId === helpers.getUser(req).id) {
+      if (targetUserId === helpers.getUser(req).id) {
         isOwner = true
       }
-
-      let otherUser = await User.findByPk(otherUserId, {
-        include: [
-          { model: User, as: 'Followers' },
-          { model: User, as: 'Followings' },
-          Like,
-          Tweet
-        ]
-      })
-
-      if (!otherUser) {
-        throw new Error('otherUser is not found')
-      }
-      // ------------------ otherUser 資料整理 -------------------
-      otherUser = {
-        ...otherUser.dataValues,
-        introduction: otherUser.introduction.substring(0, 30),
-        Followers: otherUser.Followers.map(follower => ({
-          ...follower.dataValues
-        })),
-        Followings: otherUser.Followings.map(following => ({
-          ...following.dataValues
-        })),
-        Tweet: otherUser.Tweets.map(tweet => ({
-          ...tweet.dataValues
-        })),
-        isFollowing: otherUser.Followers.map(d => d.id).includes(req.user.id)
+      const targetUserData = await getTargetUserData(req, res, targetUserId)
+      if (!targetUserData) {
+        throw new Error('該帳號已被刪除')
       }
 
       let tweets = await Tweet.findAll({
         order: [['createdAt', 'DESC']],
         where: {
-          UserId: otherUserId
+          UserId: targetUserId
         },
         include: [
           Like,
@@ -79,7 +90,7 @@ const userController = {
         likedCount: tweet.LikedUsers ? tweet.LikedUsers.length : 0
       }))
 
-      return res.render('getTweets', { otherUser, tweets, isOwner })
+      return res.render('getTweets', { targetUserData, tweets, isOwner })
     } catch (error) {
       console.log('error', error)
       req.flash('error_messages', { error_messages: '資料庫異常，請重新操作' })
@@ -89,44 +100,18 @@ const userController = {
 
   getFollowings: async (req, res) => {
     try {
-      const otherUserId = Number(req.params.id)
+      const targetUserId = Number(req.params.id)
 
       let isOwner = false
-      if (otherUserId === helpers.getUser(req).id) {
+      if (targetUserId === helpers.getUser(req).id) {
         isOwner = true
       }
-
-      let otherUser = await User.findByPk(otherUserId, {
-        include: [
-          { model: User, as: 'Followers' },
-          { model: User, as: 'Followings' },
-          Like,
-          Tweet
-        ]
-      })
-
-      if (!otherUser) {
-        throw new Error('otherUser is not found')
-      }
-      // ------------------ otherUser 資料整理 -------------------
-      otherUser = {
-        ...otherUser.dataValues,
-        introduction: otherUser.introduction.substring(0, 30),
-        Followers: otherUser.Followers.map(follower => ({
-          ...follower.dataValues
-        })),
-        Followings: otherUser.Followings.map(following => ({
-          ...following.dataValues,
-          introduction: following.introduction.substring(0, 30),
-          isFollowing: req.user.Followings.map(f => f.id).includes(following.id)
-        })),
-        Tweet: otherUser.Tweets.map(tweet => ({
-          ...tweet.dataValues
-        })),
-        isFollowing: otherUser.Followers.map(d => d.id).includes(req.user.id)
+      const targetUserData = await getTargetUserData(req, res, targetUserId)
+      if (!targetUserData) {
+        throw new Error('該帳號已被刪除')
       }
 
-      return res.render('getFollowings', { otherUser, followings: otherUser.Followings, isOwner })
+      return res.render('getFollowings', { targetUserData, followings: targetUserData.Followings, isOwner })
     } catch (error) {
       console.log('error', error)
       req.flash('error_messages', { error_messages: '資料庫異常，請重新操作' })
@@ -136,44 +121,18 @@ const userController = {
 
   getFollowers: async (req, res) => {
     try {
-      const otherUserId = Number(req.params.id)
+      const targetUserId = Number(req.params.id)
 
       let isOwner = false
-      if (otherUserId === helpers.getUser(req).id) {
+      if (targetUserId === helpers.getUser(req).id) {
         isOwner = true
       }
-
-      let otherUser = await User.findByPk(otherUserId, {
-        include: [
-          { model: User, as: 'Followers' },
-          { model: User, as: 'Followings' },
-          Like,
-          Tweet
-        ]
-      })
-
-      if (!otherUser) {
-        throw new Error('otherUser is not found')
-      }
-      // ------------------ otherUser 資料整理 -------------------
-      otherUser = {
-        ...otherUser.dataValues,
-        introduction: otherUser.introduction.substring(0, 30),
-        Followers: otherUser.Followers.map(follower => ({
-          ...follower.dataValues,
-          introduction: follower.introduction.substring(0, 30),
-          isFollowing: req.user.Followings.map(f => f.id).includes(follower.id)
-        })),
-        Followings: otherUser.Followings.map(following => ({
-          ...following.dataValues
-        })),
-        Tweet: otherUser.Tweets.map(tweet => ({
-          ...tweet.dataValues
-        })),
-        isFollowing: otherUser.Followers.map(d => d.id).includes(req.user.id)
+      const targetUserData = await getTargetUserData(req, res, targetUserId)
+      if (!targetUserData) {
+        throw new Error('該帳號已被刪除')
       }
 
-      return res.render('getFollowers', { otherUser, followers: otherUser.Followers, isOwner })
+      return res.render('getFollowers', { targetUserData, followers: targetUserData.Followers, isOwner })
     } catch (error) {
       console.log('error', error)
       req.flash('error_messages', { error_messages: '資料庫異常，請重新操作' })
@@ -183,59 +142,24 @@ const userController = {
 
   getLikes: async (req, res) => {
     try {
-      const otherUserId = Number(req.params.id)
+      const targetUserId = Number(req.params.id)
 
       let isOwner = false
-      if (otherUserId === helpers.getUser(req).id) {
+      if (targetUserId === helpers.getUser(req).id) {
         isOwner = true
       }
-
-      let otherUser = await User.findByPk(otherUserId, {
-        include: [
-          { model: User, as: 'Followers' },
-          { model: User, as: 'Followings' },
-          Like,
-          Tweet
-        ]
-      })
-
-      if (!otherUser) {
-        throw new Error('otherUser is not found')
-      }
-      // ------------------ otherUser 資料整理 -------------------
-      otherUser = {
-        ...otherUser.dataValues,
-        introduction: otherUser.introduction.substring(0, 30),
-        Followers: otherUser.Followers.map(follower => ({
-          ...follower.dataValues
-        })),
-        Followings: otherUser.Followings.map(following => ({
-          ...following.dataValues
-        })),
-        Tweet: otherUser.Tweets.map(tweet => ({
-          ...tweet.dataValues
-        })),
-        isFollowing: otherUser.Followers.map(d => d.id).includes(req.user.id)
+      const targetUserData = await getTargetUserData(req, res, targetUserId)
+      if (!targetUserData) {
+        throw new Error('該帳號已被刪除')
       }
 
-      const likedTweetsIdArr = otherUser.Likes.map(t => t.TweetId)
-      console.log('')
-      console.log('')
-      console.log('')
-      console.log('likedTweetsIdArr', likedTweetsIdArr)
+      const likedTweetsIdArr = targetUserData.Likes.map(t => t.TweetId)
 
       let likedTweets = await Tweet.findAll({
         where: {
           id: likedTweetsIdArr
         },
-        include: [
-          {
-            model: User,
-            where: { id: sequelize.col('tweet.UserId') }
-          },
-          Reply,
-          Like
-        ]
+        include: [User, Reply, Like]
       })
 
       likedTweets = likedTweets.map(tweet => ({
@@ -249,9 +173,7 @@ const userController = {
         isLiked: req.user.LikedTweets.map(t => t.id).includes(tweet.id)
       }))
 
-      console.log('likedTweets', likedTweets)
-
-      return res.render('getLikes', { otherUser, likedTweets, isOwner })
+      return res.render('getLikes', { targetUserData, likedTweets, isOwner })
     } catch (error) {
       console.log('error', error)
       req.flash('error_messages', { error_messages: '資料庫異常，請重新操作' })
@@ -388,41 +310,15 @@ const userController = {
 
   getBlockings: async (req, res) => {
     try {
-      const otherUserId = Number(req.params.id)
+      const targetUserId = Number(req.params.id)
 
       let isOwner = false
-      if (otherUserId === helpers.getUser(req).id) {
+      if (targetUserId === helpers.getUser(req).id) {
         isOwner = true
       }
-
-      let otherUser = await User.findByPk(otherUserId, {
-        include: [
-          { model: User, as: 'Followers' },
-          { model: User, as: 'Followings' },
-          Like,
-          Tweet
-        ]
-      })
-
-      if (!otherUser) {
-        throw new Error('otherUser is not found')
-      }
-      // ------------------ otherUser 資料整理 -------------------
-      otherUser = {
-        ...otherUser.dataValues,
-        introduction: otherUser.introduction.substring(0, 30),
-        Followers: otherUser.Followers.map(follower => ({
-          ...follower.dataValues,
-          introduction: follower.introduction.substring(0, 30),
-          isFollowing: req.user.Followings.map(f => f.id).includes(follower.id)
-        })),
-        Followings: otherUser.Followings.map(following => ({
-          ...following.dataValues
-        })),
-        Tweet: otherUser.Tweets.map(tweet => ({
-          ...tweet.dataValues
-        })),
-        isFollowing: otherUser.Followers.map(d => d.id).includes(req.user.id)
+      const targetUserData = await getTargetUserData(req, res, targetUserId)
+      if (!targetUserData) {
+        throw new Error('該帳號已被刪除')
       }
 
       // ------------------ blockings 資料整理 -------------------
@@ -440,9 +336,9 @@ const userController = {
 
       // tab 是用來給前端顯示畫面用的，{ tab: 'blocking' } 顯示全白，沒有 tab 的話第一筆(現在被封鎖的對象)顯示黃色
       if (req.query.tab) {
-        return res.render('getBlockings', { otherUser, isOwner, blockings, tab: 'blocking' })
+        return res.render('getBlockings', { targetUserData, isOwner, blockings, tab: 'blocking' })
       } else {
-        return res.render('getBlockings', { otherUser, isOwner, blockings })
+        return res.render('getBlockings', { targetUserData, isOwner, blockings })
       }
     } catch (error) {
       console.log('error', error)
